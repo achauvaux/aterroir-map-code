@@ -15,10 +15,10 @@ include_once "util.php";
   <meta http-equiv="Expires" content="0" />
   <title>Terroirs Chine</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-  <link rel="stylesheet" href="assets/css/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin="" />
+  <link rel="stylesheet" href="assets/css/leaflet.css"/>
   <link rel="stylesheet" href="assets/css/bootstrap.css">
   <link rel="stylesheet" href="assets/css/aterroir.css">
-  <script src="assets/js/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
+  <script src="assets/js/leaflet.js"></script>
   <script type="text/javascript" src="assets/js/tile.stamen.js"></script>
   <script type="text/javascript" src="assets/js/jquery-3.6.0.min.js"></script>
 </head>
