@@ -15,7 +15,7 @@ include_once "util.php";
   <meta http-equiv="Expires" content="0" />
   <title>Terroirs Chine</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-  <link rel="stylesheet" href="assets/css/leaflet.css"/>
+  <link rel="stylesheet" href="assets/css/leaflet.css" />
   <!-- <link rel="stylesheet" href="assets/css/bootstrap.css"> -->
   <link rel="stylesheet" href="assets/css/aterroir.css">
   <script src="assets/js/leaflet.js"></script>
@@ -24,7 +24,26 @@ include_once "util.php";
 </head>
 
 <body onload="initialize()">
-  <div class="loader">Loading&#8230;</div>
+  <!-- <div class="loading">Loading&#8230;</div> -->
+  <div class="loader">
+    <div class="loader-inner">
+      <div class="loader-line-wrap">
+        <div class="loader-line"></div>
+      </div>
+      <div class="loader-line-wrap">
+        <div class="loader-line"></div>
+      </div>
+      <div class="loader-line-wrap">
+        <div class="loader-line"></div>
+      </div>
+      <div class="loader-line-wrap">
+        <div class="loader-line"></div>
+      </div>
+      <div class="loader-line-wrap">
+        <div class="loader-line"></div>
+      </div>
+    </div>
+  </div>
   <div id="map" style="width:100%; height:100%"></div>
 </body>
 
@@ -215,8 +234,8 @@ include_once "util.php";
 
     // desc+="<a href='pdf/geojson/bourgogne.pdf' target='_blank'><img src='pdf/geojson/bourgogne-pdf-screenshot.png' /></a>";
     var pdfFile = getFileNameFromJSONMetaData(pmarker.label["pdf"]);
-    if(pdfFile)
-      desc += "<a href='assets/pdf/" +pdfFile + "' target='_blank'><img src='assets/pdf/" + getFileNameFromJSONMetaData(pmarker.label["pdf_icon"]) + "' /></a>";
+    if (pdfFile)
+      desc += "<a href='assets/pdf/" + pdfFile + "' target='_blank'><img src='assets/pdf/" + getFileNameFromJSONMetaData(pmarker.label["pdf_icon"]) + "' /></a>";
 
     return desc;
   }
@@ -311,7 +330,7 @@ include_once "util.php";
       return str;
     }
 
-    if(!parsed) return;
+    if (!parsed) return;
 
     return parsed[0]["name"].split("/").pop();
   }
@@ -650,7 +669,7 @@ include_once "util.php";
       L.DomEvent.addListener(div, 'mousewheel', L.DomEvent.stopPropagation); // .addListener(div, 'mousewheel', L.DomEvent.preventDefault);
 
       var html =
-      `
+        `
       <div>
         <input type="radio" id="map-cn" name="drone" value="map-cn" onclick="document.location='.?z=cn'" checked>
         <label for="China">China</label>
@@ -1252,7 +1271,7 @@ include_once "util.php";
 
   function setCommand(pcommand) {
 
-    if(!windows) return;
+    if (!windows) return;
 
     if (pcommand == currentCommand)
       return;
