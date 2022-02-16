@@ -16,7 +16,7 @@ include_once "util.php";
   <title>Terroirs Chine</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="assets/css/leaflet.css"/>
-  <link rel="stylesheet" href="assets/css/bootstrap.css">
+  <!-- <link rel="stylesheet" href="assets/css/bootstrap.css"> -->
   <link rel="stylesheet" href="assets/css/aterroir.css">
   <script src="assets/js/leaflet.js"></script>
   <script type="text/javascript" src="assets/js/tile.stamen.js"></script>
@@ -24,7 +24,7 @@ include_once "util.php";
 </head>
 
 <body onload="initialize()">
-  <div class="loading">Loading&#8230;</div>
+  <div class="loader">Loading&#8230;</div>
   <div id="map" style="width:100%; height:100%"></div>
 </body>
 
@@ -201,7 +201,7 @@ include_once "util.php";
     // setCommand(getCommandLegendRegion("CN.BJ"));
 
     setLayersByLevel();
-    $(".loading").hide();
+    $(".loader").hide();
 
   }
 
@@ -803,7 +803,7 @@ include_once "util.php";
 
   function getCommandLegendLabel(pidLabel) {
 
-    $(".loading").show();
+    $(".loader").show();
 
     if (currentLabel && map.hasLayer(listLayerMarkersPILabel[currentLabel]))
       map.removeLayer(listLayerMarkersPILabel[currentLabel]);
@@ -826,7 +826,7 @@ include_once "util.php";
 
       }
 
-      $(".loading").hide();
+      $(".loader").hide();
       return commandLegendLabel[pidLabel];
     }
 
@@ -834,7 +834,7 @@ include_once "util.php";
 
     if (listListMarkerPILabel[pidLabel].length == 0) {
       commandLegendLabel[pidLabel] = null;
-      $(".loading").hide();
+      $(".loader").hide();
       return null;
     }
 
@@ -865,7 +865,7 @@ include_once "util.php";
       return div;
     };
 
-    $(".loading").hide();
+    $(".loader").hide();
     return commandLegendLabel[pidLabel];
 
   }
