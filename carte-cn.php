@@ -803,6 +803,8 @@ include_once "util.php";
 
   function getCommandLegendLabel(pidLabel) {
 
+    $(".loading").show();
+
     if (currentLabel && map.hasLayer(listLayerMarkersPILabel[currentLabel]))
       map.removeLayer(listLayerMarkersPILabel[currentLabel]);
 
@@ -816,7 +818,7 @@ include_once "util.php";
       if (commandLegendLabel[pidLabel] != null) {
 
         currentLabel = pidLabel;
-        // map.addLayer(listLayerMarkersPILabel[pidLabel]);
+        map.addLayer(listLayerMarkersPILabel[pidLabel]);
 
         for (var imageMap of listListImageMapLabel[pidLabel]) {
           imageMap.addTo(map);
@@ -824,6 +826,7 @@ include_once "util.php";
 
       }
 
+      $(".loading").hide();
       return commandLegendLabel[pidLabel];
     }
 
@@ -831,11 +834,12 @@ include_once "util.php";
 
     if (listListMarkerPILabel[pidLabel].length == 0) {
       commandLegendLabel[pidLabel] = null;
+      $(".loading").hide();
       return null;
     }
 
     currentLabel = pidLabel;
-    // map.addLayer(listLayerMarkersPILabel[pidLabel]);
+    map.addLayer(listLayerMarkersPILabel[pidLabel]);
     createMapsLabel(pidLabel);
 
     for (var imageMap of listListImageMapLabel[pidLabel]) {
@@ -861,6 +865,7 @@ include_once "util.php";
       return div;
     };
 
+    $(".loading").hide();
     return commandLegendLabel[pidLabel];
 
   }
