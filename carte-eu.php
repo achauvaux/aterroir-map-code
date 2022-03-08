@@ -248,15 +248,16 @@ include_once "util.php";
 
     var desc = "";
     desc += "<p>" + pmarker.label["name_" + coLang1] + "</p>";
-    desc += "<p>" + pmarker.label["name_" + coLang2] + "</p>";
     // if (pmarker.label["name_town_label"])
     //   desc += pmarker.label["name_town_label"] + "</br>";
-
+    
     // desc+="<a href='assets/pdf/bourgogne.pdf' target='_blank'><img src='assets/pdf/bourgogne-pdf-screenshot.png' /></a>";
     var pdfFile = getFileNameFromJSONMetaData(pmarker.label["pdf"]);
     if (pdfFile)
       desc += "<a href='assets/pdf/" + pdfFile + "' target='_blank'><img class='pdf-img' src='assets/pdf/" + getFileNameFromJSONMetaData(pmarker.label["pdf_icon"]) + "' /></a>";
-
+    
+    desc += "<p>" + pmarker.label["name_" + coLang2] + "</p>";
+    
     return desc;
   }
 
