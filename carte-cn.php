@@ -156,7 +156,7 @@ include_once "util.php";
     // création de la carte
     map = L.map('map', {
       zoomSnap: 0.5,
-      center: [39.9014, 116.3947],
+      center: [33, 116.3947],
       zoom: 4.5,
       minZoom: 4.5,
       zoomControl: false
@@ -230,14 +230,14 @@ include_once "util.php";
     desc += "<p>" + pmarker.label["name_" + coLang1] + "</p>";
     // if (pmarker.label["name_town_label"])
     //   desc += pmarker.label["name_town_label"] + "</br>";
-    
+
     // desc+="<a href='pdf/geojson/bourgogne.pdf' target='_blank'><img src='pdf/geojson/bourgogne-pdf-screenshot.png' /></a>";
     var pdfFile = getFileNameFromJSONMetaData(pmarker.label["pdf"]);
     if (pdfFile)
-    desc += "<a href='assets/pdf/" + pdfFile + "' target='_blank'><img src='assets/pdf/" + getFileNameFromJSONMetaData(pmarker.label["pdf_icon"]) + "' /></a>";
-    
+      desc += "<a href='assets/pdf/" + pdfFile + "' target='_blank'><img src='assets/pdf/" + getFileNameFromJSONMetaData(pmarker.label["pdf_icon"]) + "' /></a>";
+
     desc += "<p>" + pmarker.label["name_" + coLang2] + "</p>";
-    
+
     return desc;
   }
 
@@ -408,7 +408,12 @@ include_once "util.php";
       ).on("click", function(e) {
         this.unbindPopup();
         if (aTerroirLevel == 3) { // on est au niveau 3, le niveau max. On fait apparaître la popup info
-          this.bindPopup(getMarkerLabelPopupContent(this)).openPopup();
+          // this.bindPopup(getMarkerLabelPopupContent(this)).openPopup();
+          let p = L.popup({
+              className: 'label'
+            })
+            .setContent(getMarkerLabelPopupContent(this));
+          this.bindPopup(p).openPopup();
         } else if (lastRegionClicked == this.layerRegion) { // la région est déjà sélectionnée : on était au niveau 2 et on passe au niveau 3
           var tempCommand = getCommandLegendLabel(this.label["id_label"]);
           if (tempCommand == null) return;
