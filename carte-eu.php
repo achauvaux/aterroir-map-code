@@ -715,13 +715,13 @@ include_once "util.php";
       <div class="choice-lang">
         <input type="radio" id="map-eu" name="drone" value="map-eu" onclick="document.location='.?z=eu'" checked>
         <!--label for="Europe">Europe</label-->
-        <img src="assets/img/flags/flag-europe.png">
+        <img src="assets/img/flags/eu.png">
       </div>
 
       <div class="choice-lang">
         <input type="radio" id="map-cn" name="drone" value="map-cn" onclick="document.location='.?z=cn'">
         <!--label for="China">China</label-->
-        <img src="assets/img/flags/flag-china.png">
+        <img src="assets/img/flags/cn.png">
       </div>
       `;
 

@@ -24,8 +24,8 @@ include_once "util.php";
 </head>
 
 <body onload="initialize()">
-  <!-- <div class="loading">Loading&#8230;</div> -->
-  <div class="loader">
+  <div class="loading">Loading&#8230;</div>
+  <!-- <div class="loader">
     <div class="loader-inner">
       <div class="loader-line-wrap">
         <div class="loader-line"></div>
@@ -43,7 +43,7 @@ include_once "util.php";
         <div class="loader-line"></div>
       </div>
     </div>
-  </div>
+  </div> -->
   <div id="map" style="width:100%; height:100%"></div>
 </body>
 
@@ -220,7 +220,7 @@ include_once "util.php";
     // setCommand(getCommandLegendRegion("CN.BJ"));
 
     setLayersByLevel();
-    $(".loader").hide();
+    $(".loading").hide();
 
   }
 
@@ -234,7 +234,7 @@ include_once "util.php";
     // desc+="<a href='pdf/geojson/bourgogne.pdf' target='_blank'><img src='pdf/geojson/bourgogne-pdf-screenshot.png' /></a>";
     var pdfFile = getFileNameFromJSONMetaData(pmarker.label["pdf"]);
     if (pdfFile)
-      desc += "<a href='assets/pdf/" + pdfFile + "' target='_blank'><img src='assets/pdf/" + getFileNameFromJSONMetaData(pmarker.label["pdf_icon"]) + "' /></a>";
+      desc += "<a href='assets/pdf/" + pdfFile + "' target='_blank'><img class='pdf-img' src='assets/pdf/" + getFileNameFromJSONMetaData(pmarker.label["pdf_icon"]) + "' /></a>";
 
     desc += "<p>" + pmarker.label["name_" + coLang2] + "</p>";
 
@@ -408,19 +408,14 @@ include_once "util.php";
       ).on("click", function(e) {
         this.unbindPopup();
         if (aTerroirLevel == 3) { // on est au niveau 3, le niveau max. On fait apparaître la popup info
-          // this.bindPopup(getMarkerLabelPopupContent(this)).openPopup();
-          let p = L.popup({
-              className: 'label'
-            })
-            .setContent(getMarkerLabelPopupContent(this));
-          this.bindPopup(p).openPopup();
+          this.bindPopup(getMarkerLabelPopupContent(this), {className: "label"}).openPopup();
         } else if (lastRegionClicked == this.layerRegion) { // la région est déjà sélectionnée : on était au niveau 2 et on passe au niveau 3
           var tempCommand = getCommandLegendLabel(this.label["id_label"]);
           if (tempCommand == null) return;
           setCommand(tempCommand); // fenêtre F3
           map.setView(this.getLatLng(), 10); // TODO : centrer sur image terroir
           setAterroirLevel(3);
-        } else { // on arrive sur la région (on était à un niveau inférieur ou dans une autre région)
+        } /* else { // on arrive sur la région (on était à un niveau inférieur ou dans une autre région)
           if (this.layerRegion) { // on vérifie qu'un polygone région est associé au marqueur
             lastRegionClicked = this.layerRegion;
             setAterroirLevel(2);
@@ -428,6 +423,7 @@ include_once "util.php";
             setCommand(getCommandLegendRegion(this.label["code_region"])); // fenêtre F2
           }
         }
+        */
       }).on("mouseover", function(e) {
         $("#IG-" + this.label["id_label"] + " .talon").css("background", "#ffcd00");
         if (this.layerRegion)
@@ -678,12 +674,14 @@ include_once "util.php";
         `
       <div>
         <input type="radio" id="map-cn" name="drone" value="map-cn" onclick="document.location='.?z=cn'" checked>
-        <label for="China">China</label>
+        <!--label for="China">China</label-->
+        <img src="assets/img/flags/cn.png">
       </div>
 
       <div>
         <input type="radio" id="map-eu" name="drone" value="map-eu" onclick="document.location='.?z=eu'">
-        <label for="Europe">Europe</label>
+        <!--label for="Europe">Europe</label-->
+        <img src="assets/img/flags/eu.png">
       </div>
       `;
 
@@ -828,7 +826,7 @@ include_once "util.php";
 
   function getCommandLegendLabel(pidLabel) {
 
-    $(".loader").show();
+    $(".loading").show();
 
     if (currentLabel && map.hasLayer(listLayerMarkersPILabel[currentLabel]))
       map.removeLayer(listLayerMarkersPILabel[currentLabel]);
@@ -851,7 +849,7 @@ include_once "util.php";
 
       }
 
-      $(".loader").hide();
+      $(".loading").hide();
       return commandLegendLabel[pidLabel];
     }
 
@@ -859,7 +857,7 @@ include_once "util.php";
 
     if (listListMarkerPILabel[pidLabel].length == 0) {
       commandLegendLabel[pidLabel] = null;
-      $(".loader").hide();
+      $(".loading").hide();
       return null;
     }
 
@@ -890,7 +888,7 @@ include_once "util.php";
       return div;
     };
 
-    $(".loader").hide();
+    $(".loading").hide();
     return commandLegendLabel[pidLabel];
 
   }
@@ -1060,7 +1058,8 @@ include_once "util.php";
     }
   }
 
-  var talonBGColorByLevel = ["white", "white", "#ffcd00", "#ffcd00"];
+  // var talonBGColorByLevel = ["white", "white", "#ffcd00", "#ffcd00"];
+  var talonBGColorByLevel = ["white", "white", "white", "#ffcd00"];
 
   L.Layer.prototype.setInteractive = function(interactive) {
     if (this.getLayers) {
@@ -1155,7 +1154,7 @@ include_once "util.php";
 
   function regionFocusOn(playerRegion) {
     regionFocusOut();
-    if (aTerroirLevel < 3) {
+    if (aTerroirLevel < 3 && playerRegion!=lastRegionClicked) {
       lastRegionMouseOvered = playerRegion;
       playerRegion.setStyle({
         color: "yellow"
@@ -1221,6 +1220,7 @@ include_once "util.php";
     lastRegionClicked = regionLayer;
     setAterroirLevel(2);
     map.fitBounds(regionLayer.getBounds());
+    regionFocusOut();
     setCommand(getCommandLegendRegion(pcode));
   }
 
