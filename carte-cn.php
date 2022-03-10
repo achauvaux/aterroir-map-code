@@ -672,13 +672,13 @@ include_once "util.php";
 
       var html =
         `
-      <div>
+      <div class="choice-lang">
         <input type="radio" id="map-cn" name="drone" value="map-cn" onclick="document.location='.?z=cn'" checked>
         <!--label for="China">China</label-->
         <img src="assets/img/flags/cn.png">
       </div>
 
-      <div>
+      <div class="choice-lang">
         <input type="radio" id="map-eu" name="drone" value="map-eu" onclick="document.location='.?z=eu'">
         <!--label for="Europe">Europe</label-->
         <img src="assets/img/flags/eu.png">
