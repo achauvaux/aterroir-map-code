@@ -248,7 +248,7 @@ include_once "util.php";
 
     // if (pPI["img_pi_filename"]!=0) {
     // desc += "<img src='assets/img/PI/" + getFileNameFromJSONMetaData(pPI["img_pi_filename"]) + "'>";
-    var imgJSON = loadJSON("http://51.91.157.23/aterroir-wp-jl/wp-json/wp/v2/media/" + pPI["img_pi_filename"] + "?_fields=guid")
+    var imgJSON = loadJSON("https://aterroir.org/wp-json/wp/v2/media/" + pPI["img_pi_filename"] + "?_fields=guid")
     // desc += "<img src='assets/img/PI/" + getFileNameFromJSONMetaData(pPI["img_pi_filename"]) + "'>";
     if (imgJSON) {
       desc += "<img src='" + imgJSON["guid"]["rendered"] + "'>";
@@ -858,7 +858,7 @@ include_once "util.php";
     if (listListMarkerPILabel[pidLabel].length == 0) {
       commandLegendLabel[pidLabel] = null;
       $(".loading").hide();
-      return null;
+      // return null;
     }
 
     currentLabel = pidLabel;
