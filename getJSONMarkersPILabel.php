@@ -5,7 +5,8 @@ include "util.php";
 $idLabel = $_REQUEST["id"];
 // $json = getJSONArrayFromProcedure("getListPIs", null, null, $idLabel, null);
 
-$restBaseUrl = "http://51.91.157.23/aterroir-wp-jl/wp-json/wp/v2/"; // TOTO _fields
+// $restBaseUrl = "http://51.91.157.23/aterroir-wp-jl/wp-json/wp/v2/"; // TOTO _fields
+$restBaseUrl = "https://aterroir.org/wp-json/wp/v2/"; // TODO _fields=acf
 // $rqParams = "ip?_fields=acf&filter[meta_key]=id_label&filter[meta_value]=$idLabel";
 $rqParams = "ip?filter[meta_key]=id_label&filter[meta_value]=$idLabel";
 $restUrl = $restBaseUrl . $rqParams;
