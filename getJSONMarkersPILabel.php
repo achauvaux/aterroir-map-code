@@ -2,6 +2,7 @@
 
 include "util.php";
 
+
 $idLabel = $_REQUEST["id"];
 // $json = getJSONArrayFromProcedure("getListPIs", null, null, $idLabel, null);
 
@@ -30,3 +31,5 @@ foreach ($json as $row) {
 $json = json_encode($rows);
 
 echo $json;
+
+// echo "[]";

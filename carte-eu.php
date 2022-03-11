@@ -735,8 +735,8 @@ include_once "util.php";
 
   function getJSONMarkersPILabel(pidLabel) {
 
-    var jsonMarkers;
-
+    var jsonMarkers = [];
+    /*
     $.ajax({
       url: "getJSONMarkersPILabel.php",
       type: "POST",
@@ -748,7 +748,7 @@ include_once "util.php";
         jsonMarkers = JSON.parse(data); // !!! return ici ne marche pas malgré synchrone (!?)
       }
     });
-
+    */
     return jsonMarkers;
   }
 
