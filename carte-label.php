@@ -1,7 +1,8 @@
 <?php
 
-include_once "util.php";
-// include "lang-settings.php";
+include "util.php";
+
+$idLabel = $_REQUEST["id_label"];
 
 ?>
 
@@ -24,34 +25,13 @@ include_once "util.php";
 </head>
 
 <body onload="initialize()">
-  <div class="loading">Loading&#8230;</div>
-  <!-- <div class="loader">
-    <div class="loader-inner">
-      <div class="loader-line-wrap">
-        <div class="loader-line"></div>
-      </div>
-      <div class="loader-line-wrap">
-        <div class="loader-line"></div>
-      </div>
-      <div class="loader-line-wrap">
-        <div class="loader-line"></div>
-      </div>
-      <div class="loader-line-wrap">
-        <div class="loader-line"></div>
-      </div>
-      <div class="loader-line-wrap">
-        <div class="loader-line"></div>
-      </div>
-    </div>
-  </div> -->
   <div id="map" style="width:100%; height:100%"></div>
 </body>
 
 </html>
 
 <script type="text/javascript">
-  // console.log("loading");
-
+  var idLabel = <?= $idLabel ?>;
   var attLabel;
 
   var map;
@@ -67,12 +47,6 @@ include_once "util.php";
   // polygones (pays et régions)
   var layerCountriesEurope;
   var layerRegionsEurope;
-  var layerRegionsFrance;
-  var listLayerPolygonIndexed = []; // layers polygones (tous : pays, régions...) indexés par leur code (A3 ou NUTS)
-
-  // pays
-  var listMarkerLevel0 = []; // marqueurs pays
-  var layerLevel0; // layer pays
 
   // labels
   var listMarkerLabel = []; // marqueurs label
@@ -100,21 +74,18 @@ include_once "util.php";
 
   var nutJSON, nutFranceJSON, villesTerroirBourgogneJSON;
 
-  var JSONCountries = <?= getJSONArrayFromProcedure("getListCountries", "EU"); ?>;
-  var JSONRegions = <?= getJSONArrayFromProcedure("getListRegions", "EU", null); ?>;
-  var JSONMarkersLabel = <?= getJSONArrayFromProcedure("getListLabels", "EU", null, null); ?>;
+  var JSONLabel = <?= getJSONArrayFromProcedure("getDetailLabel", $idLabel); ?>;
 
+  console.log(JSONLabel);
+
+  // var coLang = "FR";
   var coLang1 = "<?= $coLang1 ?>";
   var coLang2 = "<?= $coLang2 ?>";
   var restBaseUrl = "<?= $restBaseUrl ?>";
 
   var logOn = false;
 
-  var lastRegionMouseOvered, lastRegionClicked;
-
-  var commandLegendRegion = [];
   var commandLegendLabel = [];
-  var commandLegendCountries;
 
   var currentCommand;
 
@@ -126,122 +97,71 @@ include_once "util.php";
 
   var zoomLevel;
 
-  var windows = false;
+  L.Map.include({
+    _initControlPos: function() {
+      var corners = this._controlCorners = {},
+        l = 'leaflet-',
+        container = this._controlContainer =
+        L.DomUtil.create('div', l + 'control-container', this._container);
 
-  // $(document).on({
-  //   ajaxStart: function() {
-  //     alert("loading");
-  //   },
-  //   ajaxStop: function() {
-  //     alert("end loading");
-  //   }
-  // });
+      function createCorner(vSide, hSide) {
+        var className = l + vSide + ' ' + l + hSide;
+
+        corners[vSide + hSide] = L.DomUtil.create('div', className, container);
+      }
+
+      createCorner('top', 'left');
+      createCorner('top', 'right');
+      createCorner('bottom', 'left');
+      createCorner('bottom', 'right');
+
+      createCorner('top', 'center');
+      createCorner('middle', 'center');
+      createCorner('middle', 'left');
+      createCorner('middle', 'right');
+      createCorner('bottom', 'center');
+    }
+  });
+
+  // var bounds = new L.LatLngBounds(new L.LatLng(46.112275, 4.54834), new L.LatLng(47.336028, 5.136108));
+  // var bounds = new L.LatLngBounds(new L.LatLng(40.112275, 0.54834), new L.LatLng(47.336028, 5.136108));
+
+  createTilesLayers();
 
   function initialize() {
 
-    L.Map.include({
-      _initControlPos: function() {
-        var corners = this._controlCorners = {},
-          l = 'leaflet-',
-          container = this._controlContainer =
-          L.DomUtil.create('div', l + 'control-container', this._container);
-
-        function createCorner(vSide, hSide) {
-          var className = l + vSide + ' ' + l + hSide;
-
-          corners[vSide + hSide] = L.DomUtil.create('div', className, container);
-        }
-
-        createCorner('top', 'left');
-        createCorner('top', 'right');
-        createCorner('bottom', 'left');
-        createCorner('bottom', 'right');
-
-        createCorner('top', 'center');
-        createCorner('middle', 'center');
-        createCorner('middle', 'left');
-        createCorner('middle', 'right');
-        createCorner('bottom', 'center');
-      }
-    });
-
     createCustomedIcons(20);
 
-    // création de la carte
+    let bounds;
+
+    // var bounds = new L.LatLngBounds(new L.LatLng(JSONLabel[0]["bounds_top_left_lat"], JSONLabel[0]["bounds_top_left_lon"]), new L.LatLng(JSONLabel[0]["bounds_bottom_right_lat"], JSONLabel[0]["bounds_bottom_right_lon"]));
+    if (!JSONLabel[0]["bounds_top_left_lat"] || !JSONLabel[0]["bounds_top_left_lon"] || !JSONLabel[0]["bounds_bottom_right_lat"] || !JSONLabel[0]["bounds_bottom_right_lon"])
+      bounds = new L.LatLngBounds(new L.LatLng(Number(JSONLabel[0]["lat"]) - 0.5, Number(JSONLabel[0]["lon"]) - 0.5), new L.LatLng(Number(JSONLabel[0]["lat"]) + 0.5, Number(JSONLabel[0]["lon"]) + 0.5));
+    else
+      bounds = new L.LatLngBounds(new L.LatLng(JSONLabel[0]["bounds_top_left_lat"], JSONLabel[0]["bounds_top_left_lon"]), new L.LatLng(JSONLabel[0]["bounds_bottom_right_lat"], JSONLabel[0]["bounds_bottom_right_lon"]));
+
+    // création de la carte terroir limitée
     map = L.map('map', {
-      zoomSnap: 0.5,
-      center: [48.833, 2.333],
-      zoom: 4.5,
-      minZoom: 4.5,
-      zoomControl: false
+      // zoomSnap: 0.5,
+      // center: [48.833, 2.333],
+      // zoom: 4.5,
+      // zoomControl: false
+
+      zoomControl: false,
+      center: bounds.getCenter(),
+      // center: new L.LatLng(JSONLabel[0]["lat"], JSONLabel[0]["lon"]),
+      zoom: 7,
+      layers: [layerPositronNoLabel],
+      maxBounds: bounds,
+      maxBoundsViscosity: 0.75
     });
 
-    map.on('zoomend', function() {
-      setLayersByLevel();
-    })
-
-    log(map.getZoom());
-
-    map.on('baselayerchange', function(e) {
-      // log(e.layer);
-      currentTileLayerOverEuropeLevel = e.layer;
-      if (e.layer != layerPositron)
-        currentTileLayerForEuropeLevel = e.layer;
-      else
-        currentTileLayerForEuropeLevel = layerPositronNoLabel;
-    });
-
-    map.on('click', function() {
-      log("do");
-    })
-
-    createTilesLayers();
-
-    createPolygonsLayers();
-
-    createMarkersLevel0();
-
-    createCommandLegendCountries();
+    map.setMinZoom(map.getBoundsZoom(map.options.maxBounds));
 
     createMarkersLabel();
 
-    createDataLayers();
-
-    setCommandChoiceMap();
-
-    // correspondances niveaux aterroir et openstreetmap
-    listLevelsAterroir[0] = {
-      end: 5
-    }; // europe
-    listLevelsAterroir[1] = {
-      start: 5,
-      end: 7
-    }; // pays
-    listLevelsAterroir[2] = {
-      start: 7
-      // end: 8
-    }; // region
-    // listLevelsAterroir[3] = {
-    //   start: 8
-    // };
-
-    currentTileLayerForEuropeLevel = layerPositronNoLabel;
-    currentTileLayerOverEuropeLevel = layerPositron;
-
-    listListLayerLevel[0] = [currentTileLayerForEuropeLevel, layerCountriesEurope, layerLevel0];
-    listListLayerLevel[1] = [currentTileLayerOverEuropeLevel, layerRegionsEurope, layerRegionsFrance, listLayerLabelsLevel[1]];
-    listListLayerLevel[2] = [currentTileLayerOverEuropeLevel, layerRegionsEurope, layerRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2]];
-    listListLayerLevel[3] = [currentTileLayerOverEuropeLevel, layerRegionsEurope, layerRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2]];
-
-    // setCommand(commandLegendCountries);
-
-    // setLayers(listListLayerLevel[0]); // setLayersByLevel fonctionne après le zoomend
-
-    // computeAterroirLevel = true;
-    setLayersByLevel();
-
-    // console.log("end loading");
-    $(".loading").hide();
+    var cmd = getCommandLegendLabel(idLabel);
+    // cmd.addTo(map);
 
   }
 
@@ -251,14 +171,14 @@ include_once "util.php";
     desc += "<p>" + pmarker.label["name_" + coLang1] + "</p>";
     // if (pmarker.label["name_town_label"])
     //   desc += pmarker.label["name_town_label"] + "</br>";
-    
+
     // desc+="<a href='assets/pdf/bourgogne.pdf' target='_blank'><img src='assets/pdf/bourgogne-pdf-screenshot.png' /></a>";
     var pdfFile = getFileNameFromJSONMetaData(pmarker.label["pdf"]);
     if (pdfFile)
       desc += "<a href='assets/pdf/" + pdfFile + "' target='_blank'><img class='pdf-img' src='assets/pdf/" + getFileNameFromJSONMetaData(pmarker.label["pdf_icon"]) + "' /></a>";
-    
+
     desc += "<p>" + pmarker.label["name_" + coLang2] + "</p>";
-    
+
     return desc;
   }
 
@@ -357,10 +277,6 @@ include_once "util.php";
     return parsed[0]["name"].split("/").pop();
   }
 
-  function hasPI(pidLabel) {
-    return true;
-  }
-
   function createMarkersLabel() { // création des marqueurs label
 
     var iconMarker = null;
@@ -370,7 +286,7 @@ include_once "util.php";
     var style;
     var dy;
 
-    for (label of JSONMarkersLabel) {
+    for (label of JSONLabel) {
 
       log(label);
       iconMarker = listIconLabel[label["code_label"]];
@@ -427,50 +343,9 @@ include_once "util.php";
         }
       ).bindTooltip(
         IGTooltip
-      ).on("click", function(e) {
-        // this.unbindPopup();
-        if (aTerroirLevel == 3) { // on est au niveau 3, le niveau max. On fait apparaître la popup info
-          this.bindPopup(getMarkerLabelPopupContent(this), {className: "label"}).openPopup();
-        } else if (lastRegionClicked == this.layerRegion) { // la région est déjà sélectionnée : on était au niveau 2 et on passe au niveau 3
-          // if (!hasPI(this.label["id_label"])) return;
-          var tempCommand = getCommandLegendLabel(this.label["id_label"]);
-          if (tempCommand == null) return;
-          setCommand(tempCommand); // fenêtre F3
-          map.setView(this.getLatLng(), 10); // TODO : centrer sur image terroir
-          setAterroirLevel(3);      
-        } /* else { // on arrive sur la région (on était à un niveau inférieur ou dans une autre région)
-          if (this.layerRegion) { // on vérifie qu'un polygone région est associé au marqueur
-            lastRegionClicked = this.layerRegion;
-            setAterroirLevel(2);
-            map.fitBounds(this.layerRegion.getBounds()); // on centre sur la région
-            setCommand(getCommandLegendRegion(this.label["code_region"])); // fenêtre F2
-          }
-        }
-        */
-      }).on("mouseover", function(e) {
-        $("#IG-" + this.label["id_label"] + " .talon").css("background", "#ffcd00");
-        if (this.layerRegion)
-          regionFocusOn(this.layerRegion);
-        if (aTerroirLevel == 3)
-          markerLabelFocusOn(this);
-      }).on("mouseout", function(e) {
-        if (this.layerRegion)
-          regionFocusOut(this.layerRegion);
-        $("#IG-" + this.label["id_label"] + " .talon").css("background", talonBGColorByLevel[aTerroirLevel]);
-        if (lastRegionClicked)
-          markerLabelFocusOut(this);
-      });
+      ).bindPopup(getMarkerLabelPopupContent(this));
 
-      m.label = label;
-      m.layerRegion = getLayerPolygonByCode(label["code_region"]);
-
-      if (listListMarkerLabelLevel[label["level"]] == undefined)
-        listListMarkerLabelLevel[label["level"]] = [];
-
-      listListMarkerLabelLevel[label["level"]].push(m);
-
-      listMarkerLabel.push(m);
-      listMarkerLabelIndexed[label["id_label"]] = m;
+      m.addTo(map);
     }
   }
 
@@ -699,45 +574,10 @@ include_once "util.php";
 
   }
 
-  function setCommandChoiceMap() {
-
-    var commandChoiceMap = L.control({
-      position: 'topright'
-    });
-
-    commandChoiceMap.onAdd = function(map) {
-
-      var div = L.DomUtil.create('div', 'command');
-      // L.DomEvent.addListener(div, 'click', L.DomEvent.stopPropagation).addListener(div, 'click', L.DomEvent.preventDefault); // TODO : autres événements (scroll...)
-      L.DomEvent.addListener(div, 'mousewheel', L.DomEvent.stopPropagation); // .addListener(div, 'mousewheel', L.DomEvent.preventDefault);
-
-      var html =
-        `
-      <div class="choice-lang">
-        <input type="radio" id="map-eu" name="drone" value="map-eu" onclick="document.location='.?z=eu'" checked>
-        <!--label for="Europe">Europe</label-->
-        <img src="assets/img/flags/eu.png">
-      </div>
-
-      <div class="choice-lang">
-        <input type="radio" id="map-cn" name="drone" value="map-cn" onclick="document.location='.?z=cn'">
-        <!--label for="China">China</label-->
-        <img src="assets/img/flags/cn.png">
-      </div>
-      `;
-
-      div.innerHTML = html;
-
-      return div;
-    };
-
-    commandChoiceMap.addTo(map);
-  }
-
   function getJSONMarkersPILabel(pidLabel) {
 
-    var jsonMarkers = [];
-    /*
+    var jsonMarkers;
+
     $.ajax({
       url: "getJSONMarkersPILabel.php",
       type: "POST",
@@ -749,7 +589,7 @@ include_once "util.php";
         jsonMarkers = JSON.parse(data); // !!! return ici ne marche pas malgré synchrone (!?)
       }
     });
-    */
+
     return jsonMarkers;
   }
 
@@ -808,7 +648,7 @@ include_once "util.php";
     var html;
 
     $.ajax({
-      url: "get-f3-html-rest.php",
+      url: "get-f3-html-rest-label.php",
       type: "POST",
       async: false, // Mode synchrone indispensable
       data: ({
@@ -855,7 +695,6 @@ include_once "util.php";
   function createMapsLabel(pidLabel) {
 
     listListImageMapLabel[pidLabel] = [];
-
     var JSONMapsLabel = getJSONMapsLabel(pidLabel);
 
     for (var map of JSONMapsLabel) {
@@ -868,8 +707,6 @@ include_once "util.php";
 
   function getCommandLegendLabel(pidLabel) {
 
-    $(".loading").show();
-
     if (currentLabel && map.hasLayer(listLayerMarkersPILabel[currentLabel]))
       map.removeLayer(listLayerMarkersPILabel[currentLabel]);
 
@@ -880,32 +717,19 @@ include_once "util.php";
 
     if (pidLabel in commandLegendLabel) {
 
-      if (commandLegendLabel[pidLabel] != null) {
+      currentLabel = pidLabel;
+      map.addLayer(listLayerMarkersPILabel[pidLabel]);
 
-        currentLabel = pidLabel;
-        map.addLayer(listLayerMarkersPILabel[pidLabel]);
-
-        for (var imageMap of listListImageMapLabel[pidLabel]) {
-          imageMap.addTo(map);
-        }
-
+      for (var imageMap of listListImageMapLabel[pidLabel]) {
+        imageMap.addTo(map);
       }
 
-      $(".loading").hide();
       return commandLegendLabel[pidLabel];
     }
 
-    createLayerMarkersPILabel(pidLabel);
-
-    if (listListMarkerPILabel[pidLabel].length == 0) {
-      commandLegendLabel[pidLabel] = null;
-      $(".loading").hide();
-      // return null;
-    }
-
     currentLabel = pidLabel;
+    createLayerMarkersPILabel(pidLabel);
     map.addLayer(listLayerMarkersPILabel[pidLabel]);
-
     createMapsLabel(pidLabel);
 
     for (var imageMap of listListImageMapLabel[pidLabel]) {
@@ -931,7 +755,6 @@ include_once "util.php";
       return div;
     };
 
-    $(".loading").hide();
     return commandLegendLabel[pidLabel];
 
   }
@@ -967,7 +790,7 @@ include_once "util.php";
     for (marker of listListMarkerPILabel[pidLabel]) {
       if (marker.PI["id_label"] == pidLabel && marker.PI["id_picategory"] == ptype)
         if (!map.hasLayer(marker)) {
-          // log("#label-"+pidLabel+"-F3-PI-type-"+ptype);
+          // console.log("#label-"+pidLabel+"-F3-PI-type-"+ptype);
           $("#label-" + pidLabel + "-F3-PI-type-" + ptype + ">img").css("opacity", "1");
           map.addLayer(marker);
         }
@@ -992,7 +815,7 @@ include_once "util.php";
 
   function createPolygonsLayers() {
 
-    var EUCountryJSON = loadJSON("assets/geojson/pays-europe-nodomtom.json");
+    var EUCountryJSON = loadJSON("geojson/pays-europe-nodomtom.json");
 
     layerCountriesEurope = L.geoJSON(EUCountryJSON, {
       onEachFeature: function(feature, layer) {
@@ -1020,14 +843,11 @@ include_once "util.php";
       }
     });
 
-    nutJSON = loadJSON("assets/geojson/regions-europe.json");
+    nutJSON = loadJSON("geojson/regions-europe.json");
 
     layerRegionsEurope = L.geoJSON(nutJSON, {
       onEachFeature: function(feature, layer) {
-        listLayerPolygonIndexed[feature.properties["name"]] = layer;    
-        layer.on('click', function(e) {
-          legendRegionClick(feature.properties["name"]);
-        });
+        listLayerPolygonIndexed[feature.properties["name"]] = layer;
         layer.on('mouseover', function(e) {
           regionFocusOn(layer);
         });
@@ -1045,14 +865,11 @@ include_once "util.php";
       }
     });
 
-    nutFranceJSON = loadJSON("assets/geojson/regions-france-nodomtom.json");
+    nutFranceJSON = loadJSON("geojson/regions-france-nodomtom.json");
 
     layerRegionsFrance = L.geoJSON(nutFranceJSON, {
       onEachFeature: function(feature, layer) {
         listLayerPolygonIndexed[feature.properties["nuts2"]] = layer;
-        layer.on('click', function(e) {
-          legendRegionClick(feature.properties["nuts2"]);
-        });
         layer.on('mouseover', function(e) {
           regionFocusOn(layer);
         });
@@ -1151,8 +968,7 @@ include_once "util.php";
     }
   }
 
-  // var talonBGColorByLevel = ["white", "white", "#ffcd00", "#ffcd00"];
-  var talonBGColorByLevel = ["white", "white", "white", "#ffcd00"];
+  var talonBGColorByLevel = ["white", "white", "#ffcd00", "#ffcd00"];
 
   L.Layer.prototype.setInteractive = function(interactive) {
     if (this.getLayers) {
@@ -1271,7 +1087,7 @@ include_once "util.php";
 
   function regionFocusOn(playerRegion) {
     regionFocusOut();
-    if (aTerroirLevel < 3 && playerRegion!=lastRegionClicked) {
+    if (aTerroirLevel < 3) {
       lastRegionMouseOvered = playerRegion;
       playerRegion.setStyle({
         color: "yellow"
@@ -1311,7 +1127,7 @@ include_once "util.php";
   function legendMarkerPIClick(pid) {
     var marker = getMarkerPIById(pid);
     marker.fire("click");
-    // log("marker.openPopup();");
+    // console.log("marker.openPopup();");
   }
 
   function legendCountryClick(pcode) {
@@ -1338,7 +1154,6 @@ include_once "util.php";
     lastRegionClicked = regionLayer;
     setAterroirLevel(2);
     map.fitBounds(regionLayer.getBounds());
-    regionFocusOut();
     setCommand(getCommandLegendRegion(pcode));
   }
 
@@ -1394,8 +1209,6 @@ include_once "util.php";
   }
 
   function setCommand(pcommand) {
-
-    if (!windows) return;
 
     if (pcommand == currentCommand)
       return;

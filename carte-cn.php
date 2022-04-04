@@ -102,6 +102,7 @@ include_once "util.php";
 
   var coLang1 = "<?= $coLang1 ?>";
   var coLang2 = "<?= $coLang2 ?>";
+  var restBaseUrl = "<?= $restBaseUrl ?>";
 
   var logOn = false;
 
@@ -248,7 +249,7 @@ include_once "util.php";
 
     // if (pPI["img_pi_filename"]!=0) {
     // desc += "<img src='assets/img/PI/" + getFileNameFromJSONMetaData(pPI["img_pi_filename"]) + "'>";
-    var imgJSON = loadJSON("https://aterroir.org/wp-json/wp/v2/media/" + pPI["img_pi_filename"] + "?_fields=guid")
+    var imgJSON = loadJSON(restBaseUrl + "media/" + pPI["img_pi_filename"] + "?_fields=guid");
     // desc += "<img src='assets/img/PI/" + getFileNameFromJSONMetaData(pPI["img_pi_filename"]) + "'>";
     if (imgJSON) {
       desc += "<img src='" + imgJSON["guid"]["rendered"] + "'>";

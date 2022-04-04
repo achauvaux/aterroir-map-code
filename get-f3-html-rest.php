@@ -5,7 +5,7 @@ include "util.php";
 $idLabel = $_REQUEST["id_label"];
 
 // $restBaseUrl = "http://51.91.157.23/aterroir-wp-jl/wp-json/wp/v2/"; // TODO _fields=acf
-$restBaseUrl = "https://aterroir.org/wp-json/wp/v2/"; // TODO _fields=acf
+// $restBaseUrl = "https://aterroir.org/wp-json/wp/v2/"; // TODO _fields=acf
 // $rqParams = "ip?_fields=acf&filter[meta_key]=idLabel&filter[meta_value]=$idLabel";
 // $rqParams = "ip?filter[meta_key]=id_label&filter[meta_value]=$idLabel";
 $rqParams = "ip?filter[meta_query][relation]=AND&filter[meta_query][0][key]=id_label&filter[meta_query][0][value]=$idLabel&filter[meta_query][1][key]=id_picategory&filter[meta_query][1][value]=";
@@ -70,7 +70,7 @@ $JSONPIs = [];
         <?php foreach ($rsLabels as $row) { ?>
           <li class="legend-item">
             <div class="flag">
-              <img src="img/images-labels/<?= $row["img_icon_filename"] ?>" alt="">
+              <img src="assets/img/images-labels/<?= $row["img_icon_filename"] ?>" alt="">
             </div>
             <div class="talon-item" onclick="legendMarkerLabelClick(<?= $row['id_label'] ?>);">
               <p><?= $row['name_CN'] ?></p>
