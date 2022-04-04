@@ -38,6 +38,8 @@ $dbh = new PDO("mysql:host=$db_server;dbname=$db_name;charset=UTF8", $db_user, $
 
 $root_dir = $ini['root_dir'];
 
+$restBaseUrl = $ini['rest'];
+
 function getBaseUrl()
 {
 	global $root_dir;

@@ -46,7 +46,7 @@ $rsPICategories = getDataArrayFromProcedure("getListPICategories");
         <?php foreach ($rsLabels as $row) { ?>
           <li class="legend-item">
             <div class="flag">
-              <img src="img/images-labels/<?= $row["img_icon_filename"] ?>" alt="">
+              <img src="assets/img/images-labels/<?= $row["img_icon_filename"] ?>" alt="">
             </div>
             <div class="talon-item" onclick="legendMarkerLabelClick(<?= $row['id_label'] ?>);">
               <p><?= $row['name_CN'] ?></p>
