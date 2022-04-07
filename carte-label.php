@@ -343,8 +343,16 @@ $idLabel = $_REQUEST["id_label"];
         }
       ).bindTooltip(
         IGTooltip
-      ).bindPopup(getMarkerLabelPopupContent(this));
+      ).bindPopup(
+        getMarkerLabelPopupContent(this), 
+        {className: "label"}
+      ).on("mouseover", function(e) {
+          markerLabelFocusOn(this);
+      }).on("mouseout", function(e) {
+          markerLabelFocusOut(this);
+      });
 
+      m.label = label;
       m.addTo(map);
     }
   }
@@ -1061,12 +1069,10 @@ $idLabel = $_REQUEST["id_label"];
 
   function markerLabelFocusOn(pmarker) {
     pmarker.setIcon(listIconBigLabel[pmarker.label["code_label"]]);
-    $("#IG-" + pmarker.id + " .talon").css("background", "#fffb00");
   }
 
   function markerLabelFocusOut(pmarker) {
     pmarker.setIcon(listIconLabel[pmarker.label["code_label"]]);
-    $("#IG-" + pmarker.id + " .talon").css("background", talonBGColorByLevel[aTerroirLevel]);
   }
 
   function markerPIFocusOn(pmarker) {
