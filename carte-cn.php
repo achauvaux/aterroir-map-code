@@ -818,7 +818,7 @@ include_once "util.php";
     var JSONMapsLabel = getJSONMapsLabel(pidLabel);
 
     for (var map of JSONMapsLabel) {
-      var imgMap = createImageMap(map["img_map_filename"], map["lat_lefttop"], map["lon_lefttop"], map["lat_rightbottom"], map["lon_rightbottom"]);
+      var imgMap = createImageMap(getFileNameFromJSONMetaData(map["img_map_filename"]), map["lat_lefttop"], map["lon_lefttop"], map["lat_rightbottom"], map["lon_rightbottom"]);
       listListImageMapLabel[pidLabel].push(imgMap);
     }
   }
