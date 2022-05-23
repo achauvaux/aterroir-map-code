@@ -416,7 +416,7 @@ include_once "util.php";
           setCommand(tempCommand); // fenêtre F3
           map.setView(this.getLatLng(), 10); // TODO : centrer sur image terroir
           setAterroirLevel(3);
-        } /* else { // on arrive sur la région (on était à un niveau inférieur ou dans une autre région)
+        } else { // on arrive sur la région (on était à un niveau inférieur ou dans une autre région)
           if (this.layerRegion) { // on vérifie qu'un polygone région est associé au marqueur
             lastRegionClicked = this.layerRegion;
             setAterroirLevel(2);
@@ -424,9 +424,10 @@ include_once "util.php";
             setCommand(getCommandLegendRegion(this.label["code_region"])); // fenêtre F2
           }
         }
-        */
+        
       }).on("mouseover", function(e) {
-        $("#IG-" + this.label["id_label"] + " .talon").css("background", "#ffcd00");
+        if (aTerroirLevel > 1)
+          $("#IG-" + this.label["id_label"] + " .talon").css("background", "#ffcd00");
         if (this.layerRegion)
           regionFocusOn(this.layerRegion);
         if (aTerroirLevel == 3)
