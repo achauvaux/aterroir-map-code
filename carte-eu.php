@@ -137,7 +137,13 @@ include_once "util.php";
   //   }
   // });
 
-  function initialize() {
+  function initialize() { 
+    /* 
+    pour pouvoir positionner les commandes à de nouveaux endroits. Ex :
+    commandLegendRegion[pcodeRegion] = L.control({
+      position: 'middleleft'
+    });
+    */
 
     L.Map.include({
       _initControlPos: function() {
@@ -165,7 +171,7 @@ include_once "util.php";
       }
     });
 
-    createCustomedIcons(20);
+    createCustomedIcons(20); // création des icones de marqueurs
 
     // création de la carte
     map = L.map('map', {
@@ -195,19 +201,19 @@ include_once "util.php";
       log("do");
     })
 
-    createTilesLayers();
+    createTilesLayers(); // création des calques "tuiles"
 
-    createPolygonsLayers();
+    createPolygonsLayers(); // polygones pays et régions
 
     createMarkersLevel0();
 
-    createCommandLegendCountries();
+    createCommandLegendCountries(); // fenêtre des pays
 
     createMarkersLabel();
 
-    createDataLayers();
+    createDataLayers(); // création des calques à partir des tableaux de marqueurs
 
-    setCommandChoiceMap();
+    setCommandChoiceMap(); // choix carte EU ou CN
 
     // correspondances niveaux aterroir et openstreetmap
     listLevelsAterroir[0] = {
@@ -430,7 +436,9 @@ include_once "util.php";
       ).on("click", function(e) {
         // this.unbindPopup();
         if (aTerroirLevel == 3) { // on est au niveau 3, le niveau max. On fait apparaître la popup info
-          this.bindPopup(getMarkerLabelPopupContent(this), {className: "label"}).openPopup();
+          if(!this._popup)
+            this.bindPopup(getMarkerLabelPopupContent(this), {className: "label"}).openPopup();
+          // this.openPopup();
         } else if (lastRegionClicked == this.layerRegion) { // la région est déjà sélectionnée : on était au niveau 2 et on passe au niveau 3
           // if (!hasPI(this.label["id_label"])) return;
           var tempCommand = getCommandLegendLabel(this.label["id_label"]);
