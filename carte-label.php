@@ -309,7 +309,7 @@ $idLabel = $_REQUEST["id_label"];
 
       var toolTipContent =
         "<div id='IG-" + label["id_label"] + "' class='IG " + label["direction_heel"] + "' style='" + style + "'>" +
-        "<img src='assets/img/images-labels/" + getFileNameFromJSONMetaData(label["img_icon_filename"]) + "' style='height:" + label["height_img_icon"] + "px'>" +
+        "<img src='assets/img/images-labels/" + getFileNameFromJSONMetaData(label["img_icon"]) + "' style='height:" + label["height_img_icon"] + "px'>" +
         "<div class='talon'>" +
         "<p>" +
         label["name_" + coLang1] +
