@@ -4,7 +4,7 @@ include "util.php";
 
 
 $idLabel = $_REQUEST["id"];
-// $json = getJSONArrayFromProcedure("getListPIs", null, null, $idLabel, null);
+$json = getJSONArrayFromProcedure("getListPIs", null, null, $idLabel, null);
 
 // $restBaseUrl = "http://51.91.157.23/aterroir-wp-jl/wp-json/wp/v2/"; // TOTO _fields
 // $restBaseUrl = "https://aterroir.org/wp-json/wp/v2/"; // TODO _fields=acf
@@ -17,8 +17,8 @@ function getPIJSON() {
   return json_decode(file_get_contents($restUrl), true);
 }
 
-$json = getPIJSON();
-
+// $json = getPIJSON();
+/*
 $rows = [];
 
 foreach ($json as $row) {
@@ -29,7 +29,7 @@ foreach ($json as $row) {
 }
 
 $json = json_encode($rows);
-
+*/
 echo $json;
 
 // echo "[]";
