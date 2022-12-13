@@ -126,7 +126,7 @@ include_once "util.php";
 
   var zoomLevel;
 
-  var windows = false;
+  var windows = true; // pour activer les fenêtres contextuelles
 
   // $(document).on({
   //   ajaxStart: function() {
@@ -239,7 +239,7 @@ include_once "util.php";
     listListLayerLevel[2] = [currentTileLayerOverEuropeLevel, layerRegionsEurope, layerRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2]];
     listListLayerLevel[3] = [currentTileLayerOverEuropeLevel, layerRegionsEurope, layerRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2]];
 
-    // setCommand(commandLegendCountries);
+    setCommand(commandLegendCountries);
 
     // setLayers(listListLayerLevel[0]); // setLayersByLevel fonctionne après le zoomend
 
@@ -271,14 +271,14 @@ include_once "util.php";
   function getMarkerPIPopupContent(pPI) {
 
     var desc = "";
-    desc += "<h1>" + pPI["name_" + coLang1] + "</h1>";
+    desc += "<h1 style='font-size:15px'>" + pPI["name_" + coLang1] + "</h1>";
 
-    // if (pPI["img_pi_filename"]!=0) {
+    if (pPI["img_pi_filename"]!=0) {
+      desc += "<img style='width:100px' src='assets/img/PI/" + pPI["img_pi_filename"] + "'>";
+    // var imgJSON = loadJSON(restBaseUrl + "media/" + pPI["img_pi_filename"] + "?_fields=guid");
     // desc += "<img src='assets/img/PI/" + getFileNameFromJSONMetaData(pPI["img_pi_filename"]) + "'>";
-    var imgJSON = loadJSON(restBaseUrl + "media/" + pPI["img_pi_filename"] + "?_fields=guid");
-    // desc += "<img src='assets/img/PI/" + getFileNameFromJSONMetaData(pPI["img_pi_filename"]) + "'>";
-    if (imgJSON) {
-      desc += "<img src='" + imgJSON["guid"]["rendered"] + "'>";
+    // if (imgJSON) {
+      // desc += "<img src='" + imgJSON["guid"]["rendered"] + "'>";
       desc += "<a href='" + pPI["link"] + "' target='_blank'>" + pPI["name_" + coLang1] + "</a>";
     }
     // }
@@ -746,7 +746,7 @@ include_once "util.php";
   function getJSONMarkersPILabel(pidLabel) {
 
     var jsonMarkers = [];
-    /*
+    
     $.ajax({
       url: "getJSONMarkersPILabel.php",
       type: "POST",
@@ -758,7 +758,7 @@ include_once "util.php";
         jsonMarkers = JSON.parse(data); // !!! return ici ne marche pas malgré synchrone (!?)
       }
     });
-    */
+    
     return jsonMarkers;
   }
 
@@ -817,7 +817,8 @@ include_once "util.php";
     var html;
 
     $.ajax({
-      url: "get-f3-html-rest.php",
+      // url: "get-f3-html-rest.php",
+      url: "get-f3-html.php",
       type: "POST",
       async: false, // Mode synchrone indispensable
       data: ({
@@ -1225,7 +1226,7 @@ include_once "util.php";
     return listLayerPolygonIndexed[pcode];
   }
 
-  function getRegionLayerByCode(pcode) {
+  function getRegionLayerByCode(pcode) { // inutilisé
 
     for (var regionID in layerRegionsFrance._layers) {
       if (layerRegionsFrance._layers[regionID].feature != undefined && layerRegionsFrance._layers[regionID].feature.properties["nuts2"] == pcode)
@@ -1240,7 +1241,7 @@ include_once "util.php";
     return null;
   }
 
-  function getCountryLayerByCode(pcode) {
+  function getCountryLayerByCode(pcode) { // inutilisé
 
     for (var countryID in layerCountriesEurope._layers) {
       if (layerCountriesEurope._layers[countryID].feature != undefined && layerCountriesEurope._layers[countryID].feature.properties["adm0_a3"] == pcode)
