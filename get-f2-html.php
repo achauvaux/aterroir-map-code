@@ -19,19 +19,19 @@ $rsOTs = getDataArrayFromProcedure("getListPI", null, $id_region, null, 1);
 <div id="F2" class="aterroir-window">
   <section class="left">
     <div class="menu-item" onmouseenter="openRight('F2-regions');">
-      <img src="img/icones-aterroir/Bouton F Régions.png">
+      <img src="assets/img/icones-aterroir/Bouton F Régions.png">
     </div>
     <div class="menu-item" onmouseenter="openRight('F2-region-labels');">
-      <img src="img/icones-aterroir/Bouton F Terroir.png">
+      <img src="assets/img/icones-aterroir/Bouton F Terroir.png">
     </div>
     <div class="menu-item" onmouseenter="openRight('F2-OTs');">
-      <img src="img/icones-aterroir/Bouton F InfoOT.png">
+      <img src="assets/img/icones-aterroir/Bouton F InfoOT.png">
     </div>
     <div class="menu-item" onmouseenter="openRight('F2-infos');">
-      <img src="img/icones-aterroir/Bouton F InfoSite.png">
+      <img src="assets/img/icones-aterroir/Bouton F InfoSite.png">
     </div>
     <div class="menu-item" onmouseenter="openRight('F2-formulaire');">
-      <img src="img/icones-aterroir/Bouton F Courrier.png">
+      <img src="assets/img/icones-aterroir/Bouton F Courrier.png">
     </div>
   </section>
   <section id="F2-regions" class="right" onmouseleave="closeRight();" style="display: none;">
@@ -43,7 +43,7 @@ $rsOTs = getDataArrayFromProcedure("getListPI", null, $id_region, null, 1);
         <?php foreach ($rsRegions as $row) { ?>
           <li class="legend-item">
             <div class="flag">
-              <img src="img/logos-regions/<?= $row["img_logo"] ?>" alt="">
+              <img src="assets/img/logos-regions/<?= $row["img_logo"] ?>" alt="">
             </div>
             <div class="talon-item" onclick="legendRegionClick('<?= $row['code_region'] ?>')" onmouseover="legendRegionOver('<?= $row['code_region'] ?>')" onmouseout="legendRegionOut('<?= $row['code_region'] ?>')">
               <p><?= $row['name_CN'] ?></p>
@@ -53,7 +53,7 @@ $rsOTs = getDataArrayFromProcedure("getListPI", null, $id_region, null, 1);
         <?php } ?>
       </ul>
     </div>
-    <div class="footer"><img src="img/icones-aterroir/aterroir-logo.png"></div>
+    <div class="footer"><img src="assets/img/icones-aterroir/aterroir-logo.png"></div>
   </section>
   <section id="F2-region-labels" class="right" onmouseleave="closeRight();" style="display: none;">
     <div class="header">
@@ -74,7 +74,7 @@ $rsOTs = getDataArrayFromProcedure("getListPI", null, $id_region, null, 1);
         <?php } ?>
       </ul>
     </div>
-    <div class="footer"><img src="img/icones-aterroir/aterroir-logo.png"></div>
+    <div class="footer"><img src="assets/img/icones-aterroir/aterroir-logo.png"></div>
   </section>
   <section id="F2-OTs" class="right" onmouseleave="closeRight();" style="display: none;">
     <div class="header">
@@ -85,7 +85,7 @@ $rsOTs = getDataArrayFromProcedure("getListPI", null, $id_region, null, 1);
         <?php foreach ($rsOTs as $row) { ?>
           <li class="legend-item">
             <div class="flag">
-              <img src="img/icones-aterroir/icon-OT-local.png" alt="">
+              <img src="assets/img/icones-aterroir/icon-OT-local.png" alt="">
             </div>
             <div class="talon-item">
               <p><?= $row['name_CN'] ?></p>
@@ -95,7 +95,7 @@ $rsOTs = getDataArrayFromProcedure("getListPI", null, $id_region, null, 1);
         <?php } ?>
       </ul>
     </div>
-    <div class="footer"><img src="img/icones-aterroir/aterroir-logo.png"></div>
+    <div class="footer"><img src="assets/img/icones-aterroir/aterroir-logo.png"></div>
   </section>
   <section id="F2-infos" class="right" onmouseleave="closeRight();" style="display: none;">
     <div class="header">
@@ -103,7 +103,7 @@ $rsOTs = getDataArrayFromProcedure("getListPI", null, $id_region, null, 1);
     </div>
     <div class="content">
     </div>
-    <div class="footer"><img src="img/icones-aterroir/aterroir-logo.png"></div>
+    <div class="footer"><img src="assets/img/icones-aterroir/aterroir-logo.png"></div>
   </section>
   <section id="F2-formulaire" class="right" onmouseleave="closeRight();" style="display: none;">
     <div class="header">
@@ -126,6 +126,6 @@ $rsOTs = getDataArrayFromProcedure("getListPI", null, $id_region, null, 1);
       <button class="btn btn-primary">Envoyer</button>
       <!-- </form> -->
     </div>
-    <div class="footer"><img src="img/icones-aterroir/aterroir-logo.png"></div>
+    <div class="footer"><img src="assets/img/icones-aterroir/aterroir-logo.png"></div>
   </section>
 </div>
