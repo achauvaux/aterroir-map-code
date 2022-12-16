@@ -7,6 +7,8 @@ $code_region = $_REQUEST["code_region"];
 
 $rsRegion = getDataArrayFromProcedure("getDetailRegion2", $code_region);
 
+if (empty($rsRegion)) return;
+
 $id_country = $rsRegion[0]["id_country"];
 $id_region = $rsRegion[0]["id_region"];
 
