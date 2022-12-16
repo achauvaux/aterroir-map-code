@@ -3,10 +3,26 @@
 include_once "util.php";
 // include "lang-settings.php";
 
+
+$subdomain = null;
+
 $idLabel = 0;
 
-if (isset($_REQUEST["id_label"])) {
-  $idLabel = $_REQUEST["id_label"];
+// if (isset($_REQUEST["id_label"])) {
+//   $idLabel = $_REQUEST["id_label"];
+// }
+
+$rsBasemap = [];
+
+if (isset($_REQUEST["s"])) {
+  $subdomain = $_REQUEST["s"];
+  $rsMap = getDataArrayFromProcedure("getDetailMap", $subdomain);
+
+  if (isset($rsMap[0]["id_label"]))
+    $idLabel = $rsMap[0]["id_label"];
+
+  if (isset($rsMap[0]["id_basemap"]))
+    $rsBasemap = getDataArrayFromProcedure("getDetailBasemap", $rsMap[0]["id_basemap"]);
 }
 
 ?>
@@ -60,6 +76,9 @@ if (isset($_REQUEST["id_label"])) {
 
     // tuiles (basemap)
     var layerTerrain, layerWatercolor, layerToner, layerPositron, layerPositronNoLabel;
+    var JSONbasemap = <?= json_encode($rsBasemap) ?>;
+
+    var layerBasemap;
     var currentTileLayerForLevel0; // basemap niveau 0
     var currentTileLayerOverLevel0; // basemap courante niveau > 0
 
@@ -262,8 +281,13 @@ if (isset($_REQUEST["id_label"])) {
       //   start: 8
       // };
 
-      currentTileLayerForLevel0 = layerPositronNoLabel;
-      currentTileLayerOverLevel0 = layerPositron;
+      if (layerBasemap) {
+        currentTileLayerForLevel0 = layerBasemap;
+        currentTileLayerOverLevel0 = layerBasemap;
+      } else {
+        currentTileLayerForLevel0 = layerPositronNoLabel;
+        currentTileLayerOverLevel0 = layerPositron;
+      }
 
       listListLayerLevel[0] = [currentTileLayerForLevel0, layerCountriesEurope, layerRegionsChine, layerLevel0];
       listListLayerLevel[1] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerRegionsFrance, listLayerLabelsLevel[1]];
@@ -272,7 +296,7 @@ if (isset($_REQUEST["id_label"])) {
 
       if (!isLabelMap)
         setCommand(commandLegendCountries);
-      else 
+      else
         setCommand(getCommandLegendLabel(idLabelMap));
 
       // setLayers(listListLayerLevel[0]); // setLayersByLevel fonctionne après le zoomend
@@ -1182,6 +1206,8 @@ if (isset($_REQUEST["id_label"])) {
       layerPositron = new L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png");
       layerPositronNoLabel = new L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png");
       layerWatercolor = new L.tileLayer("https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg");
+      if(JSONbasemap.length > 0)
+        layerBasemap = new L.tileLayer(JSONbasemap[0]["url"]);
 
     }
 
