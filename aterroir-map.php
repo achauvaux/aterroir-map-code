@@ -3,6 +3,12 @@
 include_once "util.php";
 // include "lang-settings.php";
 
+$idLabel = 0;
+
+if (isset($_REQUEST["id_label"])) {
+  $idLabel = $_REQUEST["id_label"];
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -46,7 +52,6 @@ include_once "util.php";
   </div> -->
   <div id="map" style="width:100%; height:100%"></div>
   <script type="text/javascript">
-
     // console.log("loading");
 
     var attLabel;
@@ -126,7 +131,17 @@ include_once "util.php";
 
     var zoomLevel;
 
-    var windows = false;
+    var windows = true;
+
+    var isLabelMap = false;
+    var idLabelMap;
+
+    <?php if ($idLabel) { ?>
+      idLabelMap = <?= $idLabel ?>;
+      var JSONLabel = <?= getJSONArrayFromProcedure("getDetailLabel", $idLabel); ?>; // données JSON du label (carte terroir) 
+      var JSONLabelMap = JSONLabel[0];
+      isLabelMap = true;
+    <?php } ?>
 
     // $(document).on({
     //   ajaxStart: function() {
@@ -173,14 +188,32 @@ include_once "util.php";
 
       createCustomedIcons(20); // création des icones de marqueurs
 
+      let bounds;
+      let center0, zoom0;
+
+      if (isLabelMap) {
+        // var bounds = new L.LatLngBounds(new L.LatLng(JSONLabelMap["bounds_top_left_lat"], JSONLabelMap["bounds_top_left_lon"]), new L.LatLng(JSONLabelMap["bounds_bottom_right_lat"], JSONLabelMap["bounds_bottom_right_lon"]));
+        if (!JSONLabelMap["bounds_top_left_lat"] || !JSONLabelMap["bounds_top_left_lon"] || !JSONLabelMap["bounds_bottom_right_lat"] || !JSONLabelMap["bounds_bottom_right_lon"])
+          bounds = new L.LatLngBounds(new L.LatLng(Number(JSONLabelMap["lat"]) - 0.5, Number(JSONLabelMap["lon"]) - 0.5), new L.LatLng(Number(JSONLabelMap["lat"]) + 0.5, Number(JSONLabelMap["lon"]) + 0.5));
+        else
+          bounds = new L.LatLngBounds(new L.LatLng(JSONLabelMap["bounds_top_left_lat"], JSONLabelMap["bounds_top_left_lon"]), new L.LatLng(JSONLabelMap["bounds_bottom_right_lat"], JSONLabelMap["bounds_bottom_right_lon"]));
+      }
+
       // création de la carte
       map = L.map('map', {
         zoomSnap: 0.5,
+        // center: center0,
+        // zoom: zoom0,
         center: [48.833, 2.333],
         zoom: 4.5,
         minZoom: 4.5,
         zoomControl: false
       });
+
+      if (isLabelMap) {
+        map.fitBounds(bounds); // on centre sur la région
+        setAterroirLevel(3);
+      }
 
       map.on('zoomend', function() {
         setLayersByLevel();
@@ -237,7 +270,10 @@ include_once "util.php";
       listListLayerLevel[2] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2]];
       listListLayerLevel[3] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2]];
 
-      // setCommand(commandLegendCountries);
+      if (!isLabelMap)
+        setCommand(commandLegendCountries);
+      else 
+        setCommand(getCommandLegendLabel(idLabelMap));
 
       // setLayers(listListLayerLevel[0]); // setLayersByLevel fonctionne après le zoomend
 
@@ -962,7 +998,7 @@ include_once "util.php";
         L.DomEvent.addListener(div, 'click', L.DomEvent.stopPropagation).addListener(div, 'click', L.DomEvent.preventDefault);
         L.DomEvent.addListener(div, 'mousewheel', L.DomEvent.stopPropagation); // .addListener(div, 'mousewheel', L.DomEvent.preventDefault);
 
-        var html = getF3Html(pidLabel);
+        var html = '' //getF3Html(pidLabel);
 
         div.innerHTML = html;
 
@@ -1145,6 +1181,7 @@ include_once "util.php";
       // layerToner = new L.StamenTileLayer("toner");
       layerPositron = new L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png");
       layerPositronNoLabel = new L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png");
+      layerWatercolor = new L.tileLayer("https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg");
 
     }
 
