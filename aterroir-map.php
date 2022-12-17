@@ -7,6 +7,8 @@ include_once "util.php";
 $subdomain = null;
 
 $idLabel = 0;
+$idRegion = 0;
+$idCountry = 0;
 
 // if (isset($_REQUEST["id_label"])) {
 //   $idLabel = $_REQUEST["id_label"];
@@ -20,6 +22,10 @@ if (isset($_REQUEST["s"])) {
 
   if (isset($rsMap[0]["id_label"]))
     $idLabel = $rsMap[0]["id_label"];
+  else if (isset($rsMap[0]["id_region"]))
+    $idRegion = $rsMap[0]["id_region"];
+  else if (isset($rsMap[0]["id_country"]))
+    $idCountry = $rsMap[0]["id_country"];
 
   if (isset($rsMap[0]["id_basemap"]))
     $rsBasemap = getDataArrayFromProcedure("getDetailBasemap", $rsMap[0]["id_basemap"]);
@@ -152,14 +158,24 @@ if (isset($_REQUEST["s"])) {
 
     var windows = true;
 
-    var isLabelMap = false;
-    var idLabelMap;
+    var typeMap;
+    var idLabelMap, idRegionMap, idCountryMap;
 
     <?php if ($idLabel) { ?>
       idLabelMap = <?= $idLabel ?>;
       var JSONLabel = <?= getJSONArrayFromProcedure("getDetailLabel", $idLabel); ?>; // données JSON du label (carte terroir) 
       var JSONLabelMap = JSONLabel[0];
-      isLabelMap = true;
+      typeMap = 'label';
+    <?php } else if ($idRegion) { ?>
+      idRegionMap = <?= $idRegion ?>;
+      var JSONRegion = <?= getJSONArrayFromProcedure("getDetailRegion", $idRegion); ?>;
+      var JSONRegionMap = JSONRegion[0];
+      typeMap = 'region';
+    <?php } else if ($idCountry) { ?>
+      idCountryMap = <?= $idCountry ?>;
+      var JSONCountry = <?= getJSONArrayFromProcedure("getDetailCountry", $idCountry); ?>;
+      var JSONCountryMap = JSONCountry[0];
+      typeMap = 'country';
     <?php } ?>
 
     // $(document).on({
@@ -210,7 +226,7 @@ if (isset($_REQUEST["s"])) {
       let bounds;
       let center0, zoom0;
 
-      if (isLabelMap) {
+      if (typeMap == 'label') {
         // var bounds = new L.LatLngBounds(new L.LatLng(JSONLabelMap["bounds_top_left_lat"], JSONLabelMap["bounds_top_left_lon"]), new L.LatLng(JSONLabelMap["bounds_bottom_right_lat"], JSONLabelMap["bounds_bottom_right_lon"]));
         if (!JSONLabelMap["bounds_top_left_lat"] || !JSONLabelMap["bounds_top_left_lon"] || !JSONLabelMap["bounds_bottom_right_lat"] || !JSONLabelMap["bounds_bottom_right_lon"])
           bounds = new L.LatLngBounds(new L.LatLng(Number(JSONLabelMap["lat"]) - 0.5, Number(JSONLabelMap["lon"]) - 0.5), new L.LatLng(Number(JSONLabelMap["lat"]) + 0.5, Number(JSONLabelMap["lon"]) + 0.5));
@@ -228,11 +244,6 @@ if (isset($_REQUEST["s"])) {
         minZoom: 4.5,
         zoomControl: false
       });
-
-      if (isLabelMap) {
-        map.fitBounds(bounds); // on centre sur la région
-        setAterroirLevel(3);
-      }
 
       map.on('zoomend', function() {
         setLayersByLevel();
@@ -294,10 +305,20 @@ if (isset($_REQUEST["s"])) {
       listListLayerLevel[2] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2]];
       listListLayerLevel[3] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2]];
 
-      if (!isLabelMap)
-        setCommand(commandLegendCountries);
-      else
+      if (typeMap == 'label') {
+        map.fitBounds(bounds); // on centre sur la région
+        setAterroirLevel(3);
+        // legendMarkerLabelClick(idLabelMap);
+      } else if (typeMap == 'region') {
+        legendRegionClick(JSONRegionMap['code_region']);
+      } else if (typeMap == 'country') {
+        legendCountryClick(JSONCountryMap['code_country']);
+      }
+
+      if (typeMap == 'label')
         setCommand(getCommandLegendLabel(idLabelMap));
+      else
+        setCommand(commandLegendCountries);
 
       // setLayers(listListLayerLevel[0]); // setLayersByLevel fonctionne après le zoomend
 
@@ -1206,7 +1227,7 @@ if (isset($_REQUEST["s"])) {
       layerPositron = new L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png");
       layerPositronNoLabel = new L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png");
       layerWatercolor = new L.tileLayer("https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg");
-      if(JSONbasemap.length > 0)
+      if (JSONbasemap.length > 0)
         layerBasemap = new L.tileLayer(JSONbasemap[0]["url"]);
 
     }
