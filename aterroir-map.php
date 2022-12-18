@@ -533,10 +533,13 @@ if (isset($_REQUEST["s"])) {
             setAterroirLevel(3);
           } else { // on arrive sur la région (on était à un niveau inférieur ou dans une autre région)
             if (this.layerRegion) { // on vérifie qu'un polygone région est associé au marqueur
+              /*
               lastRegionClicked = this.layerRegion;
               setAterroirLevel(2);
               map.fitBounds(this.layerRegion.getBounds()); // on centre sur la région
               setCommand(getCommandLegendRegion(this.label["code_region"])); // fenêtre F2
+              */
+              legendRegionClick(this.label["code_region"]);
             }
           }
 
