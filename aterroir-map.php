@@ -3,6 +3,34 @@
 include_once "util.php";
 // include "lang-settings.php";
 
+
+$subdomain = null;
+
+$idLabel = 0;
+$idRegion = 0;
+$idCountry = 0;
+
+// if (isset($_REQUEST["id_label"])) {
+//   $idLabel = $_REQUEST["id_label"];
+// }
+
+$rsBasemap = [];
+
+if (isset($_REQUEST["s"])) {
+  $subdomain = $_REQUEST["s"];
+  $rsMap = getDataArrayFromProcedure("getDetailMap", $subdomain);
+
+  if (isset($rsMap[0]["id_label"]))
+    $idLabel = $rsMap[0]["id_label"];
+  else if (isset($rsMap[0]["id_region"]))
+    $idRegion = $rsMap[0]["id_region"];
+  else if (isset($rsMap[0]["id_country"]))
+    $idCountry = $rsMap[0]["id_country"];
+
+  if (isset($rsMap[0]["id_basemap"]))
+    $rsBasemap = getDataArrayFromProcedure("getDetailBasemap", $rsMap[0]["id_basemap"]);
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -46,7 +74,6 @@ include_once "util.php";
   </div> -->
   <div id="map" style="width:100%; height:100%"></div>
   <script type="text/javascript">
-
     // console.log("loading");
 
     var attLabel;
@@ -55,6 +82,9 @@ include_once "util.php";
 
     // tuiles (basemap)
     var layerTerrain, layerWatercolor, layerToner, layerPositron, layerPositronNoLabel;
+    var JSONbasemap = <?= json_encode($rsBasemap) ?>;
+
+    var layerBasemap;
     var currentTileLayerForLevel0; // basemap niveau 0
     var currentTileLayerOverLevel0; // basemap courante niveau > 0
 
@@ -78,6 +108,9 @@ include_once "util.php";
     var listListMarkerLabelLevel = []; // listes marqueurs label par niveau
     var listLayerLabelsLevel = []; // layers label par niveau
     var listListImageMapLabel = []; // listes des images de cartes par label
+    var listListPolMapLabel = []; // listes des images de cartes par label
+    var listLayerImagesCurrentLabel = [];
+    var listLayerPolygonsCurrentLabel = [];
 
     // PIs
     var listMarkerPIIndexed = []; // marqueurs PI indexés par leur id
@@ -126,7 +159,28 @@ include_once "util.php";
 
     var zoomLevel;
 
-    var windows = false;
+    var isWindows = false;
+
+    var typeMap;
+    var idLabelMap, idRegionMap, idCountryMap;
+
+    <?php if ($idLabel) { ?>
+      idLabelMap = <?= $idLabel ?>;
+      var JSONLabel = <?= getJSONArrayFromProcedure("getDetailLabel", $idLabel); ?>; // données JSON du label (carte terroir) 
+      var JSONLabelMap = JSONLabel[0];
+      typeMap = 'label';
+      isWindows = true;
+    <?php } else if ($idRegion) { ?>
+      idRegionMap = <?= $idRegion ?>;
+      var JSONRegion = <?= getJSONArrayFromProcedure("getDetailRegion", $idRegion); ?>;
+      var JSONRegionMap = JSONRegion[0];
+      typeMap = 'region';
+    <?php } else if ($idCountry) { ?>
+      idCountryMap = <?= $idCountry ?>;
+      var JSONCountry = <?= getJSONArrayFromProcedure("getDetailCountry", $idCountry); ?>;
+      var JSONCountryMap = JSONCountry[0];
+      typeMap = 'country';
+    <?php } ?>
 
     // $(document).on({
     //   ajaxStart: function() {
@@ -173,9 +227,22 @@ include_once "util.php";
 
       createCustomedIcons(20); // création des icones de marqueurs
 
+      let bounds;
+      let center0, zoom0;
+
+      if (typeMap == 'label') {
+        // var bounds = new L.LatLngBounds(new L.LatLng(JSONLabelMap["bounds_top_left_lat"], JSONLabelMap["bounds_top_left_lon"]), new L.LatLng(JSONLabelMap["bounds_bottom_right_lat"], JSONLabelMap["bounds_bottom_right_lon"]));
+        if (!JSONLabelMap["bounds_top_left_lat"] || !JSONLabelMap["bounds_top_left_lon"] || !JSONLabelMap["bounds_bottom_right_lat"] || !JSONLabelMap["bounds_bottom_right_lon"])
+          bounds = new L.LatLngBounds(new L.LatLng(Number(JSONLabelMap["lat"]) - 0.5, Number(JSONLabelMap["lon"]) - 0.5), new L.LatLng(Number(JSONLabelMap["lat"]) + 0.5, Number(JSONLabelMap["lon"]) + 0.5));
+        else
+          bounds = new L.LatLngBounds(new L.LatLng(JSONLabelMap["bounds_top_left_lat"], JSONLabelMap["bounds_top_left_lon"]), new L.LatLng(JSONLabelMap["bounds_bottom_right_lat"], JSONLabelMap["bounds_bottom_right_lon"]));
+      }
+
       // création de la carte
       map = L.map('map', {
         zoomSnap: 0.5,
+        // center: center0,
+        // zoom: zoom0,
         center: [48.833, 2.333],
         zoom: 4.5,
         minZoom: 4.5,
@@ -229,15 +296,33 @@ include_once "util.php";
       //   start: 8
       // };
 
-      currentTileLayerForLevel0 = layerPositronNoLabel;
-      currentTileLayerOverLevel0 = layerPositron;
+      if (layerBasemap) {
+        currentTileLayerForLevel0 = layerBasemap;
+        currentTileLayerOverLevel0 = layerBasemap;
+      } else {
+        currentTileLayerForLevel0 = layerPositronNoLabel;
+        currentTileLayerOverLevel0 = layerPositron;
+      }
 
       listListLayerLevel[0] = [currentTileLayerForLevel0, layerCountriesEurope, layerRegionsChine, layerLevel0];
       listListLayerLevel[1] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerRegionsFrance, listLayerLabelsLevel[1]];
       listListLayerLevel[2] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2]];
-      listListLayerLevel[3] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2]];
+      listListLayerLevel[3] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2]]; //, listLayerImagesCurrentLabel, listLayerPlygonsCurrentLabel];
 
-      // setCommand(commandLegendCountries);
+      if (typeMap == 'label') {
+        map.fitBounds(bounds); // on centre sur la région
+        setAterroirLevel(3);
+        // legendMarkerLabelClick(idLabelMap);
+      } else if (typeMap == 'region') {
+        legendRegionClick(JSONRegionMap['code_region']);
+      } else if (typeMap == 'country') {
+        legendCountryClick(JSONCountryMap['code_country']);
+      }
+
+      if (typeMap == 'label')
+        setCommand(getCommandLegendLabel(idLabelMap));
+      else if (isWindows)
+        setCommand(commandLegendCountries);
 
       // setLayers(listListLayerLevel[0]); // setLayersByLevel fonctionne après le zoomend
 
@@ -448,10 +533,13 @@ include_once "util.php";
             setAterroirLevel(3);
           } else { // on arrive sur la région (on était à un niveau inférieur ou dans une autre région)
             if (this.layerRegion) { // on vérifie qu'un polygone région est associé au marqueur
+              /*
               lastRegionClicked = this.layerRegion;
               setAterroirLevel(2);
               map.fitBounds(this.layerRegion.getBounds()); // on centre sur la région
               setCommand(getCommandLegendRegion(this.label["code_region"])); // fenêtre F2
+              */
+              legendRegionClick(this.label["code_region"]);
             }
           }
 
@@ -810,6 +898,25 @@ include_once "util.php";
       return jsonMaps;
     }
 
+    function getJSONPolygonsLabel(pidLabel) {
+
+      var jsonMaps;
+
+      $.ajax({
+        url: "getJSONPolygonsLabel.php",
+        type: "POST",
+        async: false, // Mode synchrone indispensable
+        data: ({
+          id: pidLabel
+        }),
+        success: function(data) {
+          jsonMaps = JSON.parse(data); // !!! return ici ne marche pas malgré synchrone (!?)
+        }
+      });
+
+      return jsonMaps;
+    }
+
     var f2Html = [];
 
     function getF2Html(pcodeRegion) {
@@ -900,6 +1007,46 @@ include_once "util.php";
         var imgMap = createImageMap(getFileNameFromJSONMetaData(map["img_map_filename"]), map["lat_lefttop"], map["lon_lefttop"], map["lat_rightbottom"], map["lon_rightbottom"]);
         listListImageMapLabel[pidLabel].push(imgMap);
       }
+      listLayerImagesCurrentLabel = listListImageMapLabel[pidLabel];
+    }
+
+    function createPolygonsLabel(pidLabel) {
+
+      listListPolMapLabel[pidLabel] = [];
+
+      var JSONPolygonsLabel = getJSONPolygonsLabel(pidLabel);
+
+      for (var pol of JSONPolygonsLabel) {
+        var polMapJSON = loadJSON("assets/geojson/terroirs/" + getFileNameFromJSONMetaData(pol["filename"]));
+        var tempLayer = L.geoJSON(polMapJSON, {
+          onEachFeature: function(feature, layer) {
+            // listLayerPolygonIndexed[feature.properties["adm0_a3"]] = layer;
+            // layer.on('click', function(e) {
+            //   map.fitBounds(layer.getBounds());
+            // });
+            // layer.on('mouseover', function(e) {
+            //   layer.setStyle({
+            //     color: "yellow",
+            //     opacity: 1,
+            //     weight: 0
+            //   });
+            // });
+            // layer.on('mouseout', function(e) {
+            //   layer.setStyle({
+            //     color: "white",
+            //     opacity: 0
+            //   });
+            // });
+          },
+          style: {
+            color: pol['color'] || "red",
+            fillOpacity: pol['opacity'] || 0.2,
+            weight: 0
+          }
+        });
+        listListPolMapLabel[pidLabel].push(tempLayer);
+      }
+      listLayerPolygonsCurrentLabel = listListPolMapLabel[pidLabel];
     }
 
     var currentLabel;
@@ -916,6 +1063,11 @@ include_once "util.php";
           imageMap.removeFrom(map);
         }
 
+        if (listListPolMapLabel[currentLabel] != undefined)
+        for (var polMap of listListPolMapLabel[currentLabel]) {
+          polMap.removeFrom(map);
+        }
+
       if (pidLabel in commandLegendLabel) {
 
         if (commandLegendLabel[pidLabel] != null) {
@@ -925,6 +1077,11 @@ include_once "util.php";
 
           for (var imageMap of listListImageMapLabel[pidLabel]) {
             imageMap.addTo(map);
+          }
+
+          
+          for (var polMap of listListPolMapLabel[pidLabel]) {
+            polMap.addTo(map);
           }
 
         }
@@ -950,6 +1107,12 @@ include_once "util.php";
         imageMap.addTo(map);
       }
 
+      createPolygonsLabel(pidLabel);
+
+      for (var polMap of listListPolMapLabel[pidLabel]) {
+        polMap.addTo(map);
+      }
+
       commandLegendLabel[pidLabel] = L.control({
         position: 'middleleft'
       });
@@ -962,7 +1125,7 @@ include_once "util.php";
         L.DomEvent.addListener(div, 'click', L.DomEvent.stopPropagation).addListener(div, 'click', L.DomEvent.preventDefault);
         L.DomEvent.addListener(div, 'mousewheel', L.DomEvent.stopPropagation); // .addListener(div, 'mousewheel', L.DomEvent.preventDefault);
 
-        var html = getF3Html(pidLabel);
+        var html = '' //getF3Html(pidLabel);
 
         div.innerHTML = html;
 
@@ -1145,6 +1308,9 @@ include_once "util.php";
       // layerToner = new L.StamenTileLayer("toner");
       layerPositron = new L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png");
       layerPositronNoLabel = new L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png");
+      layerWatercolor = new L.tileLayer("https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg");
+      if (JSONbasemap.length > 0)
+        layerBasemap = new L.tileLayer(JSONbasemap[0]["url"]);
 
     }
 
@@ -1436,7 +1602,7 @@ include_once "util.php";
 
     function setCommand(pcommand) {
 
-      if (!windows) return;
+      if (!isWindows) return;
 
       if (pcommand == currentCommand)
         return;
