@@ -263,12 +263,12 @@ if (isset($_REQUEST["s"])) {
         end: 7
       }; // pays
       listLevelsAterroir[2] = {
-        start: 7,
-        end: 8
+        start: 7
+        // end: 8
       } 
-      listLevelsAterroir[3] = {
-         start: 8
-      };
+      // listLevelsAterroir[3] = {
+      //    start: 8
+      // };
 
       if (layerBasemap) {
         currentTileLayerForLevel0 = layerBasemap;
