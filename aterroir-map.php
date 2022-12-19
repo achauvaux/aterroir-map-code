@@ -357,13 +357,13 @@ if (isset($_REQUEST["s"])) {
       desc += "<h1>" + pPI["name_" + coLang1] + "</h1>";
 
       // if (pPI["img_pi_filename"]!=0) {
+      desc += "<img src='assets/img/PI/" + getFileNameFromJSONMetaData(pPI["img_pi_filename"]) + "'>";
+      // var imgJSON = loadJSON(restBaseUrl + "media/" + pPI["img_pi_filename"] + "?_fields=guid");
       // desc += "<img src='assets/img/PI/" + getFileNameFromJSONMetaData(pPI["img_pi_filename"]) + "'>";
-      var imgJSON = loadJSON(restBaseUrl + "media/" + pPI["img_pi_filename"] + "?_fields=guid");
-      // desc += "<img src='assets/img/PI/" + getFileNameFromJSONMetaData(pPI["img_pi_filename"]) + "'>";
-      if (imgJSON) {
-        desc += "<img src='" + imgJSON["guid"]["rendered"] + "'>";
-        desc += "<a href='" + pPI["link"] + "' target='_blank'>" + pPI["name_" + coLang1] + "</a>";
-      }
+      // if (imgJSON) {
+      //   desc += "<img src='" + imgJSON["guid"]["rendered"] + "'>";
+      //   desc += "<a href='" + pPI["link"] + "' target='_blank'>" + pPI["name_" + coLang1] + "</a>";
+      // }
       // }
 
       return desc;
