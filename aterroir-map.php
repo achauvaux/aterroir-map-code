@@ -263,12 +263,12 @@ if (isset($_REQUEST["s"])) {
         end: 7
       }; // pays
       listLevelsAterroir[2] = {
-        start: 7
-        // end: 8
-      }; // region
-      // listLevelsAterroir[3] = {
-      //   start: 8
-      // };
+        start: 7,
+        end: 8
+      } 
+      listLevelsAterroir[3] = {
+         start: 8
+      };
 
       if (layerBasemap) {
         currentTileLayerForLevel0 = layerBasemap;
@@ -330,7 +330,7 @@ if (isset($_REQUEST["s"])) {
         desc += "<a href='" + pPI["link"] + "' target='_blank'>" + pPI["name_" + coLang1] + "</a>";
       } else {
         desc += "<img src='assets/img/PI/" + getFileNameFromJSONMetaData(pPI["img_pi"]) + "'>";
-        desc += "<a href='" + pPI["link"] + "' target='_blank'>" + pPI["name_" + coLang1] + "</a>";        
+        desc += "<a href='" + pPI["link"] + "' target='_blank'>" + pPI["name_" + coLang1] + "</a>";
       }
 
       return desc;
@@ -497,7 +497,7 @@ if (isset($_REQUEST["s"])) {
             setContextualWindow(tempCommand); // fenêtre F3
             map.setView(this.getLatLng(), 10); // TODO : centrer sur image terroir
             setAterroirLevel(3);
-            */IGTooltip
+            */
             goToLabel(this.label["id_label"]);
           } else { // on arrive sur la région (on était à un niveau inférieur ou dans une autre région)
             if (this.layerRegion) { // on vérifie qu'un polygone région est associé au marqueur
@@ -825,7 +825,7 @@ if (isset($_REQUEST["s"])) {
     function getJSONMarkersPILabel(pidLabel) {
 
       var jsonMarkers = [];
-      
+
       $.ajax({
         url: "getJSONMarkersPILabel.php",
         type: "POST",
@@ -837,7 +837,7 @@ if (isset($_REQUEST["s"])) {
           jsonMarkers = JSON.parse(data); // !!! return ici ne marche pas malgré synchrone (!?)
         }
       });
-      
+
       return jsonMarkers;
     }
 
@@ -982,15 +982,14 @@ if (isset($_REQUEST["s"])) {
       for (var pol of JSONPolygonsLabel) {
         var polMapJSON = loadJSON("assets/geojson/terroirs/" + getFileNameFromJSONMetaData(pol["filename"]));
         var tempLayer = L.geoJSON(polMapJSON, {
-          onEachFeature: function(feature, layer) {
-          },
+          onEachFeature: function(feature, layer) {},
           style: {
             color: pol['color'] || "red",
             fillOpacity: pol['opacity'] || 0.2,
             weight: 0
           }
         });
-        
+
         layers.push(tempLayer);
       }
 
@@ -1256,7 +1255,7 @@ if (isset($_REQUEST["s"])) {
       }
 
       for (layer of plistLayers) {
-        if(layer.length == 0) continue;
+        // if (layer.length == 0) continue;
         if (layer && !listActiveLayers.includes(layer)) { // TODO : pourquoi layer undefined parfois ?
           listActiveLayers.push(layer);
           map.addLayer(layer);
@@ -1297,6 +1296,7 @@ if (isset($_REQUEST["s"])) {
 
       log("zoom osm : " + zoomLevel + " / level at : " + aTerroirLevel);
 
+      /* TOFIX : don't work when map initialized on label
       if (aTerroirLevel >= 3)
         for (var m of listMarkerLabel) {
           m.options.interactive = true;
@@ -1312,6 +1312,7 @@ if (isset($_REQUEST["s"])) {
         lastRegionClicked = null;
         setContextualWindow(commandLegendCountries)
       }
+      */
 
       setLayers(listListLayerLevel[aTerroirLevel]);
       $(".talon").css('background', talonBGColorByLevel[aTerroirLevel]);
@@ -1400,7 +1401,7 @@ if (isset($_REQUEST["s"])) {
       marker.fire("click");
     }
 
-    function legendCountryClick(pcode) {;
+    function legendCountryClick(pcode) {
       var countryLayer = getLayerPolygonByCode(pcode);
       countryLayer.fire("click");
     }
@@ -1439,7 +1440,14 @@ if (isset($_REQUEST["s"])) {
       // $(".loading").css("display", "block");
       // console.log("1");
 
-      if(!labelDataExists[pid]) {
+      if (!lastRegionClicked) {
+        var m = getMarkerLabelById(pid);
+        lastRegionClicked = m.layerRegion;
+      }
+
+      // goToRegion(m.label["code_region"]);
+
+      if (!labelDataExists[pid]) {
         createLayerMarkersPILabel(pid);
         createLabelImages(pid);
         createLabelPolygons(pid);
@@ -1450,7 +1458,7 @@ if (isset($_REQUEST["s"])) {
       listListLayerLevel[3][6] = listLayerPIMarkersLabel[pid];
       listListLayerLevel[3][7] = listLayerImagesLabel[pid];
       // listLayerPolygonsCurrentLabel = listListPolMapLabel[pid];
-      listListLayerLevel[3][8] =  listLayerPolygonsLabel[pid];
+      listListLayerLevel[3][8] = listLayerPolygonsLabel[pid];
 
       setAterroirLevel(3);
       centerMapOnLabel(pid);
