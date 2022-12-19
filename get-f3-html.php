@@ -52,7 +52,7 @@ $rsPIs = [];
             <div class="flag">
               <img src="assets/img/images-labels/<?= $row["img_icon_filename"] ?>" alt="">
             </div>
-            <div class="talon-item" onclick="legendMarkerLabelClick(<?= $row['id_label'] ?>);">
+            <div class="talon-item" onclick="goToLabel(<?= $row['id_label'] ?>);">
               <p><?= $row['name_CN'] ?></p>
               <p><?= $row['name_FR'] ?></p>
             </div>
