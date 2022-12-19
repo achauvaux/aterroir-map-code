@@ -47,7 +47,7 @@ $rsOTs = getDataArrayFromProcedure("getListPI", null, $id_region, null, 1);
             <div class="flag">
               <img src="assets/img/logos-regions/<?= $row["img_logo"] ?>" alt="">
             </div>
-            <div class="talon-item" onclick="legendRegionClick('<?= $row['code_region'] ?>')" onmouseover="legendRegionOver('<?= $row['code_region'] ?>')" onmouseout="legendRegionOut('<?= $row['code_region'] ?>')">
+            <div class="talon-item" onclick="goToRegion('<?= $row['code_region'] ?>')" onmouseover="legendRegionOver('<?= $row['code_region'] ?>')" onmouseout="legendRegionOut('<?= $row['code_region'] ?>')">
               <p><?= $row['name_CN'] ?></p>
               <p><?= $row['name_FR'] ?></p>
             </div>
