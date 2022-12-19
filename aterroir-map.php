@@ -53,25 +53,7 @@ if (isset($_REQUEST["s"])) {
 
 <body onload="initialize()">
   <div class="loading">Loading&#8230;</div>
-  <!-- <div class="loader">
-    <div class="loader-inner">
-      <div class="loader-line-wrap">
-        <div class="loader-line"></div>
-      </div>
-      <div class="loader-line-wrap">
-        <div class="loader-line"></div>
-      </div>
-      <div class="loader-line-wrap">
-        <div class="loader-line"></div>
-      </div>
-      <div class="loader-line-wrap">
-        <div class="loader-line"></div>
-      </div>
-      <div class="loader-line-wrap">
-        <div class="loader-line"></div>
-      </div>
-    </div>
-  </div> -->
+
   <div id="map" style="width:100%; height:100%"></div>
   <script type="text/javascript">
     // console.log("loading");
@@ -109,13 +91,14 @@ if (isset($_REQUEST["s"])) {
     var listLayerLabelsLevel = []; // layers label par niveau
     var listListImageMapLabel = []; // listes des images de cartes par label
     var listListPolMapLabel = []; // listes des images de cartes par label
-    var listLayerImagesCurrentLabel = [];
-    var listLayerPolygonsCurrentLabel = [];
+
+    var listLayerImagesLabel = [];
+    var listLayerPolygonsLabel = [];
 
     // PIs
     var listMarkerPIIndexed = []; // marqueurs PI indexés par leur id
     var listListMarkerPILabel = []; // listes marqueurs PI par label
-    var listLayerMarkersPILabel = []; // listes layers PI par label
+    var listLayerPIMarkersLabel = []; // listes layers PI par label
 
 
     var listActiveLayers = []; // liste des calques actifs
@@ -159,7 +142,7 @@ if (isset($_REQUEST["s"])) {
 
     var zoomLevel;
 
-    var isWindows = false;
+    var isWindows = true;
 
     var typeMap;
     var idLabelMap, idRegionMap, idCountryMap;
@@ -181,15 +164,6 @@ if (isset($_REQUEST["s"])) {
       var JSONCountryMap = JSONCountry[0];
       typeMap = 'country';
     <?php } ?>
-
-    // $(document).on({
-    //   ajaxStart: function() {
-    //     alert("loading");
-    //   },
-    //   ajaxStop: function() {
-    //     alert("end loading");
-    //   }
-    // });
 
     function initialize() {
       /* 
@@ -307,22 +281,22 @@ if (isset($_REQUEST["s"])) {
       listListLayerLevel[0] = [currentTileLayerForLevel0, layerCountriesEurope, layerRegionsChine, layerLevel0];
       listListLayerLevel[1] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerRegionsFrance, listLayerLabelsLevel[1]];
       listListLayerLevel[2] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2]];
-      listListLayerLevel[3] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2]]; //, listLayerImagesCurrentLabel, listLayerPlygonsCurrentLabel];
+      listListLayerLevel[3] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2], null, null, null];
 
       if (typeMap == 'label') {
         map.fitBounds(bounds); // on centre sur la région
         setAterroirLevel(3);
         // legendMarkerLabelClick(idLabelMap);
       } else if (typeMap == 'region') {
-        legendRegionClick(JSONRegionMap['code_region']);
+        goToRegion(JSONRegionMap['code_region']);
       } else if (typeMap == 'country') {
         legendCountryClick(JSONCountryMap['code_country']);
       }
 
       if (typeMap == 'label')
-        setCommand(getCommandLegendLabel(idLabelMap));
+        setContextualWindow(getCommandLegendLabel(idLabelMap));
       else if (isWindows)
-        setCommand(commandLegendCountries);
+        setContextualWindow(commandLegendCountries);
 
       // setLayers(listListLayerLevel[0]); // setLayersByLevel fonctionne après le zoomend
 
@@ -338,11 +312,9 @@ if (isset($_REQUEST["s"])) {
 
       var desc = "";
       desc += "<p>" + pmarker.label["name_" + coLang1] + "</p>";
-      // if (pmarker.label["name_town_label"])
-      //   desc += pmarker.label["name_town_label"] + "</br>";
 
-      // desc+="<a href='assets/pdf/bourgogne.pdf' target='_blank'><img src='assets/pdf/bourgogne-pdf-screenshot.png' /></a>";
       var pdfFile = getFileNameFromJSONMetaData(pmarker.label["pdf"]);
+
       if (pdfFile)
         desc += "<a href='assets/pdf/" + pdfFile + "' target='_blank'><img class='pdf-img' src='assets/pdf/" + getFileNameFromJSONMetaData(pmarker.label["pdf_icon"]) + "' /></a>";
 
@@ -356,22 +328,20 @@ if (isset($_REQUEST["s"])) {
       var desc = "";
       desc += "<h1>" + pPI["name_" + coLang1] + "</h1>";
 
-      // if (pPI["img_pi_filename"]!=0) {
-      // desc += "<img src='assets/img/PI/" + getFileNameFromJSONMetaData(pPI["img_pi_filename"]) + "'>";
-      var imgJSON = loadJSON(restBaseUrl + "media/" + pPI["img_pi_filename"] + "?_fields=guid");
-      // desc += "<img src='assets/img/PI/" + getFileNameFromJSONMetaData(pPI["img_pi_filename"]) + "'>";
+      var imgJSON = null; //loadJSON(restBaseUrl + "media/" + pPI["img_pi_filename"] + "?_fields=guid");
+
       if (imgJSON) {
         desc += "<img src='" + imgJSON["guid"]["rendered"] + "'>";
         desc += "<a href='" + pPI["link"] + "' target='_blank'>" + pPI["name_" + coLang1] + "</a>";
+      } else {
+        desc += "<img src='assets/img/PI/" + getFileNameFromJSONMetaData(pPI["img_pi"]) + "'>";
+        desc += "<a href='" + pPI["link"] + "' target='_blank'>" + pPI["name_" + coLang1] + "</a>";        
       }
-      // }
 
       return desc;
     }
 
     var listPIType = {
-      // "AOP": ["AOP", "icon-AOP.png"],
-      // "IGP": ["AOP", "icon-IGP.png"],
       "OT": ["Offices de Tourisme", "icon-OT.png"],
       "visite": ["Visites", "icon-visite.png"],
       "gastro": ["Gastronomie", "icon-gastro.png"],
@@ -525,21 +495,18 @@ if (isset($_REQUEST["s"])) {
               }).openPopup();
             // this.openPopup();
           } else if (lastRegionClicked == this.layerRegion) { // la région est déjà sélectionnée : on était au niveau 2 et on passe au niveau 3
+            /*
             // if (!hasPI(this.label["id_label"])) return;
             var tempCommand = getCommandLegendLabel(this.label["id_label"]);
             if (tempCommand == null) return;
-            setCommand(tempCommand); // fenêtre F3
+            setContextualWindow(tempCommand); // fenêtre F3
             map.setView(this.getLatLng(), 10); // TODO : centrer sur image terroir
             setAterroirLevel(3);
+            */IGTooltip
+            goToLabel(this.label["id_label"]);
           } else { // on arrive sur la région (on était à un niveau inférieur ou dans une autre région)
             if (this.layerRegion) { // on vérifie qu'un polygone région est associé au marqueur
-              /*
-              lastRegionClicked = this.layerRegion;
-              setAterroirLevel(2);
-              map.fitBounds(this.layerRegion.getBounds()); // on centre sur la région
-              setCommand(getCommandLegendRegion(this.label["code_region"])); // fenêtre F2
-              */
-              legendRegionClick(this.label["code_region"]);
+              goToRegion(this.label["code_region"]);
             }
           }
 
@@ -783,7 +750,7 @@ if (isset($_REQUEST["s"])) {
                 <div class="flag">
                   <img src="assets/img/logos-regions/` + (region["img_logo"] ?? "flag-europe.png") + `" alt="">
                 </div>
-                <div class="talon-item" onclick='legendRegionClick("` + region["code_region"] + `")' onmouseover='legendRegionOver("` + region["code_region"] + `")' onmouseout='legendRegionOut("` + region["code_region"] + `")'>
+                <div class="talon-item" onclick='goToRegion("` + region["code_region"] + `")' onmouseover='legendRegionOver("` + region["code_region"] + `")' onmouseout='legendRegionOut("` + region["code_region"] + `")'>
                   <p>` + region["name_" + coLang1] + `</p>
                   <p>` + region["name_" + coLang2] + `</p>
                 </div>
@@ -863,7 +830,7 @@ if (isset($_REQUEST["s"])) {
     function getJSONMarkersPILabel(pidLabel) {
 
       var jsonMarkers = [];
-      /*
+      
       $.ajax({
         url: "getJSONMarkersPILabel.php",
         type: "POST",
@@ -875,7 +842,7 @@ if (isset($_REQUEST["s"])) {
           jsonMarkers = JSON.parse(data); // !!! return ici ne marche pas malgré synchrone (!?)
         }
       });
-      */
+      
       return jsonMarkers;
     }
 
@@ -953,7 +920,7 @@ if (isset($_REQUEST["s"])) {
       var html;
 
       $.ajax({
-        url: "get-f3-html-rest.php",
+        url: "get-f3-html.php",
         type: "POST",
         async: false, // Mode synchrone indispensable
         data: ({
@@ -994,25 +961,26 @@ if (isset($_REQUEST["s"])) {
         listMarkerPIIndexed[PI["id_pi"]] = m;
       }
 
-      listLayerMarkersPILabel[pidLabel] = L.layerGroup(listListMarkerPILabel[pidLabel]);
+      listLayerPIMarkersLabel[pidLabel] = L.layerGroup(listListMarkerPILabel[pidLabel]);
     }
 
-    function createMapsLabel(pidLabel) {
+    function createLabelImages(pidLabel) {
 
-      listListImageMapLabel[pidLabel] = [];
+      var layers = [];
 
       var JSONMapsLabel = getJSONMapsLabel(pidLabel);
 
       for (var map of JSONMapsLabel) {
         var imgMap = createImageMap(getFileNameFromJSONMetaData(map["img_map_filename"]), map["lat_lefttop"], map["lon_lefttop"], map["lat_rightbottom"], map["lon_rightbottom"]);
-        listListImageMapLabel[pidLabel].push(imgMap);
+        layers.push(imgMap);
       }
-      listLayerImagesCurrentLabel = listListImageMapLabel[pidLabel];
+
+      listLayerImagesLabel[pidLabel] = L.layerGroup(layers);
     }
 
-    function createPolygonsLabel(pidLabel) {
+    function createLabelPolygons(pidLabel) {
 
-      listListPolMapLabel[pidLabel] = [];
+      var layers = [];
 
       var JSONPolygonsLabel = getJSONPolygonsLabel(pidLabel);
 
@@ -1020,23 +988,6 @@ if (isset($_REQUEST["s"])) {
         var polMapJSON = loadJSON("assets/geojson/terroirs/" + getFileNameFromJSONMetaData(pol["filename"]));
         var tempLayer = L.geoJSON(polMapJSON, {
           onEachFeature: function(feature, layer) {
-            // listLayerPolygonIndexed[feature.properties["adm0_a3"]] = layer;
-            // layer.on('click', function(e) {
-            //   map.fitBounds(layer.getBounds());
-            // });
-            // layer.on('mouseover', function(e) {
-            //   layer.setStyle({
-            //     color: "yellow",
-            //     opacity: 1,
-            //     weight: 0
-            //   });
-            // });
-            // layer.on('mouseout', function(e) {
-            //   layer.setStyle({
-            //     color: "white",
-            //     opacity: 0
-            //   });
-            // });
           },
           style: {
             color: pol['color'] || "red",
@@ -1044,19 +995,42 @@ if (isset($_REQUEST["s"])) {
             weight: 0
           }
         });
-        listListPolMapLabel[pidLabel].push(tempLayer);
+        
+        layers.push(tempLayer);
       }
-      listLayerPolygonsCurrentLabel = listListPolMapLabel[pidLabel];
+
+      listLayerPolygonsLabel[pidLabel] = L.layerGroup(layers);
     }
 
     var currentLabel;
+
+    function createLabelWindow(pid) {
+      commandLegendLabel[pid] = L.control({
+        position: 'middleleft'
+      });
+
+      var m = getMarkerLabelById(pid);
+
+      commandLegendLabel[pid].onAdd = function(map) {
+
+        var div = L.DomUtil.create('div', 'command');
+        L.DomEvent.addListener(div, 'click', L.DomEvent.stopPropagation).addListener(div, 'click', L.DomEvent.preventDefault);
+        L.DomEvent.addListener(div, 'mousewheel', L.DomEvent.stopPropagation); // .addListener(div, 'mousewheel', L.DomEvent.preventDefault);
+
+        var html = getF3Html(pid);
+
+        div.innerHTML = html;
+
+        return div;
+      };
+    }
 
     function getCommandLegendLabel(pidLabel) {
 
       $(".loading").show();
 
-      if (currentLabel && map.hasLayer(listLayerMarkersPILabel[currentLabel]))
-        map.removeLayer(listLayerMarkersPILabel[currentLabel]);
+      if (currentLabel && map.hasLayer(listLayerPIMarkersLabel[currentLabel]))
+        map.removeLayer(listLayerPIMarkersLabel[currentLabel]);
 
       if (listListImageMapLabel[currentLabel] != undefined)
         for (var imageMap of listListImageMapLabel[currentLabel]) {
@@ -1073,7 +1047,7 @@ if (isset($_REQUEST["s"])) {
         if (commandLegendLabel[pidLabel] != null) {
 
           currentLabel = pidLabel;
-          map.addLayer(listLayerMarkersPILabel[pidLabel]);
+          map.addLayer(listLayerPIMarkersLabel[pidLabel]);
 
           for (var imageMap of listListImageMapLabel[pidLabel]) {
             imageMap.addTo(map);
@@ -1099,15 +1073,15 @@ if (isset($_REQUEST["s"])) {
       }
 
       currentLabel = pidLabel;
-      map.addLayer(listLayerMarkersPILabel[pidLabel]);
+      map.addLayer(listLayerPIMarkersLabel[pidLabel]);
 
-      createMapsLabel(pidLabel);
+      createLabelImages(pidLabel);
 
       for (var imageMap of listListImageMapLabel[pidLabel]) {
         imageMap.addTo(map);
       }
 
-      createPolygonsLabel(pidLabel);
+      createLabelPolygons(pidLabel);
 
       for (var polMap of listListPolMapLabel[pidLabel]) {
         polMap.addTo(map);
@@ -1227,7 +1201,7 @@ if (isset($_REQUEST["s"])) {
         onEachFeature: function(feature, layer) {
           listLayerPolygonIndexed[feature.properties["name"]] = layer;
           layer.on('click', function(e) {
-            legendRegionClick(feature.properties["name"]);
+            goToRegion(feature.properties["name"]);
           });
           layer.on('mouseover', function(e) {
             regionFocusOn(layer);
@@ -1252,7 +1226,7 @@ if (isset($_REQUEST["s"])) {
         onEachFeature: function(feature, layer) {
           listLayerPolygonIndexed[feature.properties["nuts2"]] = layer;
           layer.on('click', function(e) {
-            legendRegionClick(feature.properties["nuts2"]);
+            goToRegion(feature.properties["nuts2"]);
           });
           layer.on('mouseover', function(e) {
             regionFocusOn(layer);
@@ -1280,7 +1254,7 @@ if (isset($_REQUEST["s"])) {
             lastRegionClicked = layer;
             setAterroirLevel(2);
             map.fitBounds(layer.getBounds());
-            setCommand(getCommandLegendRegion(feature.properties["HASC_1"]));
+            setContextualWindow(getCommandLegendRegion(feature.properties["HASC_1"]));
           });
           layer.on('mouseover', function(e) {
             regionFocusOn(layer);
@@ -1303,12 +1277,9 @@ if (isset($_REQUEST["s"])) {
 
     function createTilesLayers() { // création des calques "tuiles"
 
-      // layerTerrain = new L.StamenTileLayer("terrain");
-      // layerWatercolor = new L.StamenTileLayer("watercolor");
-      // layerToner = new L.StamenTileLayer("toner");
       layerPositron = new L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png");
       layerPositronNoLabel = new L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png");
-      layerWatercolor = new L.tileLayer("https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg");
+
       if (JSONbasemap.length > 0)
         layerBasemap = new L.tileLayer(JSONbasemap[0]["url"]);
 
@@ -1376,6 +1347,7 @@ if (isset($_REQUEST["s"])) {
       }
 
       for (layer of plistLayers) {
+        if(layer.length == 0) continue;
         if (layer && !listActiveLayers.includes(layer)) { // TODO : pourquoi layer undefined parfois ?
           listActiveLayers.push(layer);
           map.addLayer(layer);
@@ -1429,7 +1401,7 @@ if (isset($_REQUEST["s"])) {
 
       if (aTerroirLevel < 2) {
         lastRegionClicked = null;
-        setCommand(commandLegendCountries)
+        setContextualWindow(commandLegendCountries)
       }
 
       setLayers(listListLayerLevel[aTerroirLevel]);
@@ -1512,41 +1484,70 @@ if (isset($_REQUEST["s"])) {
     function legendMarkerLabelClick(pid) {
       var marker = getMarkerLabelById(pid);
       marker.fire("click");
-      // map.setView(marker.getLatLng(), 10);
     }
 
     function legendMarkerPIClick(pid) {
       var marker = getMarkerPIById(pid);
       marker.fire("click");
-      // log("marker.openPopup();");
     }
 
-    function legendCountryClick(pcode) {
-      // var countryLayer = getCountryLayerByCode(pcode);
+    function legendCountryClick(pcode) {;
       var countryLayer = getLayerPolygonByCode(pcode);
       countryLayer.fire("click");
     }
 
     function legendCountryOver(pcode) {
-      // var countryLayer = getCountryLayerByCode(pcode);
       var countryLayer = getLayerPolygonByCode(pcode);
       countryLayer.fire("mouseover");
     }
 
     function legendCountryOut(pcode) {
-      // var countryLayer = getCountryLayerByCode(pcode);
       var countryLayer = getLayerPolygonByCode(pcode);
       countryLayer.fire("mouseout");
     }
 
-    function legendRegionClick(pcode) {
-      // var regionLayer = getRegionLayerByCode(pcode);
+    function goToRegion(pcode) {
       var regionLayer = getLayerPolygonByCode(pcode);
       lastRegionClicked = regionLayer;
       setAterroirLevel(2);
       map.fitBounds(regionLayer.getBounds());
       regionFocusOut();
-      setCommand(getCommandLegendRegion(pcode));
+      setContextualWindow(getCommandLegendRegion(pcode));
+    }
+
+    let labelDataExists = [];
+
+    function centerMapOnLabel(pid) {
+
+      let m = getMarkerLabelById(pid);
+      map.setView(m.getLatLng(), 10);
+
+    }
+
+    function goToLabel(pid) {
+
+      $(".loading").show();
+
+      if(!labelDataExists[pid]) {
+        createLayerMarkersPILabel(pid);
+        createLabelImages(pid);
+        createLabelPolygons(pid);
+        createLabelWindow(pid);
+        labelDataExists[pid] = true;
+      }
+
+      listListLayerLevel[3][6] = listLayerPIMarkersLabel[pid];
+      listListLayerLevel[3][7] = listLayerImagesLabel[pid];
+      // listLayerPolygonsCurrentLabel = listListPolMapLabel[pid];
+      listListLayerLevel[3][8] =  listLayerPolygonsLabel[pid];
+
+      setAterroirLevel(3);
+      centerMapOnLabel(pid);
+
+      setContextualWindow(commandLegendLabel[pid]);
+
+      $(".loading").hide();
+
     }
 
     function legendRegionOver(pcode) {
@@ -1600,7 +1601,7 @@ if (isset($_REQUEST["s"])) {
       $("#" + pitem).show(0);
     }
 
-    function setCommand(pcommand) {
+    function setContextualWindow(pcommand) {
 
       if (!isWindows) return;
 
