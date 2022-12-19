@@ -52,7 +52,7 @@ if (isset($_REQUEST["s"])) {
 </head>
 
 <body onload="initialize()">
-  <div class="loading">Loading&#8230;</div>
+  <div class="loading">Loading…</div>
 
   <div id="map" style="width:100%; height:100%"></div>
   <script type="text/javascript">
@@ -144,7 +144,7 @@ if (isset($_REQUEST["s"])) {
 
     var isWindows = true;
 
-    var typeMap;
+    var typeMap = 'global';
     var idLabelMap, idRegionMap, idCountryMap;
 
     <?php if ($idLabel) { ?>
@@ -284,26 +284,21 @@ if (isset($_REQUEST["s"])) {
       listListLayerLevel[3] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2], null, null, null];
 
       if (typeMap == 'label') {
-        map.fitBounds(bounds); // on centre sur la région
-        setAterroirLevel(3);
+        // map.fitBounds(bounds); // on centre sur la région
+        // setAterroirLevel(3);
         // legendMarkerLabelClick(idLabelMap);
+        goToLabel(idLabelMap);
       } else if (typeMap == 'region') {
         goToRegion(JSONRegionMap['code_region']);
       } else if (typeMap == 'country') {
         legendCountryClick(JSONCountryMap['code_country']);
       }
 
-      if (typeMap == 'label')
-        setContextualWindow(getCommandLegendLabel(idLabelMap));
-      else if (isWindows)
+      if (typeMap == 'global') {
         setContextualWindow(commandLegendCountries);
+        setLayersByLevel();
+      }
 
-      // setLayers(listListLayerLevel[0]); // setLayersByLevel fonctionne après le zoomend
-
-      // computeAterroirLevel = true;
-      setLayersByLevel();
-
-      // console.log("end loading");
       $(".loading").hide();
 
     }
@@ -1025,92 +1020,6 @@ if (isset($_REQUEST["s"])) {
       };
     }
 
-    function getCommandLegendLabel(pidLabel) {
-
-      $(".loading").show();
-
-      if (currentLabel && map.hasLayer(listLayerPIMarkersLabel[currentLabel]))
-        map.removeLayer(listLayerPIMarkersLabel[currentLabel]);
-
-      if (listListImageMapLabel[currentLabel] != undefined)
-        for (var imageMap of listListImageMapLabel[currentLabel]) {
-          imageMap.removeFrom(map);
-        }
-
-        if (listListPolMapLabel[currentLabel] != undefined)
-        for (var polMap of listListPolMapLabel[currentLabel]) {
-          polMap.removeFrom(map);
-        }
-
-      if (pidLabel in commandLegendLabel) {
-
-        if (commandLegendLabel[pidLabel] != null) {
-
-          currentLabel = pidLabel;
-          map.addLayer(listLayerPIMarkersLabel[pidLabel]);
-
-          for (var imageMap of listListImageMapLabel[pidLabel]) {
-            imageMap.addTo(map);
-          }
-
-          
-          for (var polMap of listListPolMapLabel[pidLabel]) {
-            polMap.addTo(map);
-          }
-
-        }
-
-        $(".loading").hide();
-        return commandLegendLabel[pidLabel];
-      }
-
-      createLayerMarkersPILabel(pidLabel);
-
-      if (listListMarkerPILabel[pidLabel].length == 0) {
-        commandLegendLabel[pidLabel] = null;
-        $(".loading").hide();
-        // return null;
-      }
-
-      currentLabel = pidLabel;
-      map.addLayer(listLayerPIMarkersLabel[pidLabel]);
-
-      createLabelImages(pidLabel);
-
-      for (var imageMap of listListImageMapLabel[pidLabel]) {
-        imageMap.addTo(map);
-      }
-
-      createLabelPolygons(pidLabel);
-
-      for (var polMap of listListPolMapLabel[pidLabel]) {
-        polMap.addTo(map);
-      }
-
-      commandLegendLabel[pidLabel] = L.control({
-        position: 'middleleft'
-      });
-
-      var m = getMarkerLabelById(pidLabel);
-
-      commandLegendLabel[pidLabel].onAdd = function(map) {
-
-        var div = L.DomUtil.create('div', 'command');
-        L.DomEvent.addListener(div, 'click', L.DomEvent.stopPropagation).addListener(div, 'click', L.DomEvent.preventDefault);
-        L.DomEvent.addListener(div, 'mousewheel', L.DomEvent.stopPropagation); // .addListener(div, 'mousewheel', L.DomEvent.preventDefault);
-
-        var html = '' //getF3Html(pidLabel);
-
-        div.innerHTML = html;
-
-        return div;
-      };
-
-      $(".loading").hide();
-      return commandLegendLabel[pidLabel];
-
-    }
-
     function getListPIByType(pJSONMarkersPI, pidLabel, ptypePI) {
       var listPI = [];
       for (var PI of pJSONMarkersPI)
@@ -1527,6 +1436,8 @@ if (isset($_REQUEST["s"])) {
     function goToLabel(pid) {
 
       $(".loading").show();
+      // $(".loading").css("display", "block");
+      // console.log("1");
 
       if(!labelDataExists[pid]) {
         createLayerMarkersPILabel(pid);
@@ -1547,6 +1458,7 @@ if (isset($_REQUEST["s"])) {
       setContextualWindow(commandLegendLabel[pid]);
 
       $(".loading").hide();
+      // console.log("2");
 
     }
 
