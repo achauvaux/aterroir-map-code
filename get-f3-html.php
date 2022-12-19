@@ -12,6 +12,7 @@ $rsLabels = getDataArrayFromProcedure("getListLabels", null, null, $id_region);
 // $rsPIs = getDataArrayFromProcedure("getListPI", null, $id_region, null, null);
 $rsOTs = getDataArrayFromProcedure("getListPI", null, $id_region, null, 1);
 $rsPICategories = getDataArrayFromProcedure("getListPICategories");
+$rsPIs = [];
 
 ?>
 
@@ -24,7 +25,10 @@ $rsPICategories = getDataArrayFromProcedure("getListPICategories");
       <img src="assets/img/icones-aterroir/Bouton F InfoOT.png">
     </div>
     <div class="list-PI">
-      <?php foreach ($rsPICategories as $row) { ?>
+      <?php foreach ($rsPICategories as $row) {
+        $rsPIs[$row["id_picategory"]] = getDataArrayFromProcedure("getListPIs", null, null, $id_label, $row["id_picategory"]);
+        if(empty($rsPIs[$row["id_picategory"]])) continue;
+      ?>
         <div id="label-<?= $id_label ?>-F3-PI-type-<?= $row["id_picategory"] ?>" class="menu-item PI" onmouseenter="openRight('F3-PI-type-<?= $row['id_picategory'] ?>');" onclick="togglePIType(29,'<?= $row['id_picategory'] ?>');">
           <img src="assets/img/icones-categories-pi/<?= $row['img_icon_category'] ?>">
         </div>
@@ -87,8 +91,8 @@ $rsPICategories = getDataArrayFromProcedure("getListPICategories");
       <div class="content">
         <ul class="list-items">
           <?php
-          $rsPIs = getDataArrayFromProcedure("getListPIs", null, null, $id_label, $row["id_picategory"]);
-          foreach ($rsPIs as $row2) {
+          $rsPIcat = $rsPIs[$row["id_picategory"]];
+          foreach ($rsPIcat as $row2) {
           ?>
             <li class="legend-item PI">
               <div class="icon" onclick="togglePI(<?= $row2['id_pi'] ?>);" onmouseover="itemPIFocusOn(<?= $row2['id_pi'] ?>);" onmouseout="itemPIFocusOut(<?= $row2['id_pi'] ?>);">
