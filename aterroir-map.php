@@ -265,7 +265,7 @@ if (isset($_REQUEST["s"])) {
       listLevelsAterroir[2] = {
         start: 7
         // end: 8
-      } 
+      }
       // listLevelsAterroir[3] = {
       //    start: 8
       // };
@@ -993,7 +993,9 @@ if (isset($_REQUEST["s"])) {
         layers.push(tempLayer);
       }
 
-      listLayerPolygonsLabel[pidLabel] = L.layerGroup(layers);
+      // listLayerPolygonsLabel[pidLabel] = L.layerGroup(layers);
+      if (layers.length > 0)
+        listLayerPolygonsLabel[pidLabel] = L.featureGroup(layers);
     }
 
     var currentLabel;
@@ -1429,9 +1431,13 @@ if (isset($_REQUEST["s"])) {
 
     function centerMapOnLabel(pid) {
 
-      let m = getMarkerLabelById(pid);
-      map.setView(m.getLatLng(), 10);
-
+      if (listLayerPolygonsLabel[pid]) {
+        // let l = listLayerPolygonsLabel[pid];
+        map.fitBounds(listLayerPolygonsLabel[pid].getBounds());
+      } else {
+        let m = getMarkerLabelById(pid);
+        map.setView(m.getLatLng(), 10);
+      }
     }
 
     function goToLabel(pid) {
