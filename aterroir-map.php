@@ -138,7 +138,7 @@ if (isset($_REQUEST["s"])) {
 
     var logOn = false;
 
-    var lastRegionMouseOvered, lastRegionClicked;
+    var lastRegionMouseOvered, currentRegionLayer;
 
     var commandLegendRegion = [];
     var commandLegendLabel = [];
@@ -258,6 +258,7 @@ if (isset($_REQUEST["s"])) {
       // map.spin(true);
 
       map.on('zoomend', function() {
+        console.log("zoomend - setLayersByLevel()");
         setLayersByLevel();
       })
 
@@ -297,12 +298,12 @@ if (isset($_REQUEST["s"])) {
         end: 7
       }; // pays
       listLevelsAterroir[2] = {
-        start: 7
-        // end: 8
+        start: 7,
+        end: 8
       }
-      // listLevelsAterroir[3] = {
-      //    start: 8
-      // };
+      listLevelsAterroir[3] = {
+         start: 8
+      };
 
       if (layerBasemap) {
         currentTileLayerForLevel0 = layerBasemap;
@@ -329,7 +330,7 @@ if (isset($_REQUEST["s"])) {
       }
 
       if (typeMap == 'global') {
-        setContextualWindow(commandLegendCountries);
+        // setContextualWindow(commandLegendCountries);
         setLayersByLevel();
       }
 
@@ -525,7 +526,7 @@ if (isset($_REQUEST["s"])) {
                 className: "label"
               }).openPopup();
             // this.openPopup();
-          } else if (lastRegionClicked == this.layerRegion) { // la région est déjà sélectionnée : on était au niveau 2 et on passe au niveau 3
+          } else if (currentRegionLayer == this.layerRegion) { // la région est déjà sélectionnée : on était au niveau 2 et on passe au niveau 3
             /*
             // if (!hasPI(this.label["id_label"])) return;
             var tempCommand = getCommandLegendLabel(this.label["id_label"]);
@@ -542,7 +543,7 @@ if (isset($_REQUEST["s"])) {
           }
 
         }).on("mouseover", function(e) {
-          if (aTerroirLevel > 1 && this.layerRegion == lastRegionClicked)
+          if (aTerroirLevel > 1 && this.layerRegion == currentRegionLayer)
             $("#IG-" + this.label["id_label"] + " .talon").css("background", "#ffcd00");
           if (this.layerRegion)
             regionFocusOn(this.layerRegion);
@@ -552,7 +553,7 @@ if (isset($_REQUEST["s"])) {
           if (this.layerRegion)
             regionFocusOut(this.layerRegion);
           $("#IG-" + this.label["id_label"] + " .talon").css("background", talonBGColorByLevel[aTerroirLevel]);
-          if (lastRegionClicked)
+          if (currentRegionLayer)
             markerLabelFocusOut(this);
         });
 
@@ -1206,10 +1207,10 @@ if (isset($_REQUEST["s"])) {
         onEachFeature: function(feature, layer) {
           listLayerPolygonIndexed[feature.properties["HASC_1"]] = layer;
           layer.on('click', function(e) {
-            lastRegionClicked = layer;
+            currentRegionLayer = layer;
             setAterroirLevel(2);
             map.fitBounds(layer.getBounds());
-            setContextualWindow(getCommandLegendRegion(feature.properties["HASC_1"]));
+            // setContextualWindow(getCommandLegendRegion(feature.properties["HASC_1"]));
           });
           layer.on('mouseover', function(e) {
             regionFocusOn(layer);
@@ -1370,13 +1371,23 @@ if (isset($_REQUEST["s"])) {
         }
 
       if (aTerroirLevel < 2) {
-        lastRegionClicked = null;
-        setContextualWindow(commandLegendCountries)
+        currentRegionLayer = null;
+        // setContextualWindow(commandLegendCountries);
       }
 
-
       setLayers(listListLayerLevel[aTerroirLevel]);
-      $(".talon").css('background', talonBGColorByLevel[aTerroirLevel]);
+      console.log("setLayersByLevel - setLayers() - level " + aTerroirLevel);
+
+      // if(aTerroirLevel != 3) {
+        $(".talon").css('background', talonBGColorByLevel[aTerroirLevel]);
+      // } else {
+      //   for(let m in listMarkerLabel) {
+      //     if(m.layerRegion == currentRegionLayer)
+      //       $("#IG-" + m.id + " .talon").css("background", talonBGColorByLevel[3]);
+      //     else
+      //       $("#IG-" + m.id + " .talon").css("background", talonBGColorByLevel[2]);
+      //   }
+      // }
 
       computeAterroirLevel = true;
     }
@@ -1421,7 +1432,7 @@ if (isset($_REQUEST["s"])) {
 
     function regionFocusOn(playerRegion) {
       regionFocusOut();
-      if (aTerroirLevel < 3 && playerRegion != lastRegionClicked) {
+      if (playerRegion != currentRegionLayer) {
         lastRegionMouseOvered = playerRegion;
         playerRegion.setStyle({
           color: "yellow"
@@ -1478,15 +1489,16 @@ if (isset($_REQUEST["s"])) {
     }
 
     function goToRegion(pcode) {
-      currentMarker.unbindPopup();
+      if(currentMarker)
+        currentMarker.unbindPopup();
       $(".loading").show();
       setTimeout(function() {
         var regionLayer = getLayerPolygonByCode(pcode);
-        lastRegionClicked = regionLayer;
+        currentRegionLayer = regionLayer;
         setAterroirLevel(2);
         map.fitBounds(regionLayer.getBounds());
         regionFocusOut();
-        setContextualWindow(getCommandLegendRegion(pcode));
+        // setContextualWindow(getCommandLegendRegion(pcode));
         $(".loading").hide();
       }, 0)
 
@@ -1496,13 +1508,32 @@ if (isset($_REQUEST["s"])) {
 
     function centerMapOnLabel(pid) {
 
+      let z1 = map.getZoom();
+      console.log(z1);
+
       if (listLayerImagesAndPolygonsLabel[pid]) {
-      // if (false) {
-        // let l = listLayerPolygonsLabel[pid];
-        map.fitBounds(listLayerImagesAndPolygonsLabel[pid].getBounds());
+        // if (false) {
+          console.log("centerMapOnLabel - map.fitBounds(listLayerImagesAndPolygonsLabel[pid].getBounds());");
+          map.fitBounds(listLayerImagesAndPolygonsLabel[pid].getBounds());
+          // let l = listLayerPolygonsLabel[pid];
+          // setTimeout(() => {
+          //   map.fitBounds(listLayerImagesAndPolygonsLabel[pid].getBounds());
+          //   setAterroirLevel(3);
+          //   setLayersByLevel();
+          // }, 0);
+          
       } else {
         let m = getMarkerLabelById(pid);
         map.setView(m.getLatLng(), 10);
+      }
+
+      // computeAterroirLevel = false;
+      let z2 = map.getZoom();
+      console.log(z2);
+
+      if(z1 == z2) {
+        console.log("centerMapOnLabel - setLayersByLevel();");
+        setLayersByLevel();
       }
     }
 
@@ -1511,7 +1542,9 @@ if (isset($_REQUEST["s"])) {
     function goToLabel(pid) {
 
       currentLabel = pid;
-      currentMarker.unbindPopup();
+
+      if(currentMarker)
+        currentMarker.unbindPopup();
 
       // console.log("1");
       $(".loading").show();
@@ -1519,9 +1552,9 @@ if (isset($_REQUEST["s"])) {
       // $(".loading").css("display", "block");
 
       setTimeout(function() {
-        if (!lastRegionClicked) {
+        if (!currentRegionLayer) {
           var m = getMarkerLabelById(pid);
-          lastRegionClicked = m.layerRegion;
+          currentRegionLayer = m.layerRegion;
         }
 
         // goToRegion(m.label["code_region"]);
@@ -1539,8 +1572,10 @@ if (isset($_REQUEST["s"])) {
         // listLayerPolygonsCurrentLabel = listListPolMapLabel[pid];
         listListLayerLevel[3][8] = listLayerImagesAndPolygonsLabel[pid];
 
+        console.log("goToLabel - setAterroirLevel(3)");
         setAterroirLevel(3);
         centerMapOnLabel(pid);
+        // setLayersByLevel(); // Au cas où pas de changement
 
         // setContextualWindow(commandLegendLabel[pid]);
 
