@@ -1493,8 +1493,8 @@ if (isset($_REQUEST["s"])) {
 
     function centerMapOnLabel(pid) {
 
-      // if (listLayerImagesAndPolygonsLabel[pid]) {
-      if (false) {
+      if (listLayerImagesAndPolygonsLabel[pid]) {
+      // if (false) {
         // let l = listLayerPolygonsLabel[pid];
         map.fitBounds(listLayerImagesAndPolygonsLabel[pid].getBounds());
       } else {
