@@ -45,16 +45,28 @@ if (isset($_REQUEST["s"])) {
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" href="assets/css/leaflet.css" />
   <link rel="stylesheet" href="assets/css/aterroir.css">
+  <link rel="stylesheet" href="assets/css/spin.css">
   <!-- <link rel="stylesheet" href="assets/css/bootstrap.css"> -->
   <script src="assets/js/leaflet.js"></script>
+  <!-- <script type="text/javascript" src="assets/js/spin.js"></script> -->
+  <!-- <script type="text/javascript" src="assets/js/leaflet.spin.js"></script> -->
   <script type="text/javascript" src="assets/js/tile.stamen.js"></script>
   <script type="text/javascript" src="assets/js/jquery-3.6.0.min.js"></script>
+  <style type='text/css'>
+    #map {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+  </style>
 </head>
 
 <body onload="initialize()">
   <div class="loading">Loading…</div>
 
-  <div id="map" style="width:100%; height:100%"></div>
+  <div id="map"></div>
   <script type="text/javascript">
     // console.log("loading");
 
@@ -223,6 +235,28 @@ if (isset($_REQUEST["s"])) {
         zoomControl: false
       });
 
+      // var cmd = L.control({
+      //   position: 'topleft'
+      // });
+
+      // cmd.onAdd = function(map) {
+
+      //   var div = L.DomUtil.create('div', 'command');
+
+
+      //   div.innerHTML = '<button onclick="map.spin(true)">spin on</button>';
+      //   div.innerHTML += '<button onclick="map.spin(false)">spin off</button>';
+
+      //   div.innerHTML += `<button onclick='$(".loading").show()'>spin on 2</button>`;
+      //   div.innerHTML += `<button onclick='$(".loading").hide()'>spin off 2</button>`;
+
+      //   return div;
+      // };
+
+      // cmd.addTo(map);
+
+      // map.spin(true);
+
       map.on('zoomend', function() {
         setLayersByLevel();
       })
@@ -300,6 +334,7 @@ if (isset($_REQUEST["s"])) {
       }
 
       $(".loading").hide();
+      // map.spin(false);
 
     }
 
@@ -506,7 +541,7 @@ if (isset($_REQUEST["s"])) {
           }
 
         }).on("mouseover", function(e) {
-          if (aTerroirLevel > 1)
+          if (aTerroirLevel > 1 && this.layerRegion == lastRegionClicked)
             $("#IG-" + this.label["id_label"] + " .talon").css("background", "#ffcd00");
           if (this.layerRegion)
             regionFocusOn(this.layerRegion);
@@ -603,7 +638,7 @@ if (isset($_REQUEST["s"])) {
           var toolTipContent =
             "<div class='talon-pays " + classe + "'>" +
             "<p>" +
-            country["name_" + coLang1] +
+            country["name_" + coLang1].toUpperCase() +
             "</p>" +
             "<p>" +
             country["name_" + coLang2].toUpperCase() +
@@ -933,6 +968,8 @@ if (isset($_REQUEST["s"])) {
 
     function createLayerMarkersPILabel(pidLabel) {
 
+      // map.spin(true);
+
       var JSONMarkersPILabel = getJSONMarkersPILabel(pidLabel);
 
       listListMarkerPILabel[pidLabel] = [];
@@ -959,43 +996,49 @@ if (isset($_REQUEST["s"])) {
       listLayerPIMarkersLabel[pidLabel] = L.layerGroup(listListMarkerPILabel[pidLabel]);
     }
 
+    let listImagesAndPolygonsLabel = [];
+    let listLayerImagesAndPolygonsLabel = [];
+
     function createLabelImages(pidLabel) {
 
-      var layers = [];
+      listImagesAndPolygonsLabel = [];
 
       var JSONMapsLabel = getJSONMapsLabel(pidLabel);
 
       for (var map of JSONMapsLabel) {
         var imgMap = createImageMap(getFileNameFromJSONMetaData(map["img_map_filename"]), map["lat_lefttop"], map["lon_lefttop"], map["lat_rightbottom"], map["lon_rightbottom"]);
-        layers.push(imgMap);
+        // layers.push(imgMap);
+        listImagesAndPolygonsLabel.push(imgMap);
       }
 
-      listLayerImagesLabel[pidLabel] = L.layerGroup(layers);
+      // listLayerImagesLabel[pidLabel] = L.layerGroup(layers);
     }
 
     function createLabelPolygons(pidLabel) {
 
-      var layers = [];
-
       var JSONPolygonsLabel = getJSONPolygonsLabel(pidLabel);
 
-      for (var pol of JSONPolygonsLabel) {
-        var polMapJSON = loadJSON("assets/geojson/terroirs/" + getFileNameFromJSONMetaData(pol["filename"]));
-        var tempLayer = L.geoJSON(polMapJSON, {
-          onEachFeature: function(feature, layer) {},
-          style: {
-            color: pol['color'] || "red",
-            fillOpacity: pol['opacity'] || 0.2,
-            weight: 0
-          }
-        });
+      for (var pols of JSONPolygonsLabel) {
+        var files = JSON.parse(pols["filename"]);
+        for (var file of files) {
+          // var polMapJSON = loadJSON("assets/geojson/terroirs/" + getFileNameFromJSONMetaData(pol["filename"]));
+          var polMapJSON = loadJSON("assets/geojson/terroirs/" + file["name"].split("/").pop());
+          var tempLayer = L.geoJSON(polMapJSON, {
+            onEachFeature: function(feature, layer) {},
+            style: {
+              color: pols['color'] || "red",
+              fillOpacity: pols['opacity'] || 0.2,
+              weight: 0
+            }
+          });
 
-        layers.push(tempLayer);
+          listImagesAndPolygonsLabel.push(tempLayer);
+        }
       }
 
       // listLayerPolygonsLabel[pidLabel] = L.layerGroup(layers);
-      if (layers.length > 0)
-        listLayerPolygonsLabel[pidLabel] = L.featureGroup(layers);
+      if (listImagesAndPolygonsLabel.length > 0)
+        listLayerImagesAndPolygonsLabel[pidLabel] = L.featureGroup(listImagesAndPolygonsLabel);
     }
 
     var currentLabel;
@@ -1298,23 +1341,37 @@ if (isset($_REQUEST["s"])) {
 
       log("zoom osm : " + zoomLevel + " / level at : " + aTerroirLevel);
 
-      /* TOFIX : don't work when map initialized on label
+      // TOFIX : don't work when map initialized on label
+      // if (aTerroirLevel >= 3)
+      //   for (var m of listMarkerLabel) {
+      //     m.options.interactive = true;
+      //     m._tooltip.options.interactive = false;
+      //   }
+      // else if (aTerroirLevel == 1)
+      //   for (var m of listMarkerLabel) {
+      //     m.options.interactive = false;
+      //     m._tooltip.options.interactive = false;
+      //   }
+      // else if (aTerroirLevel == 2)
+      //   for (var m of listMarkerLabel) {
+      //     m.options.interactive = false;
+      //     m._tooltip.options.interactive = true;
+      //   }
+
       if (aTerroirLevel >= 3)
         for (var m of listMarkerLabel) {
           m.options.interactive = true;
-          m._tooltip.options.interactive = false;
         }
       else
         for (var m of listMarkerLabel) {
           m.options.interactive = false;
-          m._tooltip.options.interactive = true;
         }
 
       if (aTerroirLevel < 2) {
         lastRegionClicked = null;
         setContextualWindow(commandLegendCountries)
       }
-      */
+
 
       setLayers(listListLayerLevel[aTerroirLevel]);
       $(".talon").css('background', talonBGColorByLevel[aTerroirLevel]);
@@ -1419,21 +1476,27 @@ if (isset($_REQUEST["s"])) {
     }
 
     function goToRegion(pcode) {
-      var regionLayer = getLayerPolygonByCode(pcode);
-      lastRegionClicked = regionLayer;
-      setAterroirLevel(2);
-      map.fitBounds(regionLayer.getBounds());
-      regionFocusOut();
-      setContextualWindow(getCommandLegendRegion(pcode));
+      $(".loading").show();
+      setTimeout(function() {
+        var regionLayer = getLayerPolygonByCode(pcode);
+        lastRegionClicked = regionLayer;
+        setAterroirLevel(2);
+        map.fitBounds(regionLayer.getBounds());
+        regionFocusOut();
+        setContextualWindow(getCommandLegendRegion(pcode));
+        $(".loading").hide();
+      }, 0)
+
     }
 
     let labelDataExists = [];
 
     function centerMapOnLabel(pid) {
 
-      if (listLayerPolygonsLabel[pid]) {
+      // if (listLayerImagesAndPolygonsLabel[pid]) {
+      if (false) {
         // let l = listLayerPolygonsLabel[pid];
-        map.fitBounds(listLayerPolygonsLabel[pid].getBounds());
+        map.fitBounds(listLayerImagesAndPolygonsLabel[pid].getBounds());
       } else {
         let m = getMarkerLabelById(pid);
         map.setView(m.getLatLng(), 10);
@@ -1442,37 +1505,43 @@ if (isset($_REQUEST["s"])) {
 
     function goToLabel(pid) {
 
-      $(".loading").show();
-      // $(".loading").css("display", "block");
       // console.log("1");
+      $(".loading").show();
+      // map.spin(true);
+      // $(".loading").css("display", "block");
 
-      if (!lastRegionClicked) {
-        var m = getMarkerLabelById(pid);
-        lastRegionClicked = m.layerRegion;
-      }
+      setTimeout(function() {
+        if (!lastRegionClicked) {
+          var m = getMarkerLabelById(pid);
+          lastRegionClicked = m.layerRegion;
+        }
 
-      // goToRegion(m.label["code_region"]);
+        // goToRegion(m.label["code_region"]);
 
-      if (!labelDataExists[pid]) {
-        createLayerMarkersPILabel(pid);
-        createLabelImages(pid);
-        createLabelPolygons(pid);
-        createLabelWindow(pid);
-        labelDataExists[pid] = true;
-      }
+        if (!labelDataExists[pid]) {
+          createLayerMarkersPILabel(pid);
+          createLabelImages(pid);
+          createLabelPolygons(pid);
+          createLabelWindow(pid);
+          labelDataExists[pid] = true;
+        }
 
-      listListLayerLevel[3][6] = listLayerPIMarkersLabel[pid];
-      listListLayerLevel[3][7] = listLayerImagesLabel[pid];
-      // listLayerPolygonsCurrentLabel = listListPolMapLabel[pid];
-      listListLayerLevel[3][8] = listLayerPolygonsLabel[pid];
+        listListLayerLevel[3][6] = listLayerPIMarkersLabel[pid];
+        listListLayerLevel[3][7] = listLayerImagesLabel[pid];
+        // listLayerPolygonsCurrentLabel = listListPolMapLabel[pid];
+        listListLayerLevel[3][8] = listLayerImagesAndPolygonsLabel[pid];
 
-      setAterroirLevel(3);
-      centerMapOnLabel(pid);
+        setAterroirLevel(3);
+        centerMapOnLabel(pid);
 
-      setContextualWindow(commandLegendLabel[pid]);
+        setContextualWindow(commandLegendLabel[pid]);
 
-      $(".loading").hide();
-      // console.log("2");
+        // console.log("2");
+        $(".loading").hide();
+      });
+
+
+      // map.spin(false);
 
     }
 
