@@ -518,7 +518,8 @@ if (isset($_REQUEST["s"])) {
           IGTooltip
         ).on("click", function(e) {
           // this.unbindPopup();
-          if (aTerroirLevel == 3) { // on est au niveau 3, le niveau max. On fait apparaître la popup info
+          currentMarker = this;
+          if (aTerroirLevel == 3 && this.label["id_label"] == currentLabel) { // on est au niveau 3, le niveau max. On fait apparaître la popup info
             if (!this._popup)
               this.bindPopup(getMarkerLabelPopupContent(this), {
                 className: "label"
@@ -545,7 +546,7 @@ if (isset($_REQUEST["s"])) {
             $("#IG-" + this.label["id_label"] + " .talon").css("background", "#ffcd00");
           if (this.layerRegion)
             regionFocusOn(this.layerRegion);
-          if (aTerroirLevel == 3)
+          if (aTerroirLevel == 3 && this.label["id_label"] == currentLabel)
             markerLabelFocusOn(this);
         }).on("mouseout", function(e) {
           if (this.layerRegion)
@@ -1016,6 +1017,8 @@ if (isset($_REQUEST["s"])) {
 
     function createLabelPolygons(pidLabel) {
 
+      listImagesAndPolygonsLabel = [];
+
       var JSONPolygonsLabel = getJSONPolygonsLabel(pidLabel);
 
       for (var pols of JSONPolygonsLabel) {
@@ -1023,6 +1026,7 @@ if (isset($_REQUEST["s"])) {
         for (var file of files) {
           // var polMapJSON = loadJSON("assets/geojson/terroirs/" + getFileNameFromJSONMetaData(pol["filename"]));
           var polMapJSON = loadJSON("assets/geojson/terroirs/" + file["name"].split("/").pop());
+          if (!polMapJSON) continue;
           var tempLayer = L.geoJSON(polMapJSON, {
             onEachFeature: function(feature, layer) {},
             style: {
@@ -1040,8 +1044,6 @@ if (isset($_REQUEST["s"])) {
       if (listImagesAndPolygonsLabel.length > 0)
         listLayerImagesAndPolygonsLabel[pidLabel] = L.featureGroup(listImagesAndPolygonsLabel);
     }
-
-    var currentLabel;
 
     function createLabelWindow(pid) {
       commandLegendLabel[pid] = L.control({
@@ -1476,6 +1478,7 @@ if (isset($_REQUEST["s"])) {
     }
 
     function goToRegion(pcode) {
+      currentMarker.unbindPopup();
       $(".loading").show();
       setTimeout(function() {
         var regionLayer = getLayerPolygonByCode(pcode);
@@ -1503,7 +1506,12 @@ if (isset($_REQUEST["s"])) {
       }
     }
 
+    let currentLabel, currentMarker = null;
+
     function goToLabel(pid) {
+
+      currentLabel = pid;
+      currentMarker.unbindPopup();
 
       // console.log("1");
       $(".loading").show();
@@ -1519,10 +1527,10 @@ if (isset($_REQUEST["s"])) {
         // goToRegion(m.label["code_region"]);
 
         if (!labelDataExists[pid]) {
-          createLayerMarkersPILabel(pid);
-          createLabelImages(pid);
+          // createLayerMarkersPILabel(pid);
+          // createLabelImages(pid);
           createLabelPolygons(pid);
-          createLabelWindow(pid);
+          // createLabelWindow(pid);
           labelDataExists[pid] = true;
         }
 
@@ -1534,7 +1542,7 @@ if (isset($_REQUEST["s"])) {
         setAterroirLevel(3);
         centerMapOnLabel(pid);
 
-        setContextualWindow(commandLegendLabel[pid]);
+        // setContextualWindow(commandLegendLabel[pid]);
 
         // console.log("2");
         $(".loading").hide();
