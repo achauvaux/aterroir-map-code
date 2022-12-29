@@ -297,7 +297,7 @@ if (isset($_REQUEST["s"])) {
 
       setCommandChoiceMap();
 
-      if (JSONMap) setCommandPartner();
+      if (JSONMap[0]) setCommandPartner();
 
       // correspondances niveaux aterroir et openstreetmap
       listLevelsAterroir[0] = {
