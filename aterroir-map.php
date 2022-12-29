@@ -1522,15 +1522,15 @@ if (isset($_REQUEST["s"])) {
         let html =
           `
           <div class="choice-lang">
-            <input type="radio" id="map-eu" name="drone" value="map-eu" onclick="center('eu')" checked>
+            <!--input type="radio" id="map-eu" name="drone" value="map-eu" onclick="center('eu')" checked-->
             <!--label for="Europe">Europe</label-->
-            <img src="assets/img/flags/eu.png">
+            <a href="#"><img src="assets/img/flags/eu.png" onclick="center('eu')"></a>
           </div>
 
           <div class="choice-lang">
-            <input type="radio" id="map-cn" name="drone" value="map-cn" onclick="center('cn')">
+            <!--input type="radio" id="map-cn" name="drone" value="map-cn" onclick="center('cn')"-->
             <!--label for="China">China</label-->
-            <img src="assets/img/flags/cn.png">
+            <a href="#"><img src="assets/img/flags/cn.png" onclick="center('cn')"></a>
           </div>
           `;
 
