@@ -1378,16 +1378,16 @@ if (isset($_REQUEST["s"])) {
       setLayers(listListLayerLevel[aTerroirLevel]);
       console.log("setLayersByLevel - setLayers() - level " + aTerroirLevel);
 
-      // if(aTerroirLevel != 3) {
+      if(true /*aTerroirLevel != 3*/) {
         $(".talon").css('background', talonBGColorByLevel[aTerroirLevel]);
-      // } else {
-      //   for(let m in listMarkerLabel) {
-      //     if(m.layerRegion == currentRegionLayer)
-      //       $("#IG-" + m.id + " .talon").css("background", talonBGColorByLevel[3]);
-      //     else
-      //       $("#IG-" + m.id + " .talon").css("background", talonBGColorByLevel[2]);
-      //   }
-      // }
+      } else {
+        for(let m of listMarkerLabel) {
+          if(m.layerRegion == currentRegionLayer)
+            $("#IG-" + m.label["id_label"] + " .talon").css("background", talonBGColorByLevel[3]);
+          else
+            $("#IG-" + m.label["id_label"] + " .talon").css("background", talonBGColorByLevel[2]);
+        }
+      }
 
       computeAterroirLevel = true;
     }
@@ -1406,12 +1406,12 @@ if (isset($_REQUEST["s"])) {
 
     function markerLabelFocusOn(pmarker) {
       pmarker.setIcon(listIconBigLabel[pmarker.label["code_label"]]);
-      $("#IG-" + pmarker.id + " .talon").css("background", "#fffb00");
+      // $("#IG-" + pmarker.id + " .talon").css("background", "#fffb00");
     }
 
     function markerLabelFocusOut(pmarker) {
       pmarker.setIcon(listIconLabel[pmarker.label["code_label"]]);
-      $("#IG-" + pmarker.id + " .talon").css("background", talonBGColorByLevel[aTerroirLevel]);
+      // $("#IG-" + pmarker.id + " .talon").css("background", talonBGColorByLevel[aTerroirLevel]);
     }
 
     function markerPIFocusOn(pmarker) {
