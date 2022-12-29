@@ -5,6 +5,7 @@
 
 include_once "util.php";
 
+/*
 $z = array_key_exists("z", $_REQUEST) ? $_REQUEST["z"] : $zone;
 
 switch($z) {
@@ -17,5 +18,8 @@ switch($z) {
   default:
     $indexFile = "carte-eu.php";
 }
+*/
+
+$indexFile = "aterroir-map.php";
 
 include $indexFile;
