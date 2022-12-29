@@ -68,112 +68,112 @@ if (isset($_REQUEST["s"])) {
 
   <div id="map"></div>
   <script type="text/javascript">
-    // console.log("loading");
+    // log("loading");
 
-    var attLabel;
+    let attLabel;
 
-    var map;
+    let map;
 
     // tuiles (basemap)
-    var layerTerrain, layerWatercolor, layerToner, layerPositron, layerPositronNoLabel;
-    var JSONbasemap = <?= json_encode($rsBasemap) ?>;
+    let layerTerrain, layerWatercolor, layerToner, layerPositron, layerPositronNoLabel;
+    let JSONbasemap = <?= json_encode($rsBasemap) ?>;
 
-    var layerBasemap;
-    var currentTileLayerForLevel0; // basemap niveau 0
-    var currentTileLayerOverLevel0; // basemap courante niveau > 0
+    let layerBasemap;
+    let currentTileLayerForLevel0; // basemap niveau 0
+    let currentTileLayerOverLevel0; // basemap courante niveau > 0
 
-    var baseMaps;
-    var overlayMaps;
+    let baseMaps;
+    let overlayMaps;
 
     // polygones (pays et régions)
-    var layerCountriesEurope;
-    var layerRegionsEurope;
-    var layerRegionsChine;
-    var layerRegionsFrance;
-    var listLayerPolygonIndexed = []; // layers polygones (tous : pays, régions...) indexés par leur code (A3 ou NUTS)
+    let layerCountriesEurope;
+    let layerRegionsEurope;
+    let layerRegionsChine;
+    let layerRegionsFrance;
+    let listLayerPolygonIndexed = []; // layers polygones (tous : pays, régions...) indexés par leur code (A3 ou NUTS)
 
     // pays
-    var listMarkerLevel0 = []; // marqueurs pays
-    var layerLevel0; // layer level 0
+    let listMarkerLevel0 = []; // marqueurs pays
+    let layerLevel0; // layer level 0
 
     // labels
-    var listMarkerLabel = []; // marqueurs label
-    var listMarkerLabelIndexed = []; // idem indexés par leur id
-    var listListMarkerLabelLevel = []; // listes marqueurs label par niveau
-    var listLayerLabelsLevel = []; // layers label par niveau
-    var listListImageMapLabel = []; // listes des images de cartes par label
-    var listListPolMapLabel = []; // listes des images de cartes par label
+    let listMarkerLabel = []; // marqueurs label
+    let listMarkerLabelIndexed = []; // idem indexés par leur id
+    let listListMarkerLabelLevel = []; // listes marqueurs label par niveau
+    let listLayerLabelsLevel = []; // layers label par niveau
+    let listListImageMapLabel = []; // listes des images de cartes par label
+    let listListPolMapLabel = []; // listes des images de cartes par label
 
-    var listLayerImagesLabel = [];
-    var listLayerPolygonsLabel = [];
+    let listLayerImagesLabel = [];
+    let listLayerPolygonsLabel = [];
 
     // PIs
-    var listMarkerPIIndexed = []; // marqueurs PI indexés par leur id
-    var listListMarkerPILabel = []; // listes marqueurs PI par label
-    var listLayerPIMarkersLabel = []; // listes layers PI par label
+    let listMarkerPIIndexed = []; // marqueurs PI indexés par leur id
+    let listListMarkerPILabel = []; // listes marqueurs PI par label
+    let listLayerPIMarkersLabel = []; // listes layers PI par label
 
 
-    var listActiveLayers = []; // liste des calques actifs
+    let listActiveLayers = []; // liste des calques actifs
 
     // icones leaflet
-    var listIconLabel = [];
-    var listIconBigLabel = [];
-    var listIconPICategory = [];
-    var listIconBigPICategory = [];
+    let listIconLabel = [];
+    let listIconBigLabel = [];
+    let listIconPICategory = [];
+    let listIconBigPICategory = [];
 
-    var JSONPICategories = <?= getJSONArrayFromProcedure("getListPICAtegories"); ?>;
+    let JSONPICategories = <?= getJSONArrayFromProcedure("getListPICAtegories"); ?>;
 
-    var villesTerroirBourgogneJSON;
+    let villesTerroirBourgogneJSON;
 
-    var JSONCountries = <?= getJSONArrayFromProcedure("getListCountries", null); ?>;
-    var JSONRegionsEU = <?= getJSONArrayFromProcedure("getListRegions", "EU", null); ?>;
-    var JSONRegionsCN = <?= getJSONArrayFromProcedure("getListRegions", "CN", null); ?>;
-    // var JSONMarkersLabelEU = <?= getJSONArrayFromProcedure("getListLabels", "EU", null, null); ?>;
-    // var JSONMarkersLabelCN = <?= getJSONArrayFromProcedure("getListLabels", "CN", null, null); ?>;
-    var JSONMarkersLabel = <?= getJSONArrayFromProcedure("getListLabels", null, null, null); ?>;
+    let JSONCountries = <?= getJSONArrayFromProcedure("getListCountries", null); ?>;
+    let JSONRegionsEU = <?= getJSONArrayFromProcedure("getListRegions", "EU", null); ?>;
+    let JSONRegionsCN = <?= getJSONArrayFromProcedure("getListRegions", "CN", null); ?>;
+    // let JSONMarkersLabelEU = <?= getJSONArrayFromProcedure("getListLabels", "EU", null, null); ?>;
+    // let JSONMarkersLabelCN = <?= getJSONArrayFromProcedure("getListLabels", "CN", null, null); ?>;
+    let JSONMarkersLabel = <?= getJSONArrayFromProcedure("getListLabels", null, null, null); ?>;
 
-    var coLang1 = "<?= $coLang1 ?>";
-    var coLang2 = "<?= $coLang2 ?>";
-    var restBaseUrl = "<?= $restBaseUrl ?>";
+    let coLang1 = "<?= $coLang1 ?>";
+    let coLang2 = "<?= $coLang2 ?>";
+    let restBaseUrl = "<?= $restBaseUrl ?>";
 
-    var logOn = false;
+    let logOn = false;
 
-    var lastRegionMouseOvered, currentRegionLayer;
+    let lastRegionMouseOvered, currentRegionLayer;
 
-    var commandLegendRegion = [];
-    var commandLegendLabel = [];
-    var commandLegendCountries;
+    let commandLegendRegion = [];
+    let commandLegendLabel = [];
+    let commandLegendCountries;
 
-    var currentCommand;
+    let currentCommand;
 
-    var listLevelsAterroir = [];
-    var listListLayerLevel = [];
+    let listLevelsAterroir = [];
+    let listListLayerLevel = [];
 
-    var aTerroirLevel;
-    var computeAterroirLevel = true;
+    let aTerroirLevel;
+    let computeAterroirLevel = true;
 
-    var zoomLevel;
+    let zoomLevel;
 
-    var isWindows = true;
+    let isWindows = true;
 
-    var typeMap = 'global';
-    var idLabelMap, idRegionMap, idCountryMap;
+    let typeMap = 'global';
+    let idLabelMap, idRegionMap, idCountryMap;
 
     <?php if ($idLabel) { ?>
       idLabelMap = <?= $idLabel ?>;
-      var JSONLabel = <?= getJSONArrayFromProcedure("getDetailLabel", $idLabel); ?>; // données JSON du label (carte terroir) 
-      var JSONLabelMap = JSONLabel[0];
+      let JSONLabel = <?= getJSONArrayFromProcedure("getDetailLabel", $idLabel); ?>; // données JSON du label (carte terroir) 
+      let JSONLabelMap = JSONLabel[0];
       typeMap = 'label';
       isWindows = true;
     <?php } else if ($idRegion) { ?>
       idRegionMap = <?= $idRegion ?>;
-      var JSONRegion = <?= getJSONArrayFromProcedure("getDetailRegion", $idRegion); ?>;
-      var JSONRegionMap = JSONRegion[0];
+      let JSONRegion = <?= getJSONArrayFromProcedure("getDetailRegion", $idRegion); ?>;
+      let JSONRegionMap = JSONRegion[0];
       typeMap = 'region';
     <?php } else if ($idCountry) { ?>
       idCountryMap = <?= $idCountry ?>;
-      var JSONCountry = <?= getJSONArrayFromProcedure("getDetailCountry", $idCountry); ?>;
-      var JSONCountryMap = JSONCountry[0];
+      let JSONCountry = <?= getJSONArrayFromProcedure("getDetailCountry", $idCountry); ?>;
+      let JSONCountryMap = JSONCountry[0];
       typeMap = 'country';
     <?php } ?>
 
@@ -187,13 +187,13 @@ if (isset($_REQUEST["s"])) {
 
       L.Map.include({
         _initControlPos: function() {
-          var corners = this._controlCorners = {},
+          let corners = this._controlCorners = {},
             l = 'leaflet-',
             container = this._controlContainer =
             L.DomUtil.create('div', l + 'control-container', this._container);
 
           function createCorner(vSide, hSide) {
-            var className = l + vSide + ' ' + l + hSide;
+            let className = l + vSide + ' ' + l + hSide;
 
             corners[vSide + hSide] = L.DomUtil.create('div', className, container);
           }
@@ -217,7 +217,7 @@ if (isset($_REQUEST["s"])) {
       let center0, zoom0;
 
       if (typeMap == 'label') {
-        // var bounds = new L.LatLngBounds(new L.LatLng(JSONLabelMap["bounds_top_left_lat"], JSONLabelMap["bounds_top_left_lon"]), new L.LatLng(JSONLabelMap["bounds_bottom_right_lat"], JSONLabelMap["bounds_bottom_right_lon"]));
+        // let bounds = new L.LatLngBounds(new L.LatLng(JSONLabelMap["bounds_top_left_lat"], JSONLabelMap["bounds_top_left_lon"]), new L.LatLng(JSONLabelMap["bounds_bottom_right_lat"], JSONLabelMap["bounds_bottom_right_lon"]));
         if (!JSONLabelMap["bounds_top_left_lat"] || !JSONLabelMap["bounds_top_left_lon"] || !JSONLabelMap["bounds_bottom_right_lat"] || !JSONLabelMap["bounds_bottom_right_lon"])
           bounds = new L.LatLngBounds(new L.LatLng(Number(JSONLabelMap["lat"]) - 0.5, Number(JSONLabelMap["lon"]) - 0.5), new L.LatLng(Number(JSONLabelMap["lat"]) + 0.5, Number(JSONLabelMap["lon"]) + 0.5));
         else
@@ -235,13 +235,13 @@ if (isset($_REQUEST["s"])) {
         zoomControl: false
       });
 
-      // var cmd = L.control({
+      // let cmd = L.control({
       //   position: 'topleft'
       // });
 
       // cmd.onAdd = function(map) {
 
-      //   var div = L.DomUtil.create('div', 'command');
+      //   let div = L.DomUtil.create('div', 'command');
 
 
       //   div.innerHTML = '<button onclick="map.spin(true)">spin on</button>';
@@ -258,7 +258,7 @@ if (isset($_REQUEST["s"])) {
       // map.spin(true);
 
       map.on('zoomend', function() {
-        console.log("zoomend - setLayersByLevel()");
+        log("zoomend - setLayersByLevel()");
         setLayersByLevel();
       })
 
@@ -302,7 +302,7 @@ if (isset($_REQUEST["s"])) {
         end: 8
       }
       listLevelsAterroir[3] = {
-         start: 8
+        start: 8
       };
 
       if (layerBasemap) {
@@ -341,10 +341,10 @@ if (isset($_REQUEST["s"])) {
 
     function getMarkerLabelPopupContent(pmarker) {
 
-      var desc = "";
+      let desc = "";
       desc += "<p>" + pmarker.label["name_" + coLang1] + "</p>";
 
-      var pdfFile = getFileNameFromJSONMetaData(pmarker.label["pdf"]);
+      let pdfFile = getFileNameFromJSONMetaData(pmarker.label["pdf"]);
 
       if (pdfFile)
         desc += "<a href='assets/pdf/" + pdfFile + "' target='_blank'><img class='pdf-img' src='assets/pdf/" + getFileNameFromJSONMetaData(pmarker.label["pdf_icon"]) + "' /></a>";
@@ -356,10 +356,10 @@ if (isset($_REQUEST["s"])) {
 
     function getMarkerPIPopupContent(pPI) {
 
-      var desc = "";
+      let desc = "";
       desc += "<h1>" + pPI["name_" + coLang1] + "</h1>";
 
-      var imgJSON = null; //loadJSON(restBaseUrl + "media/" + pPI["img_pi_filename"] + "?_fields=guid");
+      let imgJSON = null; //loadJSON(restBaseUrl + "media/" + pPI["img_pi_filename"] + "?_fields=guid");
 
       if (imgJSON) {
         desc += "<img src='" + imgJSON["guid"]["rendered"] + "'>";
@@ -372,7 +372,7 @@ if (isset($_REQUEST["s"])) {
       return desc;
     }
 
-    var listPIType = {
+    let listPIType = {
       "OT": ["Offices de Tourisme", "icon-OT.png"],
       "visite": ["Visites", "icon-visite.png"],
       "gastro": ["Gastronomie", "icon-gastro.png"],
@@ -385,7 +385,7 @@ if (isset($_REQUEST["s"])) {
 
     function createCustomedIcons(psize) { // création des icones de marqueurs
 
-      // var sizeBig = Math.trunc(psize * 1.5 / 2);
+      // let sizeBig = Math.trunc(psize * 1.5 / 2);
 
       listIconLabel["AOP"] = L.icon({
         iconUrl: 'assets/img/icones-aterroir/logo-AOP.png',
@@ -417,7 +417,7 @@ if (isset($_REQUEST["s"])) {
         iconSize: [psize * 1.5, psize * 1.5]
       });
 
-      for (var picategory of JSONPICategories) {
+      for (let picategory of JSONPICategories) {
         listIconPICategory[picategory["id_picategory"]] = L.icon({
           iconUrl: 'assets/img/icones-categories-pi/' + picategory["img_icon_category"],
           iconSize: [psize, psize]
@@ -434,7 +434,7 @@ if (isset($_REQUEST["s"])) {
 
       // return str; // TODO extraction depuis champ wp
 
-      var parsed; // depuis JSON généré par php runner
+      let parsed; // depuis JSON généré par php runner
 
       try {
         parsed = JSON.parse(str);
@@ -453,12 +453,12 @@ if (isset($_REQUEST["s"])) {
 
     function createMarkersLabel() { // création des marqueurs label
 
-      var iconMarker = null;
-      var marker = null;
-      var listTemp;
+      let iconMarker = null;
+      let marker = null;
+      let listTemp;
 
-      var style;
-      var dy;
+      let style;
+      let dy;
 
       for (label of JSONMarkersLabel) {
 
@@ -481,7 +481,7 @@ if (isset($_REQUEST["s"])) {
             style = "";
         }
 
-        var toolTipContent =
+        let toolTipContent =
           "<div id='IG-" + label["id_label"] + "' class='IG " + label["direction_heel"] + "' style='" + style + "'>" +
           "<img src='assets/img/images-labels/" + getFileNameFromJSONMetaData(label["img_icon"]) + "' style='height:" + label["height_img_icon"] + "px'>" +
           "<div class='talon'>" +
@@ -494,7 +494,7 @@ if (isset($_REQUEST["s"])) {
           "</div>"; +
         "</div>";
 
-        var IGTooltip = L.tooltip({
+        let IGTooltip = L.tooltip({
           className: "aterroir-tooltip",
           permanent: true,
           direction: label["direction_heel"],
@@ -504,13 +504,13 @@ if (isset($_REQUEST["s"])) {
         IGTooltip.setContent(toolTipContent);
 
         // ! coordonnées inversées dans geojson umap
-        var lat = label["lat"];
-        var lon = label["lon"];
+        let lat = label["lat"];
+        let lon = label["lon"];
 
         log(lat);
         log(lon);
 
-        var m = L.marker(
+        let m = L.marker(
           [lat, lon], {
             icon: iconMarker,
             interactive: false
@@ -529,7 +529,7 @@ if (isset($_REQUEST["s"])) {
           } else if (currentRegionLayer == this.layerRegion) { // la région est déjà sélectionnée : on était au niveau 2 et on passe au niveau 3
             /*
             // if (!hasPI(this.label["id_label"])) return;
-            var tempCommand = getCommandLegendLabel(this.label["id_label"]);
+            let tempCommand = getCommandLegendLabel(this.label["id_label"]);
             if (tempCommand == null) return;
             setContextualWindow(tempCommand); // fenêtre F3
             map.setView(this.getLatLng(), 10); // TODO : centrer sur image terroir
@@ -552,7 +552,8 @@ if (isset($_REQUEST["s"])) {
         }).on("mouseout", function(e) {
           if (this.layerRegion)
             regionFocusOut(this.layerRegion);
-          $("#IG-" + this.label["id_label"] + " .talon").css("background", talonBGColorByLevel[aTerroirLevel]);
+          if (this.layerRegion == currentRegionLayer)
+            $("#IG-" + this.label["id_label"] + " .talon").css("background", talonBGColorByLevel[aTerroirLevel]);
           if (currentRegionLayer)
             markerLabelFocusOut(this);
         });
@@ -572,10 +573,10 @@ if (isset($_REQUEST["s"])) {
 
     function getTypeIconCountry(pcode) {
 
-      var bAOP = false;
-      var bIGP = false;
+      let bAOP = false;
+      let bIGP = false;
 
-      for (var label of JSONMarkersLabel) {
+      for (let label of JSONMarkersLabel) {
         if (bAOP && bIGP) break;
         if (label["code_country"] == pcode) {
           if (label["code_label"] == "AOP")
@@ -597,10 +598,10 @@ if (isset($_REQUEST["s"])) {
 
     function getTypeIconRegion(pcode) {
 
-      var bAOP = false;
-      var bIGP = false;
+      let bAOP = false;
+      let bIGP = false;
 
-      for (var label of JSONMarkersLabel) {
+      for (let label of JSONMarkersLabel) {
         if (bAOP && bIGP) break;
         if (label["code_region"] == pcode) {
           if (label["code_label"] == "AOP")
@@ -622,22 +623,22 @@ if (isset($_REQUEST["s"])) {
 
     function createMarkersLevel0() { // création des marqueurs niveau 0 (en fait nom des pays en chinois TODO : trouver calque des labels chinois)
 
-      var iconMarker;
-      var country;
-      var region;
-      var classe;
+      let iconMarker;
+      let country;
+      let region;
+      let classe;
 
       for (country of JSONCountries) {
 
         if (country["code_country"] != 'CHN') {
 
-          var typeIconCountry = getTypeIconCountry(country["code_country"]);
+          let typeIconCountry = getTypeIconCountry(country["code_country"]);
 
           iconMarker = listIconLabel[typeIconCountry];
 
           classe = "talon-" + country["direction_heel"];
 
-          var toolTipContent =
+          let toolTipContent =
             "<div class='talon-pays " + classe + "'>" +
             "<p>" +
             country["name_" + coLang1].toUpperCase() +
@@ -647,7 +648,7 @@ if (isset($_REQUEST["s"])) {
             "</p>" +
             "</div>";
 
-          var m = L.marker(
+          let m = L.marker(
             [country["lat_icon"], country["lon_icon"]], {
               icon: iconMarker,
               interactive: false
@@ -666,13 +667,13 @@ if (isset($_REQUEST["s"])) {
 
       for (region of JSONRegionsCN) {
 
-        var typeIconRegion = getTypeIconRegion(region["code_region"]);
+        let typeIconRegion = getTypeIconRegion(region["code_region"]);
 
         iconMarker = listIconLabel[typeIconRegion];
 
         classe = "talon-" + region["direction_heel"];
 
-        var toolTipContent =
+        let toolTipContent =
           "<div class='talon-pays " + classe + "'>" +
           "<p>" +
           region["name_" + coLang1].toUpperCase() +
@@ -682,7 +683,7 @@ if (isset($_REQUEST["s"])) {
           "</p>" +
           "</div>";
 
-        var m = L.marker(
+        let m = L.marker(
           [region["lat_capital"], region["lon_capital"]], {
             icon: iconMarker,
             interactive: false
@@ -704,12 +705,12 @@ if (isset($_REQUEST["s"])) {
 
     function createImageMap(pimageUrl, plat1, plon1, plat2, plon2) {
 
-      var imageBounds = [
+      let imageBounds = [
         [plat1, plon1],
         [plat2, plon2]
       ];
 
-      var imageMap = L.imageOverlay("assets/img/maps/" + pimageUrl, imageBounds, {
+      let imageMap = L.imageOverlay("assets/img/maps/" + pimageUrl, imageBounds, {
         interactive: true,
         opacity: 0.5
       });
@@ -725,13 +726,13 @@ if (isset($_REQUEST["s"])) {
 
       commandLegendCountries.onAdd = function(map) {
 
-        var div = L.DomUtil.create('div', 'command');
+        let div = L.DomUtil.create('div', 'command');
 
         /* IMP! Ne pas propager l'événement de click à la carte sinon les pop-ups de marqueurs se ferment immédiatement */
         L.DomEvent.addListener(div, 'click', L.DomEvent.stopPropagation).addListener(div, 'click', L.DomEvent.preventDefault);
         L.DomEvent.addListener(div, 'mousewheel', L.DomEvent.stopPropagation); // .addListener(div, 'mousewheel', L.DomEvent.preventDefault);
 
-        var html = `
+        let html = `
       <div id="F1" class="aterroir-window">
         <section class="left">
           <div class="menu-item" onmouseenter="openRight('F1-countries');">
@@ -844,11 +845,11 @@ if (isset($_REQUEST["s"])) {
 
       commandLegendRegion[pcodeRegion].onAdd = function(map) {
 
-        var div = L.DomUtil.create('div', 'command');
+        let div = L.DomUtil.create('div', 'command');
         L.DomEvent.addListener(div, 'click', L.DomEvent.stopPropagation).addListener(div, 'click', L.DomEvent.preventDefault); // TODO : autres événements (scroll...)
         L.DomEvent.addListener(div, 'mousewheel', L.DomEvent.stopPropagation); // .addListener(div, 'mousewheel', L.DomEvent.preventDefault);
 
-        var html = getF2Html(pcodeRegion);
+        let html = getF2Html(pcodeRegion);
 
         div.innerHTML = html;
 
@@ -861,7 +862,7 @@ if (isset($_REQUEST["s"])) {
 
     function getJSONMarkersPILabel(pidLabel) {
 
-      var jsonMarkers = [];
+      let jsonMarkers = [];
 
       $.ajax({
         url: "getJSONMarkersPILabel.php",
@@ -880,7 +881,7 @@ if (isset($_REQUEST["s"])) {
 
     function getJSONMapsLabel(pidLabel) {
 
-      var jsonMaps;
+      let jsonMaps;
 
       $.ajax({
         url: "getJSONMapsLabel.php",
@@ -899,7 +900,7 @@ if (isset($_REQUEST["s"])) {
 
     function getJSONPolygonsLabel(pidLabel) {
 
-      var jsonMaps;
+      let jsonMaps;
 
       $.ajax({
         url: "getJSONPolygonsLabel.php",
@@ -916,14 +917,14 @@ if (isset($_REQUEST["s"])) {
       return jsonMaps;
     }
 
-    var f2Html = [];
+    let f2Html = [];
 
     function getF2Html(pcodeRegion) {
 
       if (pcodeRegion in f2Html)
         return f2Html[pcodeRegion];
 
-      var html;
+      let html;
 
       $.ajax({
         url: "get-f2-html.php",
@@ -942,14 +943,14 @@ if (isset($_REQUEST["s"])) {
       return html;
     }
 
-    var f3Html = [];
+    let f3Html = [];
 
     function getF3Html(pidLabel) {
 
       if (pidLabel in f3Html)
         return f3Html[pidLabel];
 
-      var html;
+      let html;
 
       $.ajax({
         url: "get-f3-html.php",
@@ -972,13 +973,13 @@ if (isset($_REQUEST["s"])) {
 
       // map.spin(true);
 
-      var JSONMarkersPILabel = getJSONMarkersPILabel(pidLabel);
+      let JSONMarkersPILabel = getJSONMarkersPILabel(pidLabel);
 
       listListMarkerPILabel[pidLabel] = [];
 
-      for (var PI of JSONMarkersPILabel) {
+      for (let PI of JSONMarkersPILabel) {
 
-        var m = L.marker(
+        let m = L.marker(
           [PI["lat"], PI["lon"]], {
             icon: listIconPICategory[PI["id_picategory"]]
             // interactive: true
@@ -1005,10 +1006,10 @@ if (isset($_REQUEST["s"])) {
 
       listImagesAndPolygonsLabel = [];
 
-      var JSONMapsLabel = getJSONMapsLabel(pidLabel);
+      let JSONMapsLabel = getJSONMapsLabel(pidLabel);
 
-      for (var map of JSONMapsLabel) {
-        var imgMap = createImageMap(getFileNameFromJSONMetaData(map["img_map_filename"]), map["lat_lefttop"], map["lon_lefttop"], map["lat_rightbottom"], map["lon_rightbottom"]);
+      for (let map of JSONMapsLabel) {
+        let imgMap = createImageMap(getFileNameFromJSONMetaData(map["img_map_filename"]), map["lat_lefttop"], map["lon_lefttop"], map["lat_rightbottom"], map["lon_rightbottom"]);
         // layers.push(imgMap);
         listImagesAndPolygonsLabel.push(imgMap);
       }
@@ -1020,15 +1021,15 @@ if (isset($_REQUEST["s"])) {
 
       listImagesAndPolygonsLabel = [];
 
-      var JSONPolygonsLabel = getJSONPolygonsLabel(pidLabel);
+      let JSONPolygonsLabel = getJSONPolygonsLabel(pidLabel);
 
-      for (var pols of JSONPolygonsLabel) {
-        var files = JSON.parse(pols["filename"]);
-        for (var file of files) {
-          // var polMapJSON = loadJSON("assets/geojson/terroirs/" + getFileNameFromJSONMetaData(pol["filename"]));
-          var polMapJSON = loadJSON("assets/geojson/terroirs/" + file["name"].split("/").pop());
+      for (let pols of JSONPolygonsLabel) {
+        let files = JSON.parse(pols["filename"]);
+        for (let file of files) {
+          // let polMapJSON = loadJSON("assets/geojson/terroirs/" + getFileNameFromJSONMetaData(pol["filename"]));
+          let polMapJSON = loadJSON("assets/geojson/terroirs/" + file["name"].split("/").pop());
           if (!polMapJSON) continue;
-          var tempLayer = L.geoJSON(polMapJSON, {
+          let tempLayer = L.geoJSON(polMapJSON, {
             onEachFeature: function(feature, layer) {},
             style: {
               color: pols['color'] || "red",
@@ -1051,15 +1052,15 @@ if (isset($_REQUEST["s"])) {
         position: 'middleleft'
       });
 
-      var m = getMarkerLabelById(pid);
+      let m = getMarkerLabelById(pid);
 
       commandLegendLabel[pid].onAdd = function(map) {
 
-        var div = L.DomUtil.create('div', 'command');
+        let div = L.DomUtil.create('div', 'command');
         L.DomEvent.addListener(div, 'click', L.DomEvent.stopPropagation).addListener(div, 'click', L.DomEvent.preventDefault);
         L.DomEvent.addListener(div, 'mousewheel', L.DomEvent.stopPropagation); // .addListener(div, 'mousewheel', L.DomEvent.preventDefault);
 
-        var html = getF3Html(pid);
+        let html = getF3Html(pid);
 
         div.innerHTML = html;
 
@@ -1068,8 +1069,8 @@ if (isset($_REQUEST["s"])) {
     }
 
     function getListPIByType(pJSONMarkersPI, pidLabel, ptypePI) {
-      var listPI = [];
-      for (var PI of pJSONMarkersPI)
+      let listPI = [];
+      for (let PI of pJSONMarkersPI)
         if (PI["id_label"] == pidLabel && PI["code_category"] == ptypePI)
           listPI.push(PI);
 
@@ -1077,7 +1078,7 @@ if (isset($_REQUEST["s"])) {
     }
 
     function togglePI(pid) {
-      var marker = getMarkerLabelById(pid)
+      let marker = getMarkerLabelById(pid)
       if (!map.hasLayer(marker))
         map.addLayer(marker);
       else
@@ -1086,7 +1087,7 @@ if (isset($_REQUEST["s"])) {
     }
 
     function getLabelVal(pidLabel, pnameprop) {
-      for (var label of JSONMarkersLabelEU)
+      for (let label of JSONMarkersLabelEU)
         if (label["id_label"] == pidLabel)
           return label[pnameprop];
 
@@ -1094,7 +1095,7 @@ if (isset($_REQUEST["s"])) {
     }
 
     function togglePIType(pidLabel, ptype) {
-      var marker;
+      let marker;
       for (marker of listListMarkerPILabel[pidLabel]) {
         if (marker.PI["id_label"] == pidLabel && marker.PI["id_picategory"] == ptype)
           if (!map.hasLayer(marker)) {
@@ -1109,11 +1110,11 @@ if (isset($_REQUEST["s"])) {
       }
     }
 
-    var listMarkerPILabelLevel = [];
+    let listMarkerPILabelLevel = [];
 
     function createDataLayers() { // création des calques à partir des tableaux de marqueurs
 
-      for (var i in listListMarkerLabelLevel) {
+      for (let i in listListMarkerLabelLevel) {
         listLayerLabelsLevel[i] = L.layerGroup(listListMarkerLabelLevel[i]);
       }
 
@@ -1123,7 +1124,7 @@ if (isset($_REQUEST["s"])) {
 
     function createPolygonsLayers() {
 
-      var EUCountryJSON = loadJSON("assets/geojson/pays-europe-nodomtom.json");
+      let EUCountryJSON = loadJSON("assets/geojson/pays-europe-nodomtom.json");
 
       layerCountriesEurope = L.geoJSON(EUCountryJSON, {
         onEachFeature: function(feature, layer) {
@@ -1151,7 +1152,7 @@ if (isset($_REQUEST["s"])) {
         }
       });
 
-      var nutJSON = loadJSON("assets/geojson/regions-europe.json");
+      let nutJSON = loadJSON("assets/geojson/regions-europe.json");
 
       layerRegionsEurope = L.geoJSON(nutJSON, {
         onEachFeature: function(feature, layer) {
@@ -1176,7 +1177,7 @@ if (isset($_REQUEST["s"])) {
         }
       });
 
-      var nutFranceJSON = loadJSON("assets/geojson/regions-france-nodomtom.json");
+      let nutFranceJSON = loadJSON("assets/geojson/regions-france-nodomtom.json");
 
       layerRegionsFrance = L.geoJSON(nutFranceJSON, {
         onEachFeature: function(feature, layer) {
@@ -1201,7 +1202,7 @@ if (isset($_REQUEST["s"])) {
         }
       });
 
-      var nutJSONCN = loadJSON("assets/geojson/gadm36_CHN_1.json");
+      let nutJSONCN = loadJSON("assets/geojson/gadm36_CHN_1.json");
 
       layerRegionsChine = L.geoJSON(nutJSONCN, {
         onEachFeature: function(feature, layer) {
@@ -1257,7 +1258,7 @@ if (isset($_REQUEST["s"])) {
     }
 
     function loadJSON(pfile) {
-      var json = null;
+      let json = null;
 
       $.ajax({
         'async': false,
@@ -1273,7 +1274,7 @@ if (isset($_REQUEST["s"])) {
     }
 
     Array.prototype.remove = function() {
-      var what, a = arguments,
+      let what, a = arguments,
         L = a.length,
         ax;
       while (L && this.length) {
@@ -1289,7 +1290,7 @@ if (isset($_REQUEST["s"])) {
 
       // TODO : stocker calque basemap dans variable et actualiser à chaque station
 
-      var listLayersToRemove = [];
+      let listLayersToRemove = [];
 
       for (layer of listActiveLayers) { // suppression des calques actifs absents de la liste donnée en paramètre
         if (!plistLayers.includes(layer)) {
@@ -1311,8 +1312,8 @@ if (isset($_REQUEST["s"])) {
       }
     }
 
-    // var talonBGColorByLevel = ["white", "white", "#ffcd00", "#ffcd00"];
-    var talonBGColorByLevel = ["white", "white", "white", "#ffcd00"];
+    // let talonBGColorByLevel = ["white", "white", "#ffcd00", "#ffcd00"];
+    let talonBGColorByLevel = ["white", "white", "white", "#ffcd00"];
 
     L.Layer.prototype.setInteractive = function(interactive) {
       if (this.getLayers) {
@@ -1346,27 +1347,27 @@ if (isset($_REQUEST["s"])) {
 
       // TOFIX : don't work when map initialized on label
       // if (aTerroirLevel >= 3)
-      //   for (var m of listMarkerLabel) {
+      //   for (let m of listMarkerLabel) {
       //     m.options.interactive = true;
       //     m._tooltip.options.interactive = false;
       //   }
       // else if (aTerroirLevel == 1)
-      //   for (var m of listMarkerLabel) {
+      //   for (let m of listMarkerLabel) {
       //     m.options.interactive = false;
       //     m._tooltip.options.interactive = false;
       //   }
       // else if (aTerroirLevel == 2)
-      //   for (var m of listMarkerLabel) {
+      //   for (let m of listMarkerLabel) {
       //     m.options.interactive = false;
       //     m._tooltip.options.interactive = true;
       //   }
 
       if (aTerroirLevel >= 3)
-        for (var m of listMarkerLabel) {
+        for (let m of listMarkerLabel) {
           m.options.interactive = true;
         }
       else
-        for (var m of listMarkerLabel) {
+        for (let m of listMarkerLabel) {
           m.options.interactive = false;
         }
 
@@ -1376,13 +1377,13 @@ if (isset($_REQUEST["s"])) {
       }
 
       setLayers(listListLayerLevel[aTerroirLevel]);
-      console.log("setLayersByLevel - setLayers() - level " + aTerroirLevel);
+      log("setLayersByLevel - setLayers() - level " + aTerroirLevel);
 
-      if(true /*aTerroirLevel != 3*/) {
+      if (aTerroirLevel != 3) {
         $(".talon").css('background', talonBGColorByLevel[aTerroirLevel]);
       } else {
-        for(let m of listMarkerLabel) {
-          if(m.layerRegion == currentRegionLayer)
+        for (let m of listMarkerLabel) {
+          if (m.layerRegion == currentRegionLayer)
             $("#IG-" + m.label["id_label"] + " .talon").css("background", talonBGColorByLevel[3]);
           else
             $("#IG-" + m.label["id_label"] + " .talon").css("background", talonBGColorByLevel[2]);
@@ -1402,7 +1403,7 @@ if (isset($_REQUEST["s"])) {
       return listLayerPolygonIndexed[pcode];
     }
 
-    var lastMarkerOnMap;
+    let lastMarkerOnMap;
 
     function markerLabelFocusOn(pmarker) {
       pmarker.setIcon(listIconBigLabel[pmarker.label["code_label"]]);
@@ -1451,49 +1452,49 @@ if (isset($_REQUEST["s"])) {
     }
 
     function legendMarkerLabelMouseOver(pid) {
-      var m = getMarkerLabelById(pid);
+      let m = getMarkerLabelById(pid);
       lastMarkerOnMap = map.hasLayer(m);
       if (!lastMarkerOnMap)
         map.addLayer(m);
     }
 
     function legendMarkerLabelMouseOut(pid) {
-      var m = getMarkerLabelById(pid);
+      let m = getMarkerLabelById(pid);
       if (!lastMarkerOnMap)
         map.removeLayer(m);
     }
 
     function legendMarkerLabelClick(pid) {
-      var marker = getMarkerLabelById(pid);
+      let marker = getMarkerLabelById(pid);
       marker.fire("click");
     }
 
     function legendMarkerPIClick(pid) {
-      var marker = getMarkerPIById(pid);
+      let marker = getMarkerPIById(pid);
       marker.fire("click");
     }
 
     function legendCountryClick(pcode) {
-      var countryLayer = getLayerPolygonByCode(pcode);
+      let countryLayer = getLayerPolygonByCode(pcode);
       countryLayer.fire("click");
     }
 
     function legendCountryOver(pcode) {
-      var countryLayer = getLayerPolygonByCode(pcode);
+      let countryLayer = getLayerPolygonByCode(pcode);
       countryLayer.fire("mouseover");
     }
 
     function legendCountryOut(pcode) {
-      var countryLayer = getLayerPolygonByCode(pcode);
+      let countryLayer = getLayerPolygonByCode(pcode);
       countryLayer.fire("mouseout");
     }
 
     function goToRegion(pcode) {
-      if(currentMarker)
+      if (currentMarker)
         currentMarker.unbindPopup();
       $(".loading").show();
       setTimeout(function() {
-        var regionLayer = getLayerPolygonByCode(pcode);
+        let regionLayer = getLayerPolygonByCode(pcode);
         currentRegionLayer = regionLayer;
         setAterroirLevel(2);
         map.fitBounds(regionLayer.getBounds());
@@ -1509,19 +1510,19 @@ if (isset($_REQUEST["s"])) {
     function centerMapOnLabel(pid) {
 
       let z1 = map.getZoom();
-      console.log(z1);
+      log(z1);
 
       if (listLayerImagesAndPolygonsLabel[pid]) {
         // if (false) {
-          console.log("centerMapOnLabel - map.fitBounds(listLayerImagesAndPolygonsLabel[pid].getBounds());");
-          map.fitBounds(listLayerImagesAndPolygonsLabel[pid].getBounds());
-          // let l = listLayerPolygonsLabel[pid];
-          // setTimeout(() => {
-          //   map.fitBounds(listLayerImagesAndPolygonsLabel[pid].getBounds());
-          //   setAterroirLevel(3);
-          //   setLayersByLevel();
-          // }, 0);
-          
+        log("centerMapOnLabel - map.fitBounds(listLayerImagesAndPolygonsLabel[pid].getBounds());");
+        map.fitBounds(listLayerImagesAndPolygonsLabel[pid].getBounds());
+        // let l = listLayerPolygonsLabel[pid];
+        // setTimeout(() => {
+        //   map.fitBounds(listLayerImagesAndPolygonsLabel[pid].getBounds());
+        //   setAterroirLevel(3);
+        //   setLayersByLevel();
+        // }, 0);
+
       } else {
         let m = getMarkerLabelById(pid);
         map.setView(m.getLatLng(), 10);
@@ -1529,11 +1530,12 @@ if (isset($_REQUEST["s"])) {
 
       // computeAterroirLevel = false;
       let z2 = map.getZoom();
-      console.log(z2);
+      log(z2);
 
-      if(z1 == z2) {
-        console.log("centerMapOnLabel - setLayersByLevel();");
+      if (z1 == z2) {
+        log("centerMapOnLabel - setLayersByLevel();");
         setLayersByLevel();
+        setAterroirLevel(3);
       }
     }
 
@@ -1543,17 +1545,17 @@ if (isset($_REQUEST["s"])) {
 
       currentLabel = pid;
 
-      if(currentMarker)
+      if (currentMarker)
         currentMarker.unbindPopup();
 
-      // console.log("1");
+      // log("1");
       $(".loading").show();
       // map.spin(true);
       // $(".loading").css("display", "block");
 
       setTimeout(function() {
         if (!currentRegionLayer) {
-          var m = getMarkerLabelById(pid);
+          let m = getMarkerLabelById(pid);
           currentRegionLayer = m.layerRegion;
         }
 
@@ -1572,14 +1574,14 @@ if (isset($_REQUEST["s"])) {
         // listLayerPolygonsCurrentLabel = listListPolMapLabel[pid];
         listListLayerLevel[3][8] = listLayerImagesAndPolygonsLabel[pid];
 
-        console.log("goToLabel - setAterroirLevel(3)");
+        log("goToLabel - setAterroirLevel(3)");
         setAterroirLevel(3);
         centerMapOnLabel(pid);
         // setLayersByLevel(); // Au cas où pas de changement
 
         // setContextualWindow(commandLegendLabel[pid]);
 
-        // console.log("2");
+        // log("2");
         $(".loading").hide();
       });
 
@@ -1589,12 +1591,12 @@ if (isset($_REQUEST["s"])) {
     }
 
     function legendRegionOver(pcode) {
-      var regionLayer = getLayerPolygonByCode(pcode);
+      let regionLayer = getLayerPolygonByCode(pcode);
       regionLayer.fire("mouseover");
     }
 
     function legendRegionOut(pcode) {
-      var regionLayer = getLayerPolygonByCode(pcode);
+      let regionLayer = getLayerPolygonByCode(pcode);
       regionLayer.fire("mouseout");
     }
 
@@ -1608,7 +1610,7 @@ if (isset($_REQUEST["s"])) {
     }
 
     function getAterroirLevel(pzoomLevel) {
-      for (var nuLevel in listLevelsAterroir) {
+      for (let nuLevel in listLevelsAterroir) {
         if (listLevelsAterroir[nuLevel].start != undefined && pzoomLevel <= listLevelsAterroir[nuLevel].start)
           continue;
         if (listLevelsAterroir[nuLevel].end != undefined && pzoomLevel > listLevelsAterroir[nuLevel].end)
@@ -1623,7 +1625,7 @@ if (isset($_REQUEST["s"])) {
       computeAterroirLevel = false;
     }
 
-    var lastItem;
+    let lastItem;
 
     function closeRight() {
       if (lastItem)
