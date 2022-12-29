@@ -74,6 +74,12 @@ if (isset($_REQUEST["s"])) {
 
     let map;
 
+    let JSONMap;
+
+    <?php if (isset($rsMap)) { ?>
+      JSONMap = <?= json_encode($rsMap) ?>;
+    <?php } ?>
+
     // tuiles (basemap)
     let layerTerrain, layerWatercolor, layerToner, layerPositron, layerPositronNoLabel;
     let JSONbasemap = <?= json_encode($rsBasemap) ?>;
@@ -291,6 +297,8 @@ if (isset($_REQUEST["s"])) {
 
       setCommandChoiceMap();
 
+      if (JSONMap) setCommandPartner();
+
       // correspondances niveaux aterroir et openstreetmap
       listLevelsAterroir[0] = {
         end: 5
@@ -346,9 +354,12 @@ if (isset($_REQUEST["s"])) {
       let desc = "";
       desc += "<p>" + pmarker.label["name_" + coLang1] + "</p>";
 
+      let url = pmarker.label["url"];
       let pdfFile = getFileNameFromJSONMetaData(pmarker.label["pdf"]);
 
-      if (pdfFile)
+      if (url)
+        desc += "<a href='" + url + "' target='_blank'><img class='pdf-img' src='assets/pdf/" + getFileNameFromJSONMetaData(pmarker.label["pdf_icon"]) + "' /></a>";
+      else if (pdfFile)
         desc += "<a href='assets/pdf/" + pdfFile + "' target='_blank'><img class='pdf-img' src='assets/pdf/" + getFileNameFromJSONMetaData(pmarker.label["pdf_icon"]) + "' /></a>";
 
       desc += "<p>" + pmarker.label["name_" + coLang2] + "</p>";
@@ -860,6 +871,52 @@ if (isset($_REQUEST["s"])) {
 
       return commandLegendRegion[pcodeRegion];
 
+    }
+
+    function setCommandPartner() {
+      let cmdPartner = L.control({
+        position: 'bottomleft'
+      });
+
+      let abort = false;
+
+      cmdPartner.onAdd = function(map) {
+
+        let div = L.DomUtil.create('div', 'command');
+        // L.DomEvent.addListener(div, 'click', L.DomEvent.stopPropagation).addListener(div, 'click', L.DomEvent.preventDefault); // TODO : autres événements (scroll...)
+        // L.DomEvent.addListener(div, 'mousewheel', L.DomEvent.stopPropagation); // .addListener(div, 'mousewheel', L.DomEvent.preventDefault);
+
+        let JSONlogo = JSONMap[0]['img_partner'];
+        let logo;
+
+        if (JSONlogo) {
+          logo = getFileNameFromJSONMetaData(JSONlogo);
+          if (logo) logo = "assets/img/images-partner/" + logo;
+        } else {
+          if (typeMap == 'region') {
+            logo = getFileNameFromJSONMetaData(JSONRegionMap['img_logo']);
+            if (logo) logo = "assets/img/logos-regions/" + logo;
+          }
+        }
+
+        if (!logo) {
+          abort = true;
+          div.innerHTML = ''
+          return div;
+        }
+
+        let html =
+          `
+        <img src="${logo}" style="max-width:200px"/>
+        `;
+
+        div.innerHTML = html;
+
+        return div;
+      };
+
+      if(!abort)
+        cmdPartner.addTo(map);
     }
 
     function getJSONMarkersPILabel(pidLabel) {
@@ -1544,9 +1601,9 @@ if (isset($_REQUEST["s"])) {
 
     function center(zone) {
       // setAterroirLevel(0);
-      if (zone=='eu')
+      if (zone == 'eu')
         map.setView([48.833, 2.333], 4.5);
-      else if (zone=='cn')
+      else if (zone == 'cn')
         map.setView([33, 116.3947], 4.5);
     }
 
