@@ -1543,7 +1543,7 @@ if (isset($_REQUEST["s"])) {
     }
 
     function center(zone) {
-      setAterroirLevel(0);
+      // setAterroirLevel(0);
       if (zone=='eu')
         map.setView([48.833, 2.333], 4.5);
       else if (zone=='cn')
