@@ -289,6 +289,8 @@ if (isset($_REQUEST["s"])) {
 
       createDataLayers(); // création des calques à partir des tableaux de marqueurs
 
+      setCommandChoiceMap();
+
       // correspondances niveaux aterroir et openstreetmap
       listLevelsAterroir[0] = {
         end: 5
@@ -1503,6 +1505,49 @@ if (isset($_REQUEST["s"])) {
         $(".loading").hide();
       }, 0)
 
+    }
+
+    function setCommandChoiceMap() {
+
+      let commandChoiceMap = L.control({
+        position: 'topright'
+      });
+
+      commandChoiceMap.onAdd = function(map) {
+
+        let div = L.DomUtil.create('div', 'command');
+        // L.DomEvent.addListener(div, 'click', L.DomEvent.stopPropagation).addListener(div, 'click', L.DomEvent.preventDefault); // TODO : autres événements (scroll...)
+        L.DomEvent.addListener(div, 'mousewheel', L.DomEvent.stopPropagation); // .addListener(div, 'mousewheel', L.DomEvent.preventDefault);
+
+        let html =
+          `
+          <div class="choice-lang">
+            <input type="radio" id="map-eu" name="drone" value="map-eu" onclick="center('eu')" checked>
+            <!--label for="Europe">Europe</label-->
+            <img src="assets/img/flags/eu.png">
+          </div>
+
+          <div class="choice-lang">
+            <input type="radio" id="map-cn" name="drone" value="map-cn" onclick="center('cn')">
+            <!--label for="China">China</label-->
+            <img src="assets/img/flags/cn.png">
+          </div>
+          `;
+
+        div.innerHTML = html;
+
+        return div;
+      };
+
+      commandChoiceMap.addTo(map);
+    }
+
+    function center(zone) {
+      setAterroirLevel(0);
+      if (zone=='eu')
+        map.setView([48.833, 2.333], 4.5);
+      else if (zone=='cn')
+        map.setView([33, 116.3947], 4.5);
     }
 
     let labelDataExists = [];
