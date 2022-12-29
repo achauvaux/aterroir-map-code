@@ -16,8 +16,13 @@ $idCountry = 0;
 
 $rsBasemap = [];
 
-if (isset($_REQUEST["s"])) {
-  $subdomain = $_REQUEST["s"];
+$domain = $_SERVER['SERVER_NAME'];
+$subdomain = preg_replace('/^(?:([^\.]+)\.)?aterroir\.eu$/', '\1', $domain);
+
+
+// if (isset($_REQUEST["s"])) {
+if (isset($subdomain)) {
+  // $subdomain = $_REQUEST["s"];
   $rsMap = getDataArrayFromProcedure("getDetailMap", $subdomain);
 
   if (isset($rsMap[0]["id_label"]))
