@@ -19,6 +19,8 @@ $rsBasemap = [];
 $domain = $_SERVER['SERVER_NAME'];
 $subdomain = preg_replace('/^(?:([^\.]+)\.)?aterroir\.eu$/', '\1', $domain);
 
+if((!isset($subdomain) || $subdomain = "www") && isset($_REQUEST["s"]))
+  $subdomain = $_REQUEST["s"];
 
 // if (isset($_REQUEST["s"])) {
 if (isset($subdomain)) {
