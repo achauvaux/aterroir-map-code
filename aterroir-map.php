@@ -17,9 +17,24 @@ $idCountry = 0;
 $rsBasemap = [];
 
 $domain = $_SERVER['SERVER_NAME'];
-$subdomain = preg_replace('/^(?:([^\.]+)\.)?aterroir\.eu$/', '\1', $domain);
+// $domain = $_REQUEST["url"];
 
-if((!isset($subdomain) || $subdomain == "www") && isset($_REQUEST["s"]))
+// $subdomain = preg_replace('/^(?:([^\.]+)\.)?aterroir\.eu$/', '\1', $domain);
+preg_match('/^(?:([^\.]+)\.)?aterroir\.([a-z]+)$/', $domain, $matches, PREG_UNMATCHED_AS_NULL);
+
+// preg_match('/(foo)(bar)(baz)/', 'foobarbaz', $matches);
+$subdomain = $matches[1];
+$zone = $matches[2];
+
+if ($zone == "eu") {
+  $coLang1 = "FR";
+  $coLang2 = "CN";
+} else if ($zone == "cn") {
+  $coLang1 = "CN";
+  $coLang2 = "FR";
+}
+
+if ((!isset($subdomain) || $subdomain == "www") && isset($_REQUEST["s"]))
   $subdomain = $_REQUEST["s"];
 
 // if (isset($_REQUEST["s"])) {
@@ -82,6 +97,8 @@ if (isset($subdomain)) {
     let map;
 
     let JSONMap;
+
+    let zone = '<?= $zone ?>';
 
     <?php if (isset($rsMap)) { ?>
       JSONMap = <?= json_encode($rsMap) ?>;
@@ -237,12 +254,20 @@ if (isset($subdomain)) {
           bounds = new L.LatLngBounds(new L.LatLng(JSONLabelMap["bounds_top_left_lat"], JSONLabelMap["bounds_top_left_lon"]), new L.LatLng(JSONLabelMap["bounds_bottom_right_lat"], JSONLabelMap["bounds_bottom_right_lon"]));
       }
 
+      let centerZone;
+
+      if (zone == 'eu')
+        centerZone = [33, 116.3947];
+      else if (zone == 'cn')
+        centerZone = [48.833, 2.333];
+
+
       // création de la carte
       map = L.map('map', {
         zoomSnap: 0.5,
         // center: center0,
         // zoom: zoom0,
-        center: [48.833, 2.333],
+        center: centerZone,
         zoom: 4.5,
         minZoom: 4.5,
         zoomControl: false
@@ -349,6 +374,7 @@ if (isset($subdomain)) {
       if (typeMap == 'global') {
         // setContextualWindow(commandLegendCountries);
         setLayersByLevel();
+        // center(zone);
       }
 
       $(".loading").hide();
@@ -922,7 +948,7 @@ if (isset($subdomain)) {
         return div;
       };
 
-      if(!abort)
+      if (!abort)
         cmdPartner.addTo(map);
     }
 

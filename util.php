@@ -29,10 +29,10 @@ $db_name = $ini['db_name'];
 $db_user = $ini['db_user'];
 $db_password = $ini['db_password'];
 
-$coLang1 = $ini['coLang1'];
-$coLang2 = $ini['coLang2'];
+// $coLang1 = $ini['coLang1'];
+// $coLang2 = $ini['coLang2'];
 
-$zone = $ini['zone'];
+// $zone = $ini['zone'];
 
 $dbh = new PDO("mysql:host=$db_server;dbname=$db_name;charset=UTF8", $db_user, $db_password);
 
