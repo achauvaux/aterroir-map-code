@@ -920,6 +920,7 @@ if (isset($subdomain)) {
         // L.DomEvent.addListener(div, 'mousewheel', L.DomEvent.stopPropagation); // .addListener(div, 'mousewheel', L.DomEvent.preventDefault);
 
         let JSONlogo = JSONMap[0]['img_partner'];
+        let urlPartner = JSONMap[0]['url_partner'];
         let logo;
 
         if (JSONlogo) {
@@ -939,8 +940,8 @@ if (isset($subdomain)) {
         }
 
         let html =
-          `
-        <img src="${logo}" style="max-width:200px"/>
+        `
+        <a href='${urlPartner || '#'}' target='_blank'><img src="${logo}" style="max-width:200px"/></a>
         `;
 
         div.innerHTML = html;
