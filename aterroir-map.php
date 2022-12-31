@@ -1096,7 +1096,7 @@ if (isset($subdomain)) {
 
     function createLabelImages(pidLabel) {
 
-      listImagesAndPolygonsLabel = [];
+      // listImagesAndPolygonsLabel = [];
 
       let JSONMapsLabel = getJSONMapsLabel(pidLabel);
 
@@ -1111,7 +1111,7 @@ if (isset($subdomain)) {
 
     function createLabelPolygons(pidLabel) {
 
-      listImagesAndPolygonsLabel = [];
+      // listImagesAndPolygonsLabel = [];
 
       let JSONPolygonsLabel = getJSONPolygonsLabel(pidLabel);
 
@@ -1135,8 +1135,8 @@ if (isset($subdomain)) {
       }
 
       // listLayerPolygonsLabel[pidLabel] = L.layerGroup(layers);
-      if (listImagesAndPolygonsLabel.length > 0)
-        listLayerImagesAndPolygonsLabel[pidLabel] = L.featureGroup(listImagesAndPolygonsLabel);
+      // if (listImagesAndPolygonsLabel.length > 0)
+      //   listLayerImagesAndPolygonsLabel[pidLabel] = L.featureGroup(listImagesAndPolygonsLabel);
     }
 
     function createLabelWindow(pid) {
@@ -1698,8 +1698,11 @@ if (isset($subdomain)) {
 
         if (!labelDataExists[pid]) {
           // createLayerMarkersPILabel(pid);
-          // createLabelImages(pid);
+          listImagesAndPolygonsLabel = [];
+          createLabelImages(pid);
           createLabelPolygons(pid);
+          if (listImagesAndPolygonsLabel.length > 0)
+            listLayerImagesAndPolygonsLabel[pid] = L.featureGroup(listImagesAndPolygonsLabel);
           // createLabelWindow(pid);
           labelDataExists[pid] = true;
         }
