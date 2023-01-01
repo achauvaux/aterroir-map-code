@@ -256,7 +256,7 @@ if (isset($subdomain)) {
 
       let centerZone;
 
-      if (zone == 'eu')
+      if (zone  == 'eu' || (JSONCountryMap && JSONCountryMap['code_country'] == 'CHN'))
         centerZone = [33, 116.3947];
       else if (zone == 'cn')
         centerZone = [48.833, 2.333];
@@ -367,11 +367,11 @@ if (isset($subdomain)) {
         goToLabel(idLabelMap);
       } else if (typeMap == 'region') {
         goToRegion(JSONRegionMap['code_region']);
-      } else if (typeMap == 'country') {
-        legendCountryClick(JSONCountryMap['code_country']);
+      } else if (typeMap == 'country' && JSONCountryMap['code_country'] != 'CHN') {
+          legendCountryClick(JSONCountryMap['code_country']);
       }
 
-      if (typeMap == 'global') {
+      if (typeMap == 'global' || (JSONCountryMap && JSONCountryMap['code_country'] == 'CHN')) {
         // setContextualWindow(commandLegendCountries);
         setLayersByLevel();
         // center(zone);
@@ -940,7 +940,7 @@ if (isset($subdomain)) {
         }
 
         let html =
-        `
+          `
         <a href='${urlPartner || '#'}' target='_blank'><img src="${logo}" style="max-width:200px"/></a>
         `;
 
