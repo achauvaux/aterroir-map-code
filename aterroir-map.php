@@ -188,6 +188,7 @@ if (isset($subdomain)) {
 
     let typeMap = 'global';
     let idLabelMap, idRegionMap, idCountryMap;
+    let JSONLabelMap, JSONRegionMap, JSONCountryMap;
 
     <?php if ($idLabel) { ?>
       idLabelMap = <?= $idLabel ?>;
