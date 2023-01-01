@@ -193,18 +193,18 @@ if (isset($subdomain)) {
     <?php if ($idLabel) { ?>
       idLabelMap = <?= $idLabel ?>;
       let JSONLabel = <?= getJSONArrayFromProcedure("getDetailLabel", $idLabel); ?>; // données JSON du label (carte terroir) 
-      let JSONLabelMap = JSONLabel[0];
+      JSONLabelMap = JSONLabel[0];
       typeMap = 'label';
       isWindows = true;
     <?php } else if ($idRegion) { ?>
       idRegionMap = <?= $idRegion ?>;
       let JSONRegion = <?= getJSONArrayFromProcedure("getDetailRegion", $idRegion); ?>;
-      let JSONRegionMap = JSONRegion[0];
+      JSONRegionMap = JSONRegion[0];
       typeMap = 'region';
     <?php } else if ($idCountry) { ?>
       idCountryMap = <?= $idCountry ?>;
       let JSONCountry = <?= getJSONArrayFromProcedure("getDetailCountry", $idCountry); ?>;
-      let JSONCountryMap = JSONCountry[0];
+      JSONCountryMap = JSONCountry[0];
       typeMap = 'country';
     <?php } ?>
 
