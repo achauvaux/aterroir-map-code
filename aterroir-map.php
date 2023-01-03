@@ -16,8 +16,10 @@ $idCountry = 0;
 
 $rsBasemap = [];
 
-$domain = $_SERVER['SERVER_NAME'];
-// $domain = $_REQUEST["url"];
+if (isset($_REQUEST['dev']))
+  $domain = $_REQUEST["url"];
+else
+  $domain = $_SERVER['SERVER_NAME'];
 
 // $subdomain = preg_replace('/^(?:([^\.]+)\.)?aterroir\.eu$/', '\1', $domain);
 preg_match('/^(?:([^\.]+)\.)?aterroir\.([a-z]+)$/', $domain, $matches, PREG_UNMATCHED_AS_NULL);
@@ -257,7 +259,7 @@ if (isset($subdomain)) {
 
       let centerZone;
 
-      if (zone  == 'eu' || (JSONCountryMap && JSONCountryMap['code_country'] == 'CHN'))
+      if (zone == 'eu' || (JSONCountryMap && JSONCountryMap['code_country'] == 'CHN'))
         centerZone = [33, 116.3947];
       else if (zone == 'cn')
         centerZone = [48.833, 2.333];
@@ -330,7 +332,7 @@ if (isset($subdomain)) {
 
       setCommandChoiceMap();
 
-      if (JSONMap && JSONMap[0]) setCommandPartner();
+      setCommandPartner(zone);
 
       // correspondances niveaux aterroir et openstreetmap
       listLevelsAterroir[0] = {
@@ -369,7 +371,7 @@ if (isset($subdomain)) {
       } else if (typeMap == 'region') {
         goToRegion(JSONRegionMap['code_region']);
       } else if (typeMap == 'country' && JSONCountryMap['code_country'] != 'CHN') {
-          legendCountryClick(JSONCountryMap['code_country']);
+        legendCountryClick(JSONCountryMap['code_country']);
       }
 
       if (typeMap == 'global' || (JSONCountryMap && JSONCountryMap['code_country'] == 'CHN')) {
@@ -907,7 +909,7 @@ if (isset($subdomain)) {
 
     }
 
-    function setCommandPartner() {
+    function setCommandPartner(pzone) {
       let cmdPartner = L.control({
         position: 'bottomleft'
       });
@@ -916,28 +918,39 @@ if (isset($subdomain)) {
 
       cmdPartner.onAdd = function(map) {
 
-        let div = L.DomUtil.create('div', 'command');
-        // L.DomEvent.addListener(div, 'click', L.DomEvent.stopPropagation).addListener(div, 'click', L.DomEvent.preventDefault); // TODO : autres événements (scroll...)
-        // L.DomEvent.addListener(div, 'mousewheel', L.DomEvent.stopPropagation); // .addListener(div, 'mousewheel', L.DomEvent.preventDefault);
-
-        let JSONlogo = JSONMap[0]['img_partner'];
-        let urlPartner = JSONMap[0]['url_partner'];
+        let JSONlogo;
+        let urlPartner;
         let logo;
+        
+        let div = L.DomUtil.create('div', 'command');
 
-        if (JSONlogo) {
-          logo = getFileNameFromJSONMetaData(JSONlogo);
-          if (logo) logo = "assets/img/images-partner/" + logo;
-        } else {
-          if (typeMap == 'region') {
-            logo = getFileNameFromJSONMetaData(JSONRegionMap['img_logo']);
-            if (logo) logo = "assets/img/logos-regions/" + logo;
+        if (JSONMap) {
+
+          // L.DomEvent.addListener(div, 'click', L.DomEvent.stopPropagation).addListener(div, 'click', L.DomEvent.preventDefault); // TODO : autres événements (scroll...)
+          // L.DomEvent.addListener(div, 'mousewheel', L.DomEvent.stopPropagation); // .addListener(div, 'mousewheel', L.DomEvent.preventDefault);
+
+          JSONlogo = JSONMap[0]['img_partner'];
+          urlPartner = JSONMap[0]['url_partner'];
+
+          if (JSONlogo) {
+            logo = getFileNameFromJSONMetaData(JSONlogo);
+            if (logo) logo = "assets/img/images-partner/" + logo;
+          } else {
+            if (typeMap == 'region') {
+              logo = getFileNameFromJSONMetaData(JSONRegionMap['img_logo']);
+              if (logo) logo = "assets/img/logos-regions/" + logo;
+            }
           }
-        }
 
-        if (!logo) {
-          abort = true;
-          div.innerHTML = ''
-          return div;
+          if (!logo) {
+            abort = true;
+            div.innerHTML = ''
+            return div;
+          }
+
+        } else {
+          urlPartner = 'https://aterroir.' + pzone;
+          logo = 'assets/img/icones-aterroir/LogoPartenaireAterroirFr.png';
         }
 
         let html =
