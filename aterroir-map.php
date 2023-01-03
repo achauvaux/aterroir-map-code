@@ -921,7 +921,7 @@ if (isset($subdomain)) {
         let JSONlogo;
         let urlPartner;
         let logo;
-        
+
         let div = L.DomUtil.create('div', 'command');
 
         if (JSONMap) {
@@ -949,7 +949,11 @@ if (isset($subdomain)) {
           }
 
         } else {
-          urlPartner = 'https://aterroir.' + pzone;
+          if (pzone == 'eu')
+            urlPartner = 'https://marcopolo-international.com/zh/aterroir-eu-cn/';
+          else if (pzone == 'cn')
+            urlPartner = 'https://marcopolo-international.com/en/aterroir-cn-en/';
+
           logo = 'assets/img/icones-aterroir/LogoPartenaireAterroirFr.png';
         }
 
