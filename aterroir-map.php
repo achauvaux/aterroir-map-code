@@ -930,15 +930,23 @@ if (isset($subdomain)) {
           // L.DomEvent.addListener(div, 'mousewheel', L.DomEvent.stopPropagation); // .addListener(div, 'mousewheel', L.DomEvent.preventDefault);
 
           JSONlogo = JSONMap[0]['img_partner'];
+          JSONlogo2 = JSONMap[0]['img_partner2'];
           urlPartner = JSONMap[0]['url_partner'];
 
           if (JSONlogo) {
             logo = getFileNameFromJSONMetaData(JSONlogo);
-            if (logo) logo = "assets/img/images-partner/" + logo;
+            logo2 = getFileNameFromJSONMetaData(JSONlogo2);
+            if (logo) {
+              logo = "assets/img/images-partner/" + logo;
+              logo2 = "assets/img/images-partner/" + logo2;
+            }
           } else {
             if (typeMap == 'region') {
               logo = getFileNameFromJSONMetaData(JSONRegionMap['img_logo']);
-              if (logo) logo = "assets/img/logos-regions/" + logo;
+              if (logo) {
+                logo = "assets/img/logos-regions/" + logo;
+                logo2 = logo;
+              }
             }
           }
 
@@ -954,12 +962,13 @@ if (isset($subdomain)) {
           else if (pzone == 'cn')
             urlPartner = 'https://marcopolo-international.com/en/aterroir-cn-en/';
 
-          logo = 'assets/img/icones-aterroir/LogoPartenaireAterroirFr.png';
+          logo = 'assets/img/icones-aterroir/ATPartnerBleu.png';
+          logo2 = 'assets/img/icones-aterroir/ATPartnerRge.png';
         }
 
         let html =
-          `
-        <a href='${urlPartner || '#'}' target='_blank'><img src="${logo}" style="max-width:200px"/></a>
+        `
+        <a href='${urlPartner || '#'}' target='_blank' onmouseover="$('#partner').attr('src', '${logo2}');" onmouseout="$('#partner').attr('src', '${logo}');"><img id='partner' src="${logo}" style="max-width:200px"/></a>
         `;
 
         div.innerHTML = html;
