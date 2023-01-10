@@ -40,7 +40,7 @@ if ((!isset($subdomain) || $subdomain == "www") && isset($_REQUEST["s"]))
   $subdomain = $_REQUEST["s"];
 
 // if (isset($_REQUEST["s"])) {
-if (isset($subdomain)) {
+if (isset($subdomain) && $subdomain != "www") {
   // $subdomain = $_REQUEST["s"];
   $rsMap = getDataArrayFromProcedure("getDetailMap", $subdomain);
 
