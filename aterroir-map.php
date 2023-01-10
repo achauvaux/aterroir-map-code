@@ -186,7 +186,7 @@ if (isset($subdomain) && $subdomain != "www") {
 
     let zoomLevel;
 
-    let isWindows = true;
+    let isWindows = false;
 
     let typeMap = 'global';
     let idLabelMap, idRegionMap, idCountryMap;
@@ -197,7 +197,7 @@ if (isset($subdomain) && $subdomain != "www") {
       let JSONLabel = <?= getJSONArrayFromProcedure("getDetailLabel", $idLabel); ?>; // données JSON du label (carte terroir) 
       JSONLabelMap = JSONLabel[0];
       typeMap = 'label';
-      isWindows = true;
+      // isWindows = true;
     <?php } else if ($idRegion) { ?>
       idRegionMap = <?= $idRegion ?>;
       let JSONRegion = <?= getJSONArrayFromProcedure("getDetailRegion", $idRegion); ?>;
@@ -375,7 +375,7 @@ if (isset($subdomain) && $subdomain != "www") {
       }
 
       if (typeMap == 'global' || (JSONCountryMap && JSONCountryMap['code_country'] == 'CHN')) {
-        // setContextualWindow(commandLegendCountries);
+        setContextualWindow(commandLegendCountries);
         setLayersByLevel();
         // center(zone);
       }
@@ -1331,7 +1331,7 @@ if (isset($subdomain) && $subdomain != "www") {
             currentRegionLayer = layer;
             setAterroirLevel(2);
             map.fitBounds(layer.getBounds());
-            // setContextualWindow(getCommandLegendRegion(feature.properties["HASC_1"]));
+            if (isWindows) setContextualWindow(getCommandLegendRegion(feature.properties["HASC_1"]));
           });
           layer.on('mouseover', function(e) {
             regionFocusOn(layer);
@@ -1493,7 +1493,7 @@ if (isset($subdomain) && $subdomain != "www") {
 
       if (aTerroirLevel < 2) {
         currentRegionLayer = null;
-        // setContextualWindow(commandLegendCountries);
+        setContextualWindow(commandLegendCountries);
       }
 
       setLayers(listListLayerLevel[aTerroirLevel]);
@@ -1619,7 +1619,7 @@ if (isset($subdomain) && $subdomain != "www") {
         setAterroirLevel(2);
         map.fitBounds(regionLayer.getBounds());
         regionFocusOut();
-        // setContextualWindow(getCommandLegendRegion(pcode));
+        setContextualWindow(getCommandLegendRegion(pcode));
         $(".loading").hide();
       }, 0)
 
@@ -1731,7 +1731,7 @@ if (isset($subdomain) && $subdomain != "www") {
           createLabelPolygons(pid);
           if (listImagesAndPolygonsLabel.length > 0)
             listLayerImagesAndPolygonsLabel[pid] = L.featureGroup(listImagesAndPolygonsLabel);
-          // createLabelWindow(pid);
+          if (isWindows) createLabelWindow(pid);
           labelDataExists[pid] = true;
         }
 
@@ -1745,7 +1745,7 @@ if (isset($subdomain) && $subdomain != "www") {
         centerMapOnLabel(pid);
         // setLayersByLevel(); // Au cas où pas de changement
 
-        // setContextualWindow(commandLegendLabel[pid]);
+        setContextualWindow(commandLegendLabel[pid]);
 
         // log("2");
         $(".loading").hide();
