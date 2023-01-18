@@ -624,7 +624,7 @@ if (isset($subdomain) && $subdomain != "www") {
             regionFocusOn(this.layerRegion);
           else if (aTerroirLevel > 1 && this.layerSubRegion)
             subRegionFocusOn(this.layerSubRegion);
-          else if (aTerroirLevel == 4 && this.label["id_label"] == currentLabel)
+          if (aTerroirLevel == 4 && this.label["id_label"] == currentLabel)
             markerLabelFocusOn(this);
         }).on('mouseout', function(e) {
           if (aTerroirLevel == 2 && this.layerRegion)
@@ -1553,7 +1553,8 @@ if (isset($subdomain) && $subdomain != "www") {
       zoomLevel = map.getZoom();
 
       if (computeAterroirLevel) {
-        aTerroirLevel = getAterroirLevel(zoomLevel);
+        // aTerroirLevel = getAterroirLevel(zoomLevel);
+        setAterroirLevel(getAterroirLevel(zoomLevel));
       }
 
       log("zoom osm : " + zoomLevel + " / level at : " + aTerroirLevel);
@@ -1737,7 +1738,6 @@ if (isset($subdomain) && $subdomain != "www") {
       setTimeout(function() {
         let regionLayer = getLayerPolygonByCode(pcode);
         currentRegionLayer = regionLayer;
-        // currentSubRegionLayer = null;
         setAterroirLevel(2);
         map.fitBounds(regionLayer.getBounds());
         regionFocusOut();
@@ -1928,6 +1928,10 @@ if (isset($subdomain) && $subdomain != "www") {
     function setAterroirLevel(plevel) {
       aTerroirLevel = plevel;
       computeAterroirLevel = false;
+      if (aTerroirLevel < 3)
+        currentSubRegionLayer = null;
+      if (aTerroirLevel < 2)
+        currentRegionLayer = null;
     }
 
     let lastItem;
