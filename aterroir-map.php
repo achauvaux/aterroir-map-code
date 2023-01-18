@@ -120,6 +120,7 @@ if (isset($subdomain) && $subdomain != "www") {
     // polygones (pays et régions)
     let layerCountriesEurope;
     let layerRegionsEurope;
+    let layerSubRegionsFrance;
     let layerRegionsChine;
     let layerRegionsFrance;
     let listLayerPolygonIndexed = []; // layers polygones (tous : pays, régions...) indexés par leur code (A3 ou NUTS)
@@ -170,7 +171,7 @@ if (isset($subdomain) && $subdomain != "www") {
 
     let logOn = false;
 
-    let lastRegionMouseOvered, currentRegionLayer;
+    let lastRegionMouseOvered, lastSubRegionMouseOvered, currentRegionLayer, currentSubRegionLayer;
 
     let commandLegendRegion = [];
     let commandLegendLabel = [];
@@ -345,9 +346,13 @@ if (isset($subdomain) && $subdomain != "www") {
       listLevelsAterroir[2] = {
         start: 7,
         end: 8
-      }
+      }; // region
       listLevelsAterroir[3] = {
-        start: 8
+        start: 8,
+        end: 9
+      }; // subregion
+      listLevelsAterroir[4] = {
+        start: 9
       };
 
       if (layerBasemap) {
@@ -360,8 +365,9 @@ if (isset($subdomain) && $subdomain != "www") {
 
       listListLayerLevel[0] = [currentTileLayerForLevel0, layerCountriesEurope, layerRegionsChine, layerLevel0];
       listListLayerLevel[1] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerRegionsFrance, listLayerLabelsLevel[1]];
-      listListLayerLevel[2] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2]];
-      listListLayerLevel[3] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2], null, null, null];
+      listListLayerLevel[2] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerSubRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2]];
+      listListLayerLevel[3] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerSubRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2], listLayerLabelsLevel[3]];
+      listListLayerLevel[4] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerSubRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2], listLayerLabelsLevel[3], null, null, null];
 
       if (typeMap == 'label') {
         // map.fitBounds(bounds); // on centre sur la région
@@ -566,49 +572,88 @@ if (isset($subdomain) && $subdomain != "www") {
           }
         ).bindTooltip(
           IGTooltip
-        ).on("click", function(e) {
-          // this.unbindPopup();
+        ).on('click', function(e) {
           currentMarker = this;
-          if (aTerroirLevel == 3 && this.label["id_label"] == currentLabel) { // on est au niveau 3, le niveau max. On fait apparaître la popup info
-            if (!this._popup)
-              this.bindPopup(getMarkerLabelPopupContent(this), {
-                className: "label"
-              }).openPopup();
-            // this.openPopup();
-          } else if (currentRegionLayer == this.layerRegion) { // la région est déjà sélectionnée : on était au niveau 2 et on passe au niveau 3
-            /*
-            // if (!hasPI(this.label["id_label"])) return;
-            let tempCommand = getCommandLegendLabel(this.label["id_label"]);
-            if (tempCommand == null) return;
-            setContextualWindow(tempCommand); // fenêtre F3
-            map.setView(this.getLatLng(), 10); // TODO : centrer sur image terroir
-            setAterroirLevel(3);
-            */
-            goToLabel(this.label["id_label"]);
-          } else { // on arrive sur la région (on était à un niveau inférieur ou dans une autre région)
-            if (this.layerRegion) { // on vérifie qu'un polygone région est associé au marqueur
-              goToRegion(this.label["code_region"]);
+          if (aTerroirLevel == 1)
+            goToRegion(this.label["code_region"]);
+          else if (aTerroirLevel == 2) {
+            // if (this.label["code_subregion"])
+              goToSubRegion(this.label["code_subregion"]);
+            // else
+            //   goToLabel(this.label["id_label"]);
+          } else if (aTerroirLevel == 3)
+            // if (this.layerSubRegion) {
+              if (this.layerSubRegion == currentSubRegionLayer)
+                goToLabel(this.label["id_label"]);
+              else
+                goToSubRegion(this.label["code_subregion"]);
+            // } else {
+            //   goToRegion(this.label["code_region"]);
+            // }
+          else if (aTerroirLevel == 4) {
+            if (this.label["id_label"] == currentLabel) {
+              if (!this._popup)
+                this.bindPopup(getMarkerLabelPopupContent(this), {
+                  className: "label"
+                }).openPopup();
+            } else {
+              // if (this.layerSubRegion) {
+                if (this.layerSubRegion == currentSubRegionLayer)
+                  goToLabel(this.label["id_label"]);
+                else
+                  goToSubRegion(this.label["code_subregion"]);
+              // } else {
+              //   goToRegion(this.label["code_region"]);
+              // }
             }
           }
-
-        }).on("mouseover", function(e) {
-          if (aTerroirLevel > 1 && this.layerRegion == currentRegionLayer)
+        }).on('mouseover', function(e) {
+          if (aTerroirLevel > 2 && this.layerSubRegion == currentSubRegionLayer)
             $("#IG-" + this.label["id_label"] + " .talon").css("background", "#ffcd00");
-          if (this.layerRegion)
+          if (aTerroirLevel == 1 && this.layerRegion)
             regionFocusOn(this.layerRegion);
-          if (aTerroirLevel == 3 && this.label["id_label"] == currentLabel)
+          else if (aTerroirLevel > 1 && this.layerSubRegion)
+            subRegionFocusOn(this.layerSubRegion);
+          else if (aTerroirLevel == 4 && this.label["id_label"] == currentLabel)
             markerLabelFocusOn(this);
-        }).on("mouseout", function(e) {
-          if (this.layerRegion)
+        }).on('mouseout', function(e) {
+          if (aTerroirLevel == 2 && this.layerRegion)
             regionFocusOut(this.layerRegion);
-          if (this.layerRegion == currentRegionLayer)
+          if (aTerroirLevel > 2 && this.layerSubRegion)
+            subRegionFocusOut(this.layerSubRegion);
+          if (this.layerSubRegion == currentSubRegionLayer)
             $("#IG-" + this.label["id_label"] + " .talon").css("background", talonBGColorByLevel[aTerroirLevel]);
-          if (currentRegionLayer)
-            markerLabelFocusOut(this);
+          markerLabelFocusOut(this);
         });
+
+        // m.setMarkerInteractive = function(isInteractive) {
+        //   if(isInteractive) {
+        //     this.on("click", this.onclick());
+        //     this.on("mouseover", this.onmouseover());
+        //     this.on("mouseout", this.onmouseout());
+        //   } else {
+        //     this.off("click");
+        //     this.off("mouseover");
+        //     this.off("mouseout");
+        //   }
+        // };
+
+        // m.setTooltipInteractive = function(isInteractive) {
+        //   if(isInteractive) {
+        //     this._tooltip.on("click", this.onclick());
+        //     this._tooltip.on("mouseover", this.onmouseover());
+        //     this._tooltip.on("mouseout", this.onmouseout());
+        //   } else {
+        //     this._tooltip.off("click");
+        //     this._tooltip.off("mouseover");
+        //     this._tooltip.off("mouseout");
+        //   }
+        // };
 
         m.label = label;
         m.layerRegion = getLayerPolygonByCode(label["code_region"]);
+        if(!label["code_subregion"]) label["code_subregion"] = label["code_region"];
+        m.layerSubRegion = getLayerPolygonByCode(label["code_subregion"]);
 
         if (listListMarkerLabelLevel[label["level"]] == undefined)
           listListMarkerLabelLevel[label["level"]] = [];
@@ -967,7 +1012,7 @@ if (isset($subdomain) && $subdomain != "www") {
         }
 
         let html =
-        `
+          `
         <a href='${urlPartner || '#'}' target='_blank' onmouseover="$('#partner').attr('src', '${logo2}');" onmouseout="$('#partner').attr('src', '${logo}');"><img id='partner' src="${logo}" style="max-width:200px"/></a>
         `;
 
@@ -1297,6 +1342,38 @@ if (isset($subdomain) && $subdomain != "www") {
         }
       });
 
+      // let nut3JSON = loadJSON("assets/geojson/NUTS_RG_60M_2021_3035.json");
+      // let nut3JSON = loadJSON("assets/geojson/departements_fr.json");
+      let nut3JSON = loadJSON("assets/geojson/departements.json");
+
+      layerSubRegionsFrance = L.geoJSON(nut3JSON, {
+        onEachFeature: function(feature, layer) {
+          listLayerPolygonIndexed[feature.properties["code"]] = layer;
+          layer.on('click', function(e) {
+            // alert(feature.properties["code"]);
+            goToSubRegion(feature.properties["code"]);
+          });
+          layer.on('mouseover', function(e) {
+            subRegionFocusOn(layer);
+            // console.log("over");
+            // layer.setStyle({
+            //   color: "yellow"
+            // });
+          });
+          layer.on('mouseout', function(e) {
+            layer.setStyle({
+              color: "white",
+              opacity: 0
+            });
+          });
+        },
+        style: {
+          color: "white",
+          opacity: 0,
+          weight: 2
+        }
+      });
+
       let nutFranceJSON = loadJSON("assets/geojson/regions-france-nodomtom.json");
 
       layerRegionsFrance = L.geoJSON(nutFranceJSON, {
@@ -1433,8 +1510,9 @@ if (isset($subdomain) && $subdomain != "www") {
     }
 
     // let talonBGColorByLevel = ["white", "white", "#ffcd00", "#ffcd00"];
-    let talonBGColorByLevel = ["white", "white", "white", "#ffcd00"];
+    let talonBGColorByLevel = ["white", "white", "white", "white", "#ffcd00"];
 
+    /*
     L.Layer.prototype.setInteractive = function(interactive) {
       if (this.getLayers) {
         this.getLayers().forEach(layer => {
@@ -1454,6 +1532,7 @@ if (isset($subdomain) && $subdomain != "www") {
         L.DomUtil.removeClass(this._path, 'leaflet-interactive');
       }
     };
+    */
 
     function setLayersByLevel() {
 
@@ -1473,7 +1552,7 @@ if (isset($subdomain) && $subdomain != "www") {
       //   }
       // else if (aTerroirLevel == 1)
       //   for (let m of listMarkerLabel) {
-      //     m.options.interactive = false;
+      //     m.options.interactive = false;oncli
       //     m._tooltip.options.interactive = false;
       //   }
       // else if (aTerroirLevel == 2)
@@ -1484,11 +1563,17 @@ if (isset($subdomain) && $subdomain != "www") {
 
       if (aTerroirLevel >= 3)
         for (let m of listMarkerLabel) {
+          // m.setMarkerInteractive(true);
+          // m.setTooltipInteractive(true);
           m.options.interactive = true;
+          // m._tooltip.options.interactive = true;
         }
       else
         for (let m of listMarkerLabel) {
+          // m.setMarkerInteractive(false);
+          // m.setTooltipInteractive(false);
           m.options.interactive = false;
+          // m._tooltip.options.interactive = false;
         }
 
       if (aTerroirLevel < 2) {
@@ -1499,14 +1584,14 @@ if (isset($subdomain) && $subdomain != "www") {
       setLayers(listListLayerLevel[aTerroirLevel]);
       log("setLayersByLevel - setLayers() - level " + aTerroirLevel);
 
-      if (aTerroirLevel != 3) {
+      if (aTerroirLevel < 4) {
         $(".talon").css('background', talonBGColorByLevel[aTerroirLevel]);
       } else {
         for (let m of listMarkerLabel) {
-          if (m.layerRegion == currentRegionLayer)
-            $("#IG-" + m.label["id_label"] + " .talon").css("background", talonBGColorByLevel[3]);
+          if (m.layerSubRegion == currentSubRegionLayer)
+            $("#IG-" + m.label["id_label"] + " .talon").css("background", talonBGColorByLevel[4]);
           else
-            $("#IG-" + m.label["id_label"] + " .talon").css("background", talonBGColorByLevel[2]);
+            $("#IG-" + m.label["id_label"] + " .talon").css("background", talonBGColorByLevel[3]);
         }
       }
 
@@ -1561,6 +1646,16 @@ if (isset($subdomain) && $subdomain != "www") {
       }
     }
 
+    function subRegionFocusOn(playerSubRegion) {
+      subRegionFocusOut();
+      if (playerSubRegion != currentSubRegionLayer) {
+        lastSubRegionMouseOvered = playerSubRegion;
+        playerSubRegion.setStyle({
+          color: "yellow"
+        });
+      }
+    }
+
     function regionFocusOut() {
       if (lastRegionMouseOvered) {
         lastRegionMouseOvered.setStyle({
@@ -1570,6 +1665,18 @@ if (isset($subdomain) && $subdomain != "www") {
         lastRegionMouseOvered = null;
       }
     }
+
+    function subRegionFocusOut() {
+      if (lastSubRegionMouseOvered) {
+        lastSubRegionMouseOvered.setStyle({
+          color: "white",
+          opacity: 0
+        });
+        lastSubRegionMouseOvered = null;
+      }
+    }
+
+
 
     function legendMarkerLabelMouseOver(pid) {
       let m = getMarkerLabelById(pid);
@@ -1621,9 +1728,27 @@ if (isset($subdomain) && $subdomain != "www") {
         regionFocusOut();
         setContextualWindow(getCommandLegendRegion(pcode));
         $(".loading").hide();
-      }, 0)
+      }, 0);
 
     }
+
+    function goToSubRegion(pcode) {
+      if (currentMarker)
+        currentMarker.unbindPopup();
+      $(".loading").show();
+      setTimeout(function() {
+        let subRegionLayer = getLayerPolygonByCode(pcode);
+        if (subRegionLayer) {
+          currentSubRegionLayer = subRegionLayer;
+          setAterroirLevel(3);
+          map.fitBounds(subRegionLayer.getBounds());
+          // setContextualWindow(getCommandLegendRegion(pcode));
+        }
+        $(".loading").hide();
+      }, 0);
+
+    }
+
 
     function setCommandChoiceMap() {
 
@@ -1698,7 +1823,7 @@ if (isset($subdomain) && $subdomain != "www") {
       if (z1 == z2) {
         log("centerMapOnLabel - setLayersByLevel();");
         setLayersByLevel();
-        setAterroirLevel(3);
+        setAterroirLevel(4);
       }
     }
 
@@ -1717,10 +1842,10 @@ if (isset($subdomain) && $subdomain != "www") {
       // $(".loading").css("display", "block");
 
       setTimeout(function() {
-        if (!currentRegionLayer) {
-          let m = getMarkerLabelById(pid);
-          currentRegionLayer = m.layerRegion;
-        }
+
+        let m = getMarkerLabelById(pid);
+        currentRegionLayer = m.layerRegion;
+        currentSubRegionLayer = m.layerSubRegion;
 
         // goToRegion(m.label["code_region"]);
 
@@ -1735,13 +1860,12 @@ if (isset($subdomain) && $subdomain != "www") {
           labelDataExists[pid] = true;
         }
 
-        listListLayerLevel[3][6] = listLayerPIMarkersLabel[pid];
-        listListLayerLevel[3][7] = listLayerImagesLabel[pid];
+        listListLayerLevel[4][7] = listLayerPIMarkersLabel[pid];
+        listListLayerLevel[4][8] = listLayerImagesLabel[pid];
         // listLayerPolygonsCurrentLabel = listListPolMapLabel[pid];
-        listListLayerLevel[3][8] = listLayerImagesAndPolygonsLabel[pid];
+        listListLayerLevel[4][9] = listLayerImagesAndPolygonsLabel[pid];
 
-        log("goToLabel - setAterroirLevel(3)");
-        setAterroirLevel(3);
+        setAterroirLevel(4);
         centerMapOnLabel(pid);
         // setLayersByLevel(); // Au cas où pas de changement
 
