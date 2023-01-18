@@ -123,7 +123,7 @@ if (isset($subdomain) && $subdomain != "www") {
     // polygones (pays et régions)
     let layerCountriesEurope;
     let layerRegionsEurope;
-    let layerSubRegionsFrance;
+    let layerSubRegionsEurope;
     let layerRegionsChine;
     let layerRegionsFrance;
     let listLayerPolygonIndexed = []; // layers polygones (tous : pays, régions...) indexés par leur code (A3 ou NUTS)
@@ -373,9 +373,9 @@ if (isset($subdomain) && $subdomain != "www") {
 
       listListLayerLevel[0] = [currentTileLayerForLevel0, layerCountriesEurope, layerRegionsChine, layerLevel0];
       listListLayerLevel[1] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerRegionsFrance, listLayerLabelsLevel[1]];
-      listListLayerLevel[2] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerSubRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2]];
-      listListLayerLevel[3] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerSubRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2], listLayerLabelsLevel[3]];
-      listListLayerLevel[4] = [currentTileLayerOverLevel0, layerRegionsEurope, layerRegionsChine, layerSubRegionsFrance, listLayerLabelsLevel[1], listLayerLabelsLevel[2], listLayerLabelsLevel[3], null, null, null];
+      listListLayerLevel[2] = [currentTileLayerOverLevel0, layerSubRegionsEurope, layerRegionsChine, null, listLayerLabelsLevel[1], listLayerLabelsLevel[2]];
+      listListLayerLevel[3] = [currentTileLayerOverLevel0, layerSubRegionsEurope, layerRegionsChine, null, listLayerLabelsLevel[1], listLayerLabelsLevel[2], listLayerLabelsLevel[3]];
+      listListLayerLevel[4] = [currentTileLayerOverLevel0, layerSubRegionsEurope, layerRegionsChine, null, listLayerLabelsLevel[1], listLayerLabelsLevel[2], listLayerLabelsLevel[3], null, null, null];
 
       if (typeMap == 'label') {
         // map.fitBounds(bounds); // on centre sur la région
@@ -1358,14 +1358,14 @@ if (isset($subdomain) && $subdomain != "www") {
 
       // let nut3JSON = loadJSON("assets/geojson/NUTS_RG_60M_2021_3035.json");
       // let nut3JSON = loadJSON("assets/geojson/departements_fr.json");
-      let nut3JSON = loadJSON("assets/geojson/departements.json");
+      let nut3JSON = loadJSON("assets/geojson/europe_nuts3.json");
 
-      layerSubRegionsFrance = L.geoJSON(nut3JSON, {
+      layerSubRegionsEurope = L.geoJSON(nut3JSON, {
         onEachFeature: function(feature, layer) {
-          listLayerPolygonIndexed[feature.properties["code"]] = layer;
+          listLayerPolygonIndexed[feature.properties["NUTS_ID"]] = layer;
           layer.on('click', function(e) {
-            // alert(feature.properties["code"]);
-            goToSubRegion(feature.properties["code"]);
+            goToSubRegion(feature.properties["NUTS_ID"]);
+            // goToSubRegion(feature.properties["NUTS_ID"]);
           });
           layer.on('mouseover', function(e) {
             subRegionFocusOn(layer);
