@@ -8,6 +8,7 @@ $subdomain = null;
 
 $idLabel = 0;
 $idRegion = 0;
+$idSubRegion = 0;
 $idCountry = 0;
 
 // if (isset($_REQUEST["id_label"])) {
@@ -48,6 +49,8 @@ if (isset($subdomain) && $subdomain != "www") {
     $idLabel = $rsMap[0]["id_label"];
   else if (isset($rsMap[0]["id_region"]))
     $idRegion = $rsMap[0]["id_region"];
+  else if (isset($rsMap[0]["id_subregion"]))
+    $idSubRegion = $rsMap[0]["id_subregion"];
   else if (isset($rsMap[0]["id_country"]))
     $idCountry = $rsMap[0]["id_country"];
 
@@ -190,8 +193,8 @@ if (isset($subdomain) && $subdomain != "www") {
     let isWindows = false;
 
     let typeMap = 'global';
-    let idLabelMap, idRegionMap, idCountryMap;
-    let JSONLabelMap, JSONRegionMap, JSONCountryMap;
+    let idLabelMap, idRegionMap, idSubRegionMap, idCountryMap;
+    let JSONLabelMap, JSONRegionMap, JSONSubRegionMap, JSONCountryMap;
 
     <?php if ($idLabel) { ?>
       idLabelMap = <?= $idLabel ?>;
@@ -204,6 +207,11 @@ if (isset($subdomain) && $subdomain != "www") {
       let JSONRegion = <?= getJSONArrayFromProcedure("getDetailRegion", $idRegion); ?>;
       JSONRegionMap = JSONRegion[0];
       typeMap = 'region';
+    <?php } else if ($idSubRegion) { ?>
+      idSubRegionMap = <?= $idSubRegion ?>;
+      let JSONSubRegion = <?= getJSONArrayFromProcedure("getDetailSubRegion", $idSubRegion); ?>;
+      JSONSubRegionMap = JSONSubRegion[0];
+      typeMap = 'subregion';
     <?php } else if ($idCountry) { ?>
       idCountryMap = <?= $idCountry ?>;
       let JSONCountry = <?= getJSONArrayFromProcedure("getDetailCountry", $idCountry); ?>;
@@ -376,6 +384,8 @@ if (isset($subdomain) && $subdomain != "www") {
         goToLabel(idLabelMap);
       } else if (typeMap == 'region') {
         goToRegion(JSONRegionMap['code_region']);
+      } else if (typeMap == 'subregion') {
+        goToSubRegion(JSONSubRegionMap['code_subregion']);
       } else if (typeMap == 'country' && JSONCountryMap['code_country'] != 'CHN') {
         legendCountryClick(JSONCountryMap['code_country']);
       }
@@ -578,15 +588,15 @@ if (isset($subdomain) && $subdomain != "www") {
             goToRegion(this.label["code_region"]);
           else if (aTerroirLevel == 2) {
             // if (this.label["code_subregion"])
-              goToSubRegion(this.label["code_subregion"]);
+            goToSubRegion(this.label["code_subregion"]);
             // else
             //   goToLabel(this.label["id_label"]);
           } else if (aTerroirLevel == 3)
             // if (this.layerSubRegion) {
-              if (this.layerSubRegion == currentSubRegionLayer)
-                goToLabel(this.label["id_label"]);
-              else
-                goToSubRegion(this.label["code_subregion"]);
+            if (this.layerSubRegion == currentSubRegionLayer)
+              goToLabel(this.label["id_label"]);
+            else
+              goToSubRegion(this.label["code_subregion"]);
             // } else {
             //   goToRegion(this.label["code_region"]);
             // }
@@ -598,10 +608,10 @@ if (isset($subdomain) && $subdomain != "www") {
                 }).openPopup();
             } else {
               // if (this.layerSubRegion) {
-                if (this.layerSubRegion == currentSubRegionLayer)
-                  goToLabel(this.label["id_label"]);
-                else
-                  goToSubRegion(this.label["code_subregion"]);
+              if (this.layerSubRegion == currentSubRegionLayer)
+                goToLabel(this.label["id_label"]);
+              else
+                goToSubRegion(this.label["code_subregion"]);
               // } else {
               //   goToRegion(this.label["code_region"]);
               // }
@@ -652,7 +662,7 @@ if (isset($subdomain) && $subdomain != "www") {
 
         m.label = label;
         m.layerRegion = getLayerPolygonByCode(label["code_region"]);
-        if(!label["code_subregion"]) label["code_subregion"] = label["code_region"];
+        if (!label["code_subregion"]) label["code_subregion"] = label["code_region"];
         m.layerSubRegion = getLayerPolygonByCode(label["code_subregion"]);
 
         if (listListMarkerLabelLevel[label["level"]] == undefined)
@@ -985,13 +995,17 @@ if (isset($subdomain) && $subdomain != "www") {
               logo = "assets/img/images-partner/" + logo;
               logo2 = "assets/img/images-partner/" + logo2;
             }
-          } else {
-            if (typeMap == 'region') {
-              logo = getFileNameFromJSONMetaData(JSONRegionMap['img_logo']);
-              if (logo) {
-                logo = "assets/img/logos-regions/" + logo;
-                logo2 = logo;
-              }
+          } else if (typeMap == 'region') {
+            logo = getFileNameFromJSONMetaData(JSONRegionMap['img_logo']);
+            if (logo) {
+              logo = "assets/img/logos-regions/" + logo;
+              logo2 = logo;
+            }
+          } else if (typeMap == 'subregion') {
+            logo = getFileNameFromJSONMetaData(JSONSubRegionMap['img_logo']);
+            if (logo) {
+              logo = "assets/img/logos-regions/" + logo;
+              logo2 = logo;
             }
           }
 
