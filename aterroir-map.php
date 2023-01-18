@@ -1737,7 +1737,7 @@ if (isset($subdomain) && $subdomain != "www") {
       setTimeout(function() {
         let regionLayer = getLayerPolygonByCode(pcode);
         currentRegionLayer = regionLayer;
-        currentSubRegionLayer = null;
+        // currentSubRegionLayer = null;
         setAterroirLevel(2);
         map.fitBounds(regionLayer.getBounds());
         regionFocusOut();
