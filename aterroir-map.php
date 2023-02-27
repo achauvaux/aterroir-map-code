@@ -391,6 +391,7 @@ if (isset($subdomain) && $subdomain != "www") {
       desc += "<p>" + pmarker.label["name_" + coLang1] + "</p>";
 
       let url = pmarker.label["url"];
+      let video = pmarker.label["video"];
       let pdfFile = getFileNameFromJSONMetaData(pmarker.label["pdf"]);
 
       if (url)
@@ -399,6 +400,50 @@ if (isset($subdomain) && $subdomain != "www") {
         desc += "<a href='assets/pdf/" + pdfFile + "' target='_blank'><img class='pdf-img' src='assets/pdf/" + getFileNameFromJSONMetaData(pmarker.label["pdf_icon"]) + "' /></a>";
 
       desc += "<p>" + pmarker.label["name_" + coLang2] + "</p>";
+
+      desc =
+      `
+      <ul class="slides">
+        <input type="radio" name="radio-btn" id="img-1" checked />
+        <li class="slide-container">
+          <div class="slide">
+            <p>${ pmarker.label["name_" + coLang1] }</p>
+            <a href="assets/pdf/${ pdfFile }" target="_blank">
+              <img class="pdf-img" src="assets/pdf/${ getFileNameFromJSONMetaData(pmarker.label["pdf_icon"]) }">
+            </a>
+            <p${ pmarker.label["name_" + coLang2] }</p>
+          </div>
+        </li>
+
+        <input type="radio" name="radio-btn" id="img-2" />
+        <li class="slide-container">
+          <div class="slide">
+          <p>${ pmarker.label["name_" + coLang1] }</p>
+            <a href="${ url }" target="_blank">
+              <img class="pdf-img" src="assets/url/${ getFileNameFromJSONMetaData(pmarker.label["url_icon"]) }">
+            </a>
+            <p${ pmarker.label["name_" + coLang2] }</p>
+          </div>
+        </li>
+
+        <input type="radio" name="radio-btn" id="img-3" />
+        <li class="slide-container">
+          <div class="slide">
+          <p>${ pmarker.label["name_" + coLang1] }</p>
+            <a href="${ video }" target="_blank">
+              <img class="pdf-img" src="assets/video/${ getFileNameFromJSONMetaData(pmarker.label["video_icon"]) }">
+            </a>
+            <p${ pmarker.label["name_" + coLang2] }</p>
+          </div>
+        </li>
+
+        <li class="nav-dots">
+          <label for="img-1" class="nav-dot" id="img-dot-1"></label>
+          <label for="img-2" class="nav-dot" id="img-dot-2"></label>
+          <label for="img-3" class="nav-dot" id="img-dot-3"></label>
+        </li>
+      </ul>
+      `;
 
       return desc;
     }
