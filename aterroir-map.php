@@ -411,7 +411,11 @@ if (isset($subdomain) && $subdomain != "www") {
             <a href="assets/pdf/${ pdfFile }" target="_blank">
               <img class="pdf-img" src="assets/pdf/${ getFileNameFromJSONMetaData(pmarker.label["pdf_icon"]) }">
             </a>
-            <p${ pmarker.label["name_" + coLang2] }</p>
+            <p>${ pmarker.label["name_" + coLang2] }</p>
+            <div class="nav">
+              <label for="img-6" class="prev">&#x2039;</label>
+              <label for="img-2" class="next">&#x203a;</label>
+            </div>
           </div>
         </li>
 
@@ -423,6 +427,10 @@ if (isset($subdomain) && $subdomain != "www") {
               <img class="pdf-img" src="assets/url/${ getFileNameFromJSONMetaData(pmarker.label["url_icon"]) }">
             </a>
             <p${ pmarker.label["name_" + coLang2] }</p>
+            <div class="nav">
+              <label for="img-1" class="prev">&#x2039;</label>
+              <label for="img-3" class="next">&#x203a;</label>
+            </div>
           </div>
         </li>
 
@@ -434,14 +442,18 @@ if (isset($subdomain) && $subdomain != "www") {
               <img class="pdf-img" src="assets/video/${ getFileNameFromJSONMetaData(pmarker.label["video_icon"]) }">
             </a>
             <p${ pmarker.label["name_" + coLang2] }</p>
+            <div class="nav">
+              <label for="img-2" class="prev">&#x2039;</label>
+              <label for="img-1" class="next">&#x203a;</label>
+            </div>
           </div>
         </li>
 
-        <li class="nav-dots">
+        <!--li class="nav-dots">
           <label for="img-1" class="nav-dot" id="img-dot-1"></label>
           <label for="img-2" class="nav-dot" id="img-dot-2"></label>
           <label for="img-3" class="nav-dot" id="img-dot-3"></label>
-        </li>
+        </li-->
       </ul>
       `;
 
