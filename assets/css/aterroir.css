@@ -1,0 +1,658 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+/* suppression de la flêche au bord de la tooltip */
+
+.leaflet-tooltip-top:before, .leaflet-tooltip-bottom:before, .leaflet-tooltip-left:before, .leaflet-tooltip-right:before {
+    position: absolute;
+    pointer-events: none;
+    border: 0px solid transparent;
+    background: transparent;
+    content: "";
+}
+
+.aterroir-tooltip {
+    background: transparent;
+    padding: 0px;
+    border: 0px;
+    box-shadow: none;
+    /* z-index: 300000; */
+}
+
+.talon-pays {
+    padding: 5px 15px;
+    border-radius: 20px;
+}
+
+.talon-pays p {
+    margin: 0px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.talon-pays.talon-bottom, .talon-pays.talon-top {
+    text-align: center;
+}
+
+.talon-pays.talon-left {
+    text-align: right;
+}
+
+.talon-pays.talon-right {
+    text-align: left;
+}
+
+.talon {
+    padding: 5px 15px;
+    background: #ffcd00;
+    opacity: .7;
+    border-radius: 20px;
+}
+
+.talon-legend {
+    padding: 5px 15px;
+    background: #ffcd00;
+    border-radius: 20px;
+    text-align: center;
+    width: 40%;
+}
+
+.talon-legend p {
+    margin: 0px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.leaflet-control {
+    max-height: 80vh;
+}
+
+.retractable-window ul {
+    max-height: 80vh;
+    overflow: scroll;
+}
+
+.talon p {
+    margin: 0px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.my-div-icon {
+    font-size: 0.4rem;
+}
+
+.legend {
+    width: 15rem;
+}
+
+.label .leaflet-popup-content-wrapper:hover {
+    background-color: #ffcd00;
+}
+
+.leaflet-popup-content {
+    width: auto !important;
+}
+
+.pdf-img {
+    width: 125px;
+}
+
+
+/* .leaflet-popup-content img {
+    max-width: 100%;
+} */
+
+.leaflet-popup-content {
+    text-align: center;
+}
+
+/*
+#map {
+    display: flex;
+}
+
+.leaflet-control-container {
+    margin: auto;
+}
+*/
+
+.leaflet-center {
+    left: 50%;
+    transform: translate(-50%, 0%);
+}
+
+.leaflet-middle {
+    top: 50%;
+    position: absolute;
+    z-index: 999;
+    pointer-events: none;
+    transform: translate(0%, -50%);
+
+}
+
+.leaflet-center.leaflet-middle {
+    transform: translate(-50%, -50%);
+}
+
+
+/******** WINDOW ATERROIR ********************************************/
+
+div.aterroir-window {
+    display: flex;
+    /* padding-top:50%; */
+    width: 300px;
+    /* min-height: 500px; */
+    /* height: 500px; */
+    /* max-height: 100%; */
+}
+
+div.aterroir-window>section {
+    display: flex;
+    flex-direction: column;
+}
+
+div.aterroir-window>section.left {
+    justify-content: center;
+    align-items: center;
+    background: #fd9c00;
+    padding: 20px 0;
+}
+
+div.aterroir-window>section.right {
+    flex-grow: 1;
+    /* width: 300px; */
+}
+
+div.aterroir-window .menu-item {
+    width: 50px;
+    margin: 15px;
+}
+
+div.aterroir-window .menu-item.PI {
+    width: 30px;
+    margin: 0;
+}
+
+div.aterroir-window .menu-item img {
+    width: 100%;
+}
+
+div.aterroir-window .menu-item.PI img {
+    opacity: 1;
+}
+
+div.aterroir-window .content {
+    flex-grow: 1;
+    flex-basis: 0px;
+    overflow-y: auto;
+    background: white;
+}
+
+div.aterroir-window .content {
+    padding: 10px;
+}
+
+div.aterroir-window .header, div.aterroir-window .footer {
+    display: flex;
+    height: 60px;
+    background: #ffcd00;
+    color: #f87000;
+}
+
+div.aterroir-window .footer img {
+    height: 100%;
+    margin: auto;
+}
+
+div.aterroir-window h1 {
+    margin: auto;
+}
+
+div.aterroir-window .btn-primary {
+    float: right;
+}
+
+div.aterroir-window ul.list-items {
+    margin: 0;
+    padding: 0;
+}
+
+div.aterroir-window .legend-item {
+    display: flex;
+    align-items: center;
+}
+
+.legend-item .talon-item {
+    flex-grow: 1;
+    font: 16px;
+    margin: 3px;
+    padding: 2px 15px;
+    background: #ffcd00;
+    border-radius: 20px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.legend-item.PI .talon-item {
+    background: transparent;
+}
+
+div.aterroir-window .flag img {
+    width: 40px;
+}
+
+div.aterroir-window .icon img {
+    width: 40px;
+    margin: 0 5px;
+}
+
+div.aterroir-window .photo img {
+    width: 60px;
+    margin: 0 5px;
+}
+
+div.aterroir-window .legend-item p {
+    margin: 0px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+div.aterroir-window .list-PI {
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: center;
+}
+
+.IG {
+    text-align: center;
+    /* transform: translate(-5px, -25px); */
+    /* z-index: 200000; */
+}
+
+/* .IG.left {
+            transform: translate(-7px, -25px);
+        }
+
+        .IG.right {
+            transform: translate(7px, -25px);
+        } */
+
+.IG.bottom {
+    transform: translate(0px, 10px);
+}
+
+/* .IG.bottom img {
+            transform: translate(-30px, 0px);
+        } */
+
+.IG.top {
+    transform: translate(0px, -10px);
+}
+
+/* .IG img {
+            height: 50px;
+            transform: translate(-30px, 5px);
+        } */
+
+/* Absolute Center Spinner */
+.loading {
+    position: fixed;
+    z-index: 999;
+    height: 2em;
+    width: 2em;
+    overflow: visible;
+    margin: auto;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+/* Transparent Overlay */
+.loading:before {
+    content: '';
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* :not(:required) hides these rules from IE9 and below */
+.loading:not(:required) {
+    /* hide "loading..." text */
+    font: 0/0 a;
+    color: transparent;
+    text-shadow: none;
+    background-color: transparent;
+    border: 0;
+}
+
+.loading:not(:required):after {
+    content: '';
+    display: block;
+    font-size: 10px;
+    width: 1em;
+    height: 1em;
+    margin-top: -0.5em;
+    -webkit-animation: spinner 1500ms infinite linear;
+    -moz-animation: spinner 1500ms infinite linear;
+    -ms-animation: spinner 1500ms infinite linear;
+    -o-animation: spinner 1500ms infinite linear;
+    animation: spinner 1500ms infinite linear;
+    border-radius: 0.5em;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0, rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0, rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.5) -1.5em 0 0 0, rgba(0, 0, 0, 0.5) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0, rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0;
+    box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0, rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0, rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) -1.5em 0 0 0, rgba(0, 0, 0, 0.75) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0, rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0;
+}
+
+/* Animation */
+
+@-webkit-keyframes spinner {
+    0% {
+        -webkit-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+@-moz-keyframes spinner {
+    0% {
+        -webkit-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+@-o-keyframes spinner {
+    0% {
+        -webkit-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spinner {
+    0% {
+        -webkit-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+.loader {
+    background: #000;
+    background: radial-gradient(#222, #000);
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    position: fixed;
+    right: 0;
+    top: 0;
+    /* z-index: 99999; */
+}
+
+.loader-inner {
+    bottom: 0;
+    height: 60px;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 100px;
+}
+
+.loader-line-wrap {
+    animation:
+        spin 2000ms cubic-bezier(.175, .885, .32, 1.275) infinite;
+    box-sizing: border-box;
+    height: 50px;
+    left: 0;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    transform-origin: 50% 100%;
+    width: 100px;
+}
+
+.loader-line {
+    border: 4px solid transparent;
+    border-radius: 100%;
+    box-sizing: border-box;
+    height: 100px;
+    left: 0;
+    margin: 0 auto;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 100px;
+}
+
+.loader-line-wrap:nth-child(1) {
+    animation-delay: -50ms;
+}
+
+.loader-line-wrap:nth-child(2) {
+    animation-delay: -100ms;
+}
+
+.loader-line-wrap:nth-child(3) {
+    animation-delay: -150ms;
+}
+
+.loader-line-wrap:nth-child(4) {
+    animation-delay: -200ms;
+}
+
+.loader-line-wrap:nth-child(5) {
+    animation-delay: -250ms;
+}
+
+.loader-line-wrap:nth-child(1) .loader-line {
+    border-color: hsl(0, 80%, 60%);
+    height: 90px;
+    width: 90px;
+    top: 7px;
+}
+
+.loader-line-wrap:nth-child(2) .loader-line {
+    border-color: hsl(60, 80%, 60%);
+    height: 76px;
+    width: 76px;
+    top: 14px;
+}
+
+.loader-line-wrap:nth-child(3) .loader-line {
+    border-color: hsl(120, 80%, 60%);
+    height: 62px;
+    width: 62px;
+    top: 21px;
+}
+
+.loader-line-wrap:nth-child(4) .loader-line {
+    border-color: hsl(180, 80%, 60%);
+    height: 48px;
+    width: 48px;
+    top: 28px;
+}
+
+.loader-line-wrap:nth-child(5) .loader-line {
+    border-color: hsl(240, 80%, 60%);
+    height: 34px;
+    width: 34px;
+    top: 35px;
+}
+
+@keyframes spin {
+    0%, 15% {
+        transform: rotate(0);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.choice-lang {
+    margin-bottom: 10px;
+}
+
+.choice-lang img {
+    /* height: 50px; */
+    vertical-align: middle;
+}
+
+@import url(https://fonts.googleapis.com/css?family=Varela+Round);
+
+html, body { background: #333 url("https://codepen.io/images/classy_fabric.png"); }
+
+.slides {
+    padding: 0;
+    width: 209px;
+    height: 250px;
+    display: block;
+    margin: 0 auto;
+    /* position: relative; */
+}
+
+.slides * {
+    user-select: none;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+.slides input { display: none; }
+
+.slide-container { display: block; }
+
+.slide {
+    top: 0;
+    opacity: 0;
+    width: 209px;
+    /* height: 120px; */
+    display: block;
+    position: absolute;
+
+    transform: scale(0);
+
+    transition: all .7s ease-in-out;
+}
+
+.slide img {
+    /* width: 100%; */
+    height: 100%;
+}
+
+.nav label {
+    /* width: 200px;
+    height: 100%; */
+    display: none;
+    position: absolute;
+    top: 0;
+
+	opacity: 1;
+    z-index: 9;
+    cursor: pointer;
+
+    transition: opacity .2s;
+
+    color: #FFF;
+    font-size: 56pt;
+    text-align: center;
+    line-height: 250px;
+    font-family: "Varela Round", sans-serif;
+    /* background-color: rgba(255, 255, 255, .3); */
+    text-shadow: 0px 0px 15px rgb(119, 119, 119);
+}
+
+.slide:hover + .nav label { opacity: 0.5; }
+
+.nav label:hover { opacity: 1; }
+
+.nav .next { right: 0; }
+
+input:checked + .slide-container  .slide {
+    opacity: 1;
+
+    transform: scale(1);
+
+    transition: opacity 1s ease-in-out;
+}
+
+input:checked + .slide-container .nav label { display: block; }
+
+.nav-dots {
+	width: 100%;
+	bottom: 9px;
+	height: 11px;
+	display: block;
+	position: absolute;
+	text-align: center;
+}
+
+.nav-dots .nav-dot {
+	top: -5px;
+	width: 11px;
+	height: 11px;
+	margin: 0 4px;
+	position: relative;
+	border-radius: 100%;
+	display: inline-block;
+	background-color: rgba(0, 0, 0, 0.6);
+}
+
+.nav-dots .nav-dot:hover {
+	cursor: pointer;
+	background-color: rgba(0, 0, 0, 0.8);
+}
+

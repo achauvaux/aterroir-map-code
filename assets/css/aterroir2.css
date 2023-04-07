@@ -1,0 +1,91 @@
+@font-face {
+  font-family: "NimbusSanL";
+  src: url("../fonts/NimbusSanL/NimbusSanL-Bol.otf"), url("/fonts/NimbusSanL/NimbusSanL-BolIta.otf"), url("/fonts/NimbusSanL/NimbusSanL-Reg.otf"), url("/fonts/NimbusSanL/NimbusSanL-RegIta.otf");
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  margin: 0;
+  font-family: "NimbusSanL";
+}
+
+#main {
+  display: flex;
+  flex: 1;
+}
+
+#main>article {
+  flex: 1;
+  order: 1;
+}
+
+#main>nav, #main>aside {
+  flex: 0 0 20vw;
+}
+
+#main>nav {
+  background: #D7E8D4;
+  order: 3;
+}
+
+#main>aside {
+  background: beige;
+  order: 2;
+}
+
+header, footer {
+  display: flex;
+  background-color: #f7eee6;
+  height: 15vh;
+}
+
+header {
+  align-items: center;
+  justify-content: center;
+  border-bottom-style: solid;
+  border-bottom-width: 1vh;
+  border-bottom-color: #fd9c00;
+}
+
+footer {
+  align-items: center;
+  justify-content: center;
+  border-top-style: solid;
+  border-top-width: 1vh;
+  border-top-color: #fd9c00;
+}
+
+footer>div {
+  width: 33%;
+  text-align: center;
+}
+
+footer>div>a {
+  text-decoration: none;
+  color: #fd9c00;
+  font-size: 2vh;
+  /* font-weight: lighter; */
+  font-style: italic;
+}
+
+#logo {
+  width: 40vh;
+  z-index: 10;
+}
+
+#logo-planete {
+  position: absolute;
+  width: 80vh;
+  transform: translate(-30%, -45%);
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+}
