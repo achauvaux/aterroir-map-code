@@ -71,11 +71,14 @@ if (isset($subdomain) && $subdomain != "www") {
   <link rel="stylesheet" href="assets/css/aterroir.css">
   <link rel="stylesheet" href="assets/css/spin.css">
   <!-- <link rel="stylesheet" href="assets/css/bootstrap.css"> -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
   <script src="assets/js/leaflet.js"></script>
   <!-- <script type="text/javascript" src="assets2/js/spin.js"></script> -->
   <!-- <script type="text/javascript" src="assets2/js/leaflet.spin.js"></script> -->
   <script type="text/javascript" src="assets/js/tile.stamen.js"></script>
   <script type="text/javascript" src="assets/js/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
   <style type='text/css'>
     #map {
       position: absolute;
@@ -91,6 +94,22 @@ if (isset($subdomain) && $subdomain != "www") {
   <div class="loading">Loading…</div>
 
   <div id="map"></div>
+  <!-- Modal -->
+  <div class="modal fade" data-backdrop="false" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" modeless>
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <!-- <h4 class="modal-title" id="myModalLabel">Vidéo</h4> -->
+        </div>
+        <div class="modal-body">
+          <!-- <iframe width="100%" height="315" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
+          <!-- <iframe width="560" height="315" src="https://www.youtube.com/embed/U0D_a_o9wcQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> -->
+          <!-- <iframe></iframe> -->
+        </div>
+      </div>
+    </div>
+  </div>
   <script type="text/javascript">
     // log("loading");
 
@@ -209,6 +228,8 @@ if (isset($subdomain) && $subdomain != "www") {
       JSONCountryMap = JSONCountry[0];
       typeMap = 'country';
     <?php } ?>
+
+    // let videoIframe = '';
 
     function initialize() {
       /* 
@@ -334,6 +355,8 @@ if (isset($subdomain) && $subdomain != "www") {
 
       setCommandPartner(zone);
 
+      // setCommandTestPopup();
+
       // correspondances niveaux aterroir et openstreetmap
       listLevelsAterroir[0] = {
         end: 5
@@ -380,75 +403,83 @@ if (isset($subdomain) && $subdomain != "www") {
         // center(zone);
       }
 
+      $(".modal").draggable({
+        handle: ".modal-header"
+      });
+
+      // $(".modal").on('shown.bs.modal', function (e) {
+      //   console.log (20);
+      //   $(".modal iframe").attr('src', "https://www.youtube-nocookie.com/embed/U0D_a_o9wcQ?autoplay=1&amp;modestbranding=1&amp;showinfo=0&amp;start=0" ); 
+      // });
+
+      $(".modal").on('hide.bs.modal', function (e) {
+        $(".modal iframe").attr('src', '');
+      });
+
       $(".loading").hide();
       // map.spin(false);
 
     }
 
+    function setVideoIframe(ihtml) {
+      // videoIframe =
+      let html = unescape(ihtml);
+      // console.log(html);
+      $("#myModal .modal-body").html(html);
+      $("#myModal iframe").attr('width', '100%');
+    }
+
     function getMarkerLabelPopupContent(pmarker) {
 
-      let desc = "";
-      desc += "<p>" + pmarker.label["name_" + coLang1] + "</p>";
+      let JSONLabelMedias = getJSONMediasLabel(pmarker.label['id_label']);
 
-      let url = pmarker.label["url"];
-      let video = pmarker.label["video"];
-      let pdfFile = getFileNameFromJSONMetaData(pmarker.label["pdf"]);
-
-      if (url)
-        desc += "<a href='" + url + "' target='_blank'><img class='pdf-img' src='medias/pdf/" + getFileNameFromJSONMetaData(pmarker.label["pdf_icon"]) + "' /></a>";
-      else if (pdfFile)
-        desc += "<a href='medias/pdf/" + pdfFile + "' target='_blank'><img class='pdf-img' src='medias/pdf/" + getFileNameFromJSONMetaData(pmarker.label["pdf_icon"]) + "' /></a>";
-
-      desc += "<p>" + pmarker.label["name_" + coLang2] + "</p>";
-
-      desc =
-      `
-      <ul class="slides">
-        <input type="radio" name="radio-btn" id="img-1" checked />
+      let i = 0;
+      let href;
+      let html_code;
+      let anchor_attr;
+      let desc = `
+      <ul class="slides">`;
+      for (let row of JSONLabelMedias) {
+        href = '';
+        html_code = '';
+        anchor_attr = '';
+        if (row['type_media'] == 'file') {
+          href = "medias/label-medias/" + getFileNameFromJSONMetaData(row['media_filename']);
+        } else if (row['type_media'] == 'url') {
+          href = row['url'];
+        } else if (row['type_media'] == 'embed') {
+          html_code = row['html_code'];
+          console.log(html_code);
+          anchor_attr = `data-toggle="modal" data-backdrop="false" data-target="#myModal" onclick="setVideoIframe('${ escape(html_code) }')"`;
+        }
+        let next = (i + 1) % JSONLabelMedias.length + 1;
+        let prev = (i + JSONLabelMedias.length - 1)  % JSONLabelMedias.length + 1;
+        desc += `
+        <input type="radio" name="radio-btn" id="img-${ i + 1 }" ${ i == 0 ? "checked" : "" } />
         <li class="slide-container">
           <div class="slide">
             <p>${ pmarker.label["name_" + coLang1] }</p>
-            <a href="medias/pdf/${ pdfFile }" target="_blank">
-              <img class="pdf-img" src="medias/pdf/${ getFileNameFromJSONMetaData(pmarker.label["pdf_icon"]) }">
+            <a href="${ href }" target="_blank" ${ anchor_attr }>
+              <img class="pdf-img" src="medias/label-medias/${ getFileNameFromJSONMetaData(row['icon_filename']) }">
             </a>
+            <!--
+            <iframe src="https://www.youtube.com/embed/U0D_a_o9wcQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            -->
             <p>${ pmarker.label["name_" + coLang2] }</p>
             <div class="nav">
-              <label for="img-6" class="prev">&#x2039;</label>
-              <label for="img-2" class="next">&#x203a;</label>
+              <!--
+              <label for="img-${ prev }" class="prev">&#x2039;</label>
+              <label for="img-${ next }" class="next">&#x203a;</label>
+              -->
+              <label for="img-${ prev }" class="prev"><img class="next-prev" src="assets/img/FGBR.png"></label>
+              <label for="img-${ next }" class="next"><img class="next-prev" src="assets/img/FDBR.png"></label>
             </div>
           </div>
-        </li>
+        </li>`;
+        i++;
+      }
 
-        <input type="radio" name="radio-btn" id="img-2" />
-        <li class="slide-container">
-          <div class="slide">
-          <p>${ pmarker.label["name_" + coLang1] }</p>
-            <a href="${ url }" target="_blank">
-              <img class="pdf-img" src="medias/url/${ getFileNameFromJSONMetaData(pmarker.label["url_icon"]) }">
-            </a>
-            <p${ pmarker.label["name_" + coLang2] }</p>
-            <div class="nav">
-              <label for="img-1" class="prev">&#x2039;</label>
-              <label for="img-3" class="next">&#x203a;</label>
-            </div>
-          </div>
-        </li>
-
-        <input type="radio" name="radio-btn" id="img-3" />
-        <li class="slide-container">
-          <div class="slide">
-          <p>${ pmarker.label["name_" + coLang1] }</p>
-            <a href="${ video }" target="_blank">
-              <img class="pdf-img" src="medias/video/${ getFileNameFromJSONMetaData(pmarker.label["video_icon"]) }">
-            </a>
-            <p${ pmarker.label["name_" + coLang2] }</p>
-            <div class="nav">
-              <label for="img-2" class="prev">&#x2039;</label>
-              <label for="img-1" class="next">&#x203a;</label>
-            </div>
-          </div>
-        </li>
-
+      desc += `
         <!--li class="nav-dots">
           <label for="img-1" class="nav-dot" id="img-dot-1"></label>
           <label for="img-2" class="nav-dot" id="img-dot-2"></label>
@@ -1037,6 +1068,34 @@ if (isset($subdomain) && $subdomain != "www") {
         cmdPartner.addTo(map);
     }
 
+    function setCommandTestPopup() {
+      let cmd = L.control({
+        position: 'bottomleft'
+      });
+
+      cmd.onAdd = function(map) {
+
+        let JSONlogo;
+        let urlPartner;
+        let logo;
+
+        let div = L.DomUtil.create('div', 'command');
+
+        let html =
+        `
+        <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+          Launch demo modal
+        </button>
+        `;
+
+        div.innerHTML = html;
+
+        return div;
+      };
+
+      cmd.addTo(map);
+    }
+
     function getJSONMarkersPILabel(pidLabel) {
 
       let jsonMarkers = [];
@@ -1073,6 +1132,25 @@ if (isset($subdomain) && $subdomain != "www") {
       });
 
       return jsonMaps;
+    }
+
+    function getJSONMediasLabel(pidLabel) {
+
+      let jsonMedias;
+
+      $.ajax({
+        url: "getJSONMediasLabel.php",
+        type: "POST",
+        async: false, // Mode synchrone indispensable
+        data: ({
+          id: pidLabel
+        }),
+        success: function(data) {
+          jsonMedias = JSON.parse(data); // !!! return ici ne marche pas malgré synchrone (!?)
+        }
+      });
+
+      return jsonMedias;
     }
 
     function getJSONPolygonsLabel(pidLabel) {
@@ -1584,12 +1662,10 @@ if (isset($subdomain) && $subdomain != "www") {
 
     function markerLabelFocusOn(pmarker) {
       pmarker.setIcon(listIconBigLabel[pmarker.label["code_label"]]);
-      // $("#IG-" + pmarker.id + " .talon").css("background", "#fffb00");
     }
 
     function markerLabelFocusOut(pmarker) {
       pmarker.setIcon(listIconLabel[pmarker.label["code_label"]]);
-      // $("#IG-" + pmarker.id + " .talon").css("background", talonBGColorByLevel[aTerroirLevel]);
     }
 
     function markerPIFocusOn(pmarker) {

@@ -95,9 +95,8 @@ html, body {
 .leaflet-popup-content {
     width: auto !important;
 }
-
 .pdf-img {
-    width: 125px;
+    height: 175px;
 }
 
 
@@ -555,7 +554,7 @@ html, body { background: #333 url("https://codepen.io/images/classy_fabric.png")
 
 .slides {
     padding: 0;
-    width: 209px;
+    width: 150px;
     height: 250px;
     display: block;
     margin: 0 auto;
@@ -577,8 +576,9 @@ html, body { background: #333 url("https://codepen.io/images/classy_fabric.png")
 
 .slide {
     top: 0;
+    left: 0;
     opacity: 0;
-    width: 209px;
+    width: 100%;
     /* height: 120px; */
     display: block;
     position: absolute;
@@ -590,7 +590,9 @@ html, body { background: #333 url("https://codepen.io/images/classy_fabric.png")
 
 .slide img {
     /* width: 100%; */
-    height: 100%;
+    /* height: 100%; */
+    object-fit: contain;
+    max-width: 75%;
 }
 
 .nav label {
@@ -609,17 +611,18 @@ html, body { background: #333 url("https://codepen.io/images/classy_fabric.png")
     color: #FFF;
     font-size: 56pt;
     text-align: center;
-    line-height: 250px;
+    line-height: 270px;
     font-family: "Varela Round", sans-serif;
     /* background-color: rgba(255, 255, 255, .3); */
-    text-shadow: 0px 0px 15px rgb(119, 119, 119);
+    /* text-shadow: 0px 0px 15px rgb(119, 119, 119); */
 }
 
 .slide:hover + .nav label { opacity: 0.5; }
 
 .nav label:hover { opacity: 1; }
 
-.nav .next { right: 0; }
+.nav .prev { left: 10px; }
+.nav .next { right: 10px; }
 
 input:checked + .slide-container  .slide {
     opacity: 1;
@@ -629,7 +632,11 @@ input:checked + .slide-container  .slide {
     transition: opacity 1s ease-in-out;
 }
 
-input:checked + .slide-container .nav label { display: block; }
+/* input:checked + .slide-container .nav label { display: block; } */
+
+.label .leaflet-popup-content-wrapper:hover input:checked + .slide-container .nav label {
+    display: block;
+}
 
 .nav-dots {
 	width: 100%;
@@ -656,3 +663,27 @@ input:checked + .slide-container .nav label { display: block; }
 	background-color: rgba(0, 0, 0, 0.8);
 }
 
+#myModal {
+    overflow-y: hidden;
+}
+
+.modal-header {
+    cursor: move;
+}
+
+.modal-body {
+    padding: 0px !important;
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+    top: 5px;
+    right: 10px;
+}
+
+.modal-header .close {
+    margin-top: -8px !important;
+}
+
+.leaflet-popup-content p {
+    font-size: small !important;
+}
