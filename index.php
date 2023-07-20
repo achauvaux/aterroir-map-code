@@ -431,7 +431,7 @@ if (isset($subdomain) && $subdomain != "www") {
 
     function getMarkerLabelPopupContent(pmarker) {
 
-      let JSONLabelMedias = getJSONMediasLabel(pmarker.label['id_label']);
+      let JSONLabelMedias = getJSONMediasLabel(pmarker.label['id_label'], '<?= $coLang1 ?>');
 
       let i = 0;
       let href;
@@ -1134,7 +1134,7 @@ if (isset($subdomain) && $subdomain != "www") {
       return jsonMaps;
     }
 
-    function getJSONMediasLabel(pidLabel) {
+    function getJSONMediasLabel(pidLabel, pcoLang) {
 
       let jsonMedias;
 
@@ -1143,7 +1143,8 @@ if (isset($subdomain) && $subdomain != "www") {
         type: "POST",
         async: false, // Mode synchrone indispensable
         data: ({
-          id: pidLabel
+          id: pidLabel,
+          co_lang: pcoLang
         }),
         success: function(data) {
           jsonMedias = JSON.parse(data); // !!! return ici ne marche pas malgré synchrone (!?)
