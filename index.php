@@ -525,32 +525,32 @@ if (isset($subdomain) && $subdomain != "www") {
       // let sizeBig = Math.trunc(psize * 1.5 / 2);
 
       listIconLabel["AOP"] = L.icon({
-        iconUrl: 'medias/img/icones-aterroir/logo-AOP.png',
+        iconUrl: 'medias/img/icones-aterroir/R-AOP.png',
         iconSize: [psize, psize]
       });
 
       listIconBigLabel["AOP"] = L.icon({
-        iconUrl: 'medias/img/icones-aterroir/logo-AOP.png',
+        iconUrl: 'medias/img/icones-aterroir/R-AOP.png',
         iconSize: [psize * 1.5, psize * 1.5]
       });
 
       listIconLabel["IGP"] = L.icon({
-        iconUrl: 'medias/img/icones-aterroir/logo-IGP.png',
+        iconUrl: 'medias/img/icones-aterroir/R-IGP.png',
         iconSize: [psize, psize]
       });
 
       listIconBigLabel["IGP"] = L.icon({
-        iconUrl: 'medias/img/icones-aterroir/logo-IGP.png',
+        iconUrl: 'medias/img/icones-aterroir/R-IGP.png',
         iconSize: [psize * 1.5, psize * 1.5]
       });
 
       listIconLabel["AOPIGP"] = L.icon({
-        iconUrl: 'medias/img/icones-aterroir/logo-AOPIGP.png',
+        iconUrl: 'medias/img/icones-aterroir/R-AOP-IGP.png',
         iconSize: [psize, psize]
       });
 
       listIconBigLabel["AOPIGP"] = L.icon({
-        iconUrl: 'medias/img/icones-aterroir/logo-AOPIGP.png',
+        iconUrl: 'medias/img/icones-aterroir/R-AOP-IGP.png',
         iconSize: [psize * 1.5, psize * 1.5]
       });
 
@@ -1050,8 +1050,8 @@ if (isset($subdomain) && $subdomain != "www") {
           else if (pzone == 'cn')
             urlPartner = 'https://marcopolo-international.com/en/aterroir-cn-en/';
 
-          logo = 'medias/img/icones-aterroir/ATPartnerBleu.png';
-          logo2 = 'medias/img/icones-aterroir/ATPartnerRge.png';
+          logo = 'medias/img/icones-aterroir/ATFrancePartenaire01.png';
+          logo2 = 'medias/img/icones-aterroir/ATFrancePartenaire00.png';
         }
 
         let html =
