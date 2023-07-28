@@ -1050,8 +1050,8 @@ if (isset($subdomain) && $subdomain != "www") {
           else if (pzone == 'cn')
             urlPartner = 'https://marcopolo-international.com/en/aterroir-cn-en/';
 
-          logo = 'medias/img/icones-aterroir/ATFrancePartenaire01.png';
-          logo2 = 'medias/img/icones-aterroir/ATFrancePartenaire00.png';
+          logo = 'medias/img/icones-aterroir/ATFrancePartenaire00.png';
+          logo2 = 'medias/img/icones-aterroir/ATFrancePartenaire01.png';
         }
 
         let html =
