@@ -1,5 +1,9 @@
 <?php
 
+/* README
+** dev url = http://51.91.157.23/aterroir-map-code/?dev&url=aterroir.eu
+*/
+
 include_once "util.php";
 // include "lang-settings.php";
 
