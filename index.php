@@ -180,15 +180,11 @@ if (isset($subdomain) && $subdomain != "www") {
 
     let villesTerroirBourgogneJSON;
 
-    let JSONCountries = <?= getJSONArrayFromProcedure("getListCountries", null); ?>;
     let JSONCountriesStrapi = fetchStrapiData('http://51.91.157.23:1338/api/countries?populate=*');
-    console.log("JSONCountriesStrapi");
-    console.log(JSONCountriesStrapi);
 
-    let JSONRegionsEU = <?= getJSONArrayFromProcedure("getListRegions", "EU", null); ?>;
-    let JSONRegionsCN = <?= getJSONArrayFromProcedure("getListRegions", "CN", null); ?>;
-    // let JSONMarkersLabelEU = <?= getJSONArrayFromProcedure("getListLabels", "EU", null, null); ?>;
-    // let JSONMarkersLabelCN = <?= getJSONArrayFromProcedure("getListLabels", "CN", null, null); ?>;
+    let JSONRegionsEUStrapi = fetchStrapiData('http://51.91.157.23:1338/api/regions?populate=*&filters[country][code_zone][$eq]=EU');
+    let JSONRegionsCNStrapi = fetchStrapiData('http://51.91.157.23:1338/api/regions?populate=*&filters[country][code_zone][$eq]=CN');
+
     let JSONMarkersLabel = <?= getJSONArrayFromProcedure("getListLabels", null, null, null); ?>;
 
     let coLang1 = "<?= $coLang1 ?>";
@@ -213,7 +209,7 @@ if (isset($subdomain) && $subdomain != "www") {
 
     let zoomLevel;
 
-    let isWindows = false;
+    let isWindows = true;
 
     let typeMap = 'global';
     let idLabelMap, idRegionMap, idCountryMap;
@@ -888,7 +884,7 @@ if (isset($subdomain) && $subdomain != "www") {
             <img src="medias/img/icones-aterroir/Bouton F Pays.png">
           </div>
           <div class="menu-item" onmouseenter="openRight('F1-regions');">
-            <img src="medias/img/icones-aterroir/Bouton F Régions.png">
+            <img src="medias/img/icones-aterroir/Bouton F Regions.png">
           </div>
           <div class="menu-item" onmouseenter="openRight('F1-infos');">
             <img src="medias/img/icones-aterroir/Bouton F InfoSite.png">
@@ -903,15 +899,16 @@ if (isset($subdomain) && $subdomain != "www") {
           </div>
           <div class="content">
             <ul class="list-items">`;
-        for (country of JSONCountries) {
+        for (let rec of JSONCountriesStrapi) {
+          let country = rec.attributes;
           html += `
               <li class="legend-item">
                 <div class="flag">
                   <img src="medias/img/flags/` + (country["img_icon"] ?? "flag-europe.png") + `" alt="">
                 </div>
-                <div class="talon-item" onclick='legendCountryClick("` + country["code_country"] + `")' onmouseover='legendCountryOver("` + country["code_country"] + `")' onmouseout='legendCountryOut("` + country["code_country"] + `")'>
-                  <p>` + country["name_" + coLang1] + `</p>
-                  <p>` + country["name_" + coLang2] + `</p>
+                <div class="talon-item" onclick='legendCountryClick("` + country["code_nuts"] + `")' onmouseover='legendCountryOver("` + country["code_nuts"] + `")' onmouseout='legendCountryOut("` + country["code_nuts"] + `")'>
+                  <p>` + country["name"]["name_" + coLang1] + `</p>
+                  <p>` + country["name"]["name_" + coLang2] + `</p>
                 </div>
               </li>`;
         }
@@ -926,17 +923,19 @@ if (isset($subdomain) && $subdomain != "www") {
           </div>
           <div class="content">
             <ul class="list-items">`;
-        for (region of JSONRegionsEU)
+        for (let rec of JSONRegionsEUStrapi) {
+          let region = rec.attributes;
           html += `
               <li class="legend-item">
                 <div class="flag">
                   <img src="medias/img/logos-regions/` + (region["img_logo"] ?? "flag-europe.png") + `" alt="">
                 </div>
-                <div class="talon-item" onclick='goToRegion("` + region["code_region"] + `")' onmouseover='legendRegionOver("` + region["code_region"] + `")' onmouseout='legendRegionOut("` + region["code_region"] + `")'>
-                  <p>` + region["name_" + coLang1] + `</p>
-                  <p>` + region["name_" + coLang2] + `</p>
+                <div class="talon-item" onclick='goToRegion("` + region["code_nuts"] + `")' onmouseover='legendRegionOver("` + region["code_nuts"] + `")' onmouseout='legendRegionOut("` + region["code_nuts"] + `")'>
+                  <p>` + region["name"]["name_" + coLang1] + `</p>
+                  <p>` + region["name"]["name_" + coLang1] + `</p>
                 </div>
               </li>`;
+        }
         html += `
             </ul>
           </div>
@@ -1094,7 +1093,7 @@ if (isset($subdomain) && $subdomain != "www") {
         let div = L.DomUtil.create('div', 'command');
 
         let html =
-          `
+        `
         <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
           Launch demo modal
         </button>
@@ -1990,7 +1989,27 @@ if (isset($subdomain) && $subdomain != "www") {
       });
 
       return response.data;
+    }
 
+    function fetchStrapiData2(url) {
+      return new Promise((resolve, reject) => {
+        $.ajax({
+          url: url,
+          method: 'GET',
+          headers: {
+            'Authorization': 'Bearer 8ff94e0aab95375592ce0bceb1e8ea7cd110ee88e699487d44cc84eb9f935b7aff7ec949fca78d6afe0189093a3463a3f6f29e591789bb28995288c403facb75995c3e4c93544c1a6a053f90b501d15bc8feacd77d28a0c06b7a2e91c00b0690f8b87b5a0d5d2e0f7cb6d2affb3f1ecfbf97fa1668f102e4102b0b36e386ecf7',
+            'Content-Type': 'application/json'
+          },
+          success: function(data) {
+            console.log(data);
+            resolve(data.data);
+          },
+          error: function(xhr, status, error) {
+            console.error("Erreur lors de la récupération des données :", error);
+            reject(error);
+          }
+        });
+      });
     }
   </script>
 
