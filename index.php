@@ -33,11 +33,11 @@ $subdomain = $matches[1];
 $zone = $matches[2];
 
 if ($zone == "eu") {
-  $coLang1 = "FR";
-  $coLang2 = "CN";
+  $coLang1 = "fr";
+  $coLang2 = "cn";
 } else if ($zone == "cn") {
-  $coLang1 = "CN";
-  $coLang2 = "FR";
+  $coLang1 = "cn";
+  $coLang2 = "fr";
 }
 
 if ((!isset($subdomain) || $subdomain == "www") && isset($_REQUEST["s"]))
@@ -181,6 +181,10 @@ if (isset($subdomain) && $subdomain != "www") {
     let villesTerroirBourgogneJSON;
 
     let JSONCountries = <?= getJSONArrayFromProcedure("getListCountries", null); ?>;
+    let JSONCountriesStrapi = fetchStrapiData('http://51.91.157.23:1338/api/countries?populate=*');
+    console.log("JSONCountriesStrapi");
+    console.log(JSONCountriesStrapi);
+
     let JSONRegionsEU = <?= getJSONArrayFromProcedure("getListRegions", "EU", null); ?>;
     let JSONRegionsCN = <?= getJSONArrayFromProcedure("getListRegions", "CN", null); ?>;
     // let JSONMarkersLabelEU = <?= getJSONArrayFromProcedure("getListLabels", "EU", null, null); ?>;
@@ -416,7 +420,7 @@ if (isset($subdomain) && $subdomain != "www") {
       //   $(".modal iframe").attr('src', "https://www.youtube-nocookie.com/embed/U0D_a_o9wcQ?autoplay=1&amp;modestbranding=1&amp;showinfo=0&amp;start=0" ); 
       // });
 
-      $(".modal").on('hide.bs.modal', function (e) {
+      $(".modal").on('hide.bs.modal', function(e) {
         $(".modal iframe").attr('src', '');
       });
 
@@ -457,7 +461,7 @@ if (isset($subdomain) && $subdomain != "www") {
           anchor_attr = `data-toggle="modal" data-backdrop="false" data-target="#myModal" onclick="setVideoIframe('${ escape(html_code) }')"`;
         }
         let next = (i + 1) % JSONLabelMedias.length + 1;
-        let prev = (i + JSONLabelMedias.length - 1)  % JSONLabelMedias.length + 1;
+        let prev = (i + JSONLabelMedias.length - 1) % JSONLabelMedias.length + 1;
         desc += `
         <input type="radio" name="radio-btn" id="img-${ i + 1 }" ${ i == 0 ? "checked" : "" } />
         <li class="slide-container">
@@ -769,35 +773,39 @@ if (isset($subdomain) && $subdomain != "www") {
       let region;
       let classe;
 
-      for (country of JSONCountries) {
+      for (let rec of JSONCountriesStrapi) {
 
-        if (country["code_country"] != 'CHN') {
+        country = rec.attributes;
 
-          let typeIconCountry = getTypeIconCountry(country["code_country"]);
+        console.log(country);
+
+        if (country["code_nuts"] != 'CHN') {
+
+          let typeIconCountry = getTypeIconCountry(country["code_nuts"]);
 
           iconMarker = listIconLabel[typeIconCountry];
 
-          classe = "talon-" + country["direction_heel"];
+          classe = "talon-" + country["direction_heel"].toLowerCase();
 
           let toolTipContent =
             "<div class='talon-pays " + classe + "'>" +
             "<p>" +
-            country["name_" + coLang1].toUpperCase() +
+            country["name"]["name_" + coLang1].toUpperCase() +
             "</p>" +
             "<p>" +
-            country["name_" + coLang2].toUpperCase() +
+            country["name"]["name_" + coLang2].toUpperCase() +
             "</p>" +
             "</div>";
 
           let m = L.marker(
-            [country["lat_icon"], country["lon_icon"]], {
+            [country["marker"]["coordinates"]["lat"], country["marker"]["coordinates"]["lng"]], {
               icon: iconMarker,
               interactive: false
             }
           ).bindTooltip(
             toolTipContent, {
               permanent: true,
-              direction: country["direction_heel"],
+              direction: country["direction_heel"].toLowerCase(),
               className: "aterroir-tooltip"
             }
           );
@@ -817,10 +825,10 @@ if (isset($subdomain) && $subdomain != "www") {
         let toolTipContent =
           "<div class='talon-pays " + classe + "'>" +
           "<p>" +
-          region["name_" + coLang1].toUpperCase() +
+          region["name_" + coLang1.toUpperCase()].toUpperCase() +
           "</p>" +
           "<p>" +
-          region["name_" + coLang2].toUpperCase() +
+          region["name_" + coLang2.toUpperCase()].toUpperCase() +
           "</p>" +
           "</div>";
 
@@ -1059,7 +1067,7 @@ if (isset($subdomain) && $subdomain != "www") {
         }
 
         let html =
-        `
+          `
         <a href='${urlPartner || '#'}' target='_blank' onmouseover="$('#partner').attr('src', '${logo2}');" onmouseout="$('#partner').attr('src', '${logo}');"><img id='partner' src="${logo}" style="max-width:200px"/></a>
         `;
 
@@ -1086,7 +1094,7 @@ if (isset($subdomain) && $subdomain != "www") {
         let div = L.DomUtil.create('div', 'command');
 
         let html =
-        `
+          `
         <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
           Launch demo modal
         </button>
@@ -1958,6 +1966,31 @@ if (isset($subdomain) && $subdomain != "www") {
       pcommand.addTo(map);
 
       currentCommand = pcommand;
+    }
+
+    // URL de l'API Strapi pour l'entité 'country'
+    // const url = 'http://51.91.157.23:1338/api/countries?populate=*';
+
+    // Fonction asynchrone pour récupérer les enregistrements de 'country'
+    function fetchStrapiData(url) {
+      let response = [];
+
+      $.ajax({
+        url: url,
+        type: "GET",
+        headers: {
+          // Ajoutez l'en-tête 'Authorization' si nécessaire
+          'Authorization': 'Bearer 8ff94e0aab95375592ce0bceb1e8ea7cd110ee88e699487d44cc84eb9f935b7aff7ec949fca78d6afe0189093a3463a3f6f29e591789bb28995288c403facb75995c3e4c93544c1a6a053f90b501d15bc8feacd77d28a0c06b7a2e91c00b0690f8b87b5a0d5d2e0f7cb6d2affb3f1ecfbf97fa1668f102e4102b0b36e386ecf7',
+          'Content-Type': 'application/json',
+        },
+        async: false, // Mode synchrone indispensable
+        success: function(data) {
+          response = data; // !!! return ici ne marche pas malgré synchrone (!?)
+        }
+      });
+
+      return response.data;
+
     }
   </script>
 
