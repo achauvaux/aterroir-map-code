@@ -185,7 +185,8 @@ if (isset($subdomain) && $subdomain != "www") {
     let JSONRegionsEUStrapi = fetchStrapiData('http://51.91.157.23:1338/api/regions?populate=*&filters[country][code_zone][$eq]=EU');
     let JSONRegionsCNStrapi = fetchStrapiData('http://51.91.157.23:1338/api/regions?populate=*&filters[country][code_zone][$eq]=CN');
 
-    let JSONMarkersLabel = <?= getJSONArrayFromProcedure("getListLabels", null, null, null); ?>;
+    // let JSONMarkersLabelStrapi = fetchStrapiData('http://51.91.157.23:1338/api/labels?populate[region][populate][country]=*');
+    let JSONMarkersLabelStrapi = fetchStrapiData('http://51.91.157.23:1338/api/labels?populate[0]=name&populate[1]=region.country');
 
     let coLang1 = "<?= $coLang1 ?>";
     let coLang2 = "<?= $coLang2 ?>";
@@ -601,9 +602,12 @@ if (isset($subdomain) && $subdomain != "www") {
       let style;
       let dy;
 
-      for (label of JSONMarkersLabel) {
+      for (let rec of JSONMarkersLabelStrapi) {
 
-        log(label);
+        let label = rec.attributes;
+        label.id_label = rec.id;
+
+        console.log(label);
         iconMarker = listIconLabel[label["code_label"]];
 
         if (label["height_img_icon"] != undefined && label["height_img_icon"] != null)
@@ -627,10 +631,10 @@ if (isset($subdomain) && $subdomain != "www") {
           "<img src='medias/img/images-labels/" + getFileNameFromJSONMetaData(label["img_icon"]) + "' style='height:" + label["height_img_icon"] + "px'>" +
           "<div class='talon'>" +
           "<p>" +
-          label["name_" + coLang1] +
+          label["name"]["name_" + coLang1] +
           "</p>" +
           "<p>" +
-          label["name_" + coLang2] +
+          label["name"]["name_" + coLang2] +
           "</p>" +
           "</div>"; +
         "</div>";
@@ -645,8 +649,8 @@ if (isset($subdomain) && $subdomain != "www") {
         IGTooltip.setContent(toolTipContent);
 
         // ! coordonnées inversées dans geojson umap
-        let lat = label["lat"];
-        let lon = label["lon"];
+        let lat = label["marker"]["coordinates"]["lat"];
+        let lon = label["marker"]["coordinates"]["lng"];
 
         log(lat);
         log(lon);
@@ -679,7 +683,7 @@ if (isset($subdomain) && $subdomain != "www") {
             goToLabel(this.label["id_label"]);
           } else { // on arrive sur la région (on était à un niveau inférieur ou dans une autre région)
             if (this.layerRegion) { // on vérifie qu'un polygone région est associé au marqueur
-              goToRegion(this.label["code_region"]);
+              goToRegion(this.label["region"]["data"]["attributes"]["code_nuts"]);
             }
           }
 
@@ -700,7 +704,7 @@ if (isset($subdomain) && $subdomain != "www") {
         });
 
         m.label = label;
-        m.layerRegion = getLayerPolygonByCode(label["code_region"]);
+        m.layerRegion = getLayerPolygonByCode(label["region"]["data"]["attributes"]["code_nuts"]);
 
         if (listListMarkerLabelLevel[label["level"]] == undefined)
           listListMarkerLabelLevel[label["level"]] = [];
@@ -717,7 +721,7 @@ if (isset($subdomain) && $subdomain != "www") {
       let bAOP = false;
       let bIGP = false;
 
-      for (let label of JSONMarkersLabel) {
+      for (let label of JSONMarkersLabelStrapi) {
         if (bAOP && bIGP) break;
         if (label["code_country"] == pcode) {
           if (label["code_label"] == "AOP")
@@ -742,7 +746,7 @@ if (isset($subdomain) && $subdomain != "www") {
       let bAOP = false;
       let bIGP = false;
 
-      for (let label of JSONMarkersLabel) {
+      for (let label of JSONMarkersLabelStrapi) {
         if (bAOP && bIGP) break;
         if (label["code_region"] == pcode) {
           if (label["code_label"] == "AOP")
@@ -772,8 +776,7 @@ if (isset($subdomain) && $subdomain != "www") {
       for (let rec of JSONCountriesStrapi) {
 
         country = rec.attributes;
-
-        console.log(country);
+        // console.log(country);
 
         if (country["code_nuts"] != 'CHN') {
 
@@ -810,9 +813,12 @@ if (isset($subdomain) && $subdomain != "www") {
         }
       }
 
-      for (region of JSONRegionsCN) {
+      for (let rec of JSONRegionsCNStrapi) {
 
-        let typeIconRegion = getTypeIconRegion(region["code_region"]);
+        let region = rec.attributes;
+        console.log(region);
+
+        let typeIconRegion = getTypeIconRegion(region["code_nuts"]);
 
         iconMarker = listIconLabel[typeIconRegion];
 
@@ -821,27 +827,29 @@ if (isset($subdomain) && $subdomain != "www") {
         let toolTipContent =
           "<div class='talon-pays " + classe + "'>" +
           "<p>" +
-          region["name_" + coLang1.toUpperCase()].toUpperCase() +
+          region["name"]["name_" + coLang1].toUpperCase() +
           "</p>" +
           "<p>" +
-          region["name_" + coLang2.toUpperCase()].toUpperCase() +
+          region["name"]["name_" + coLang2].toUpperCase() +
           "</p>" +
           "</div>";
 
-        let m = L.marker(
-          [region["lat_capital"], region["lon_capital"]], {
-            icon: iconMarker,
-            interactive: false
-          }
-        ).bindTooltip(
-          toolTipContent, {
-            permanent: true,
-            direction: region["direction_heel"],
-            className: "aterroir-tooltip"
-          }
-        );
 
-        listMarkerLevel0.push(m);
+        if (region["marker"]["coordinates"]["lat"] && region["marker"]["coordinates"]["lng"]) {
+          let m = L.marker(
+            [region["marker"]["coordinates"]["lat"], region["marker"]["coordinates"]["lng"]], {
+              icon: iconMarker,
+              interactive: false
+            }
+          ).bindTooltip(
+            toolTipContent, {
+              permanent: true,
+              direction: region["direction_heel"],
+              className: "aterroir-tooltip"
+            }
+          );
+          listMarkerLevel0.push(m);
+        }
       }
 
       layerLevel0 = L.layerGroup(listMarkerLevel0);
@@ -1066,7 +1074,7 @@ if (isset($subdomain) && $subdomain != "www") {
         }
 
         let html =
-          `
+        `
         <a href='${urlPartner || '#'}' target='_blank' onmouseover="$('#partner').attr('src', '${logo2}');" onmouseout="$('#partner').attr('src', '${logo}');"><img id='partner' src="${logo}" style="max-width:200px"/></a>
         `;
 
