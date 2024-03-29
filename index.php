@@ -186,7 +186,7 @@ if (isset($subdomain) && $subdomain != "www") {
     let JSONRegionsCNStrapi = fetchStrapiData('http://51.91.157.23:1338/api/regions?populate=*&filters[country][code_zone][$eq]=CN');
 
     // let JSONMarkersLabelStrapi = fetchStrapiData('http://51.91.157.23:1338/api/labels?populate[region][populate][country]=*');
-    let JSONMarkersLabelStrapi = fetchStrapiData('http://51.91.157.23:1338/api/labels?populate[0]=name&populate[1]=region.country');
+    let JSONMarkersLabelStrapi = fetchStrapiData('http://51.91.157.23:1338/api/labels?populate[0]=name&populate[1]=region.country&populate[2]=marker_icon');
 
     let coLang1 = "<?= $coLang1 ?>";
     let coLang2 = "<?= $coLang2 ?>";
@@ -610,8 +610,8 @@ if (isset($subdomain) && $subdomain != "www") {
         console.log(label);
         iconMarker = listIconLabel[label["code_label"]];
 
-        if (label["height_img_icon"] != undefined && label["height_img_icon"] != null)
-          dy = label["height_img_icon"] / 2;
+        if (label["marker_icon_height"] != undefined && label["marker_icon_height"] != null)
+          dy = label["marker_icon_height"] / 2;
         else
           dy = 50;
 
@@ -626,9 +626,10 @@ if (isset($subdomain) && $subdomain != "www") {
             style = "";
         }
 
+        let labelImage = 'http://51.91.157.23:1338' + label.marker_icon.data?.attributes.url;
         let toolTipContent =
-          "<div id='IG-" + label["id_label"] + "' class='IG " + label["direction_heel"] + "' style='" + style + "'>" +
-          "<img src='medias/img/images-labels/" + getFileNameFromJSONMetaData(label["img_icon"]) + "' style='height:" + label["height_img_icon"] + "px'>" +
+          "<div id='IG-" + label["id_label"] + "' class='IG " + label["direction_heel"].toLowerCase() + "' style='" + style + "'>" +
+          "<img src='" + labelImage + "' style='height:" + label["marker_icon_height"] + "px'>" +
           "<div class='talon'>" +
           "<p>" +
           label["name"]["name_" + coLang1] +
@@ -642,7 +643,7 @@ if (isset($subdomain) && $subdomain != "www") {
         let IGTooltip = L.tooltip({
           className: "aterroir-tooltip",
           permanent: true,
-          direction: label["direction_heel"],
+          direction: label["direction_heel"].toLowerCase(),
           interactive: true
         });
 
@@ -1987,7 +1988,7 @@ if (isset($subdomain) && $subdomain != "www") {
         type: "GET",
         headers: {
           // Ajoutez l'en-tête 'Authorization' si nécessaire
-          'Authorization': 'Bearer 8ff94e0aab95375592ce0bceb1e8ea7cd110ee88e699487d44cc84eb9f935b7aff7ec949fca78d6afe0189093a3463a3f6f29e591789bb28995288c403facb75995c3e4c93544c1a6a053f90b501d15bc8feacd77d28a0c06b7a2e91c00b0690f8b87b5a0d5d2e0f7cb6d2affb3f1ecfbf97fa1668f102e4102b0b36e386ecf7',
+          'Authorization': 'Bearer 6afb7b639162f356dc5f5750c8b094b7d931636b87a9402097f0614f3ef9975a5b9f37a6a776cd5eb9942a84f73a336295938027956e17302e7b9ca7d8a799ae25b30460e13e2d2602b2bd6b1bbb863323d499b4f49dea26db6775167910a5712d9cc4b6923bbfb6a0b2d3795b0291ec54c087f53d5fd19b072c8a1c1fc3d307',
           'Content-Type': 'application/json',
         },
         async: false, // Mode synchrone indispensable
@@ -2005,7 +2006,7 @@ if (isset($subdomain) && $subdomain != "www") {
           url: url,
           method: 'GET',
           headers: {
-            'Authorization': 'Bearer 8ff94e0aab95375592ce0bceb1e8ea7cd110ee88e699487d44cc84eb9f935b7aff7ec949fca78d6afe0189093a3463a3f6f29e591789bb28995288c403facb75995c3e4c93544c1a6a053f90b501d15bc8feacd77d28a0c06b7a2e91c00b0690f8b87b5a0d5d2e0f7cb6d2affb3f1ecfbf97fa1668f102e4102b0b36e386ecf7',
+            'Authorization': 'Bearer 6afb7b639162f356dc5f5750c8b094b7d931636b87a9402097f0614f3ef9975a5b9f37a6a776cd5eb9942a84f73a336295938027956e17302e7b9ca7d8a799ae25b30460e13e2d2602b2bd6b1bbb863323d499b4f49dea26db6775167910a5712d9cc4b6923bbfb6a0b2d3795b0291ec54c087f53d5fd19b072c8a1c1fc3d307',
             'Content-Type': 'application/json'
           },
           success: function(data) {
