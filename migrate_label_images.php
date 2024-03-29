@@ -30,17 +30,17 @@ foreach ($rsLabels as $label) {
     // get the file name from the full path
     $img_icon_filename = basename($img_icon_filename_full);
     $filePath = 'medias/img/images-labels/' . $img_icon_filename;
-    $nameEn = $label['name_EN'];
+    $name = $label['name_EN'];
 
     // Télécharger l'image vers Strapi
     $uploadedMedia = uploadImageToStrapi($filePath);
 
     // Trouver l'ID Strapi du label par `name_local`
-    $labelId = findStrapiLabelIdByNameLocal($nameEn);
+    $labelId = findStrapiLabelIdByName($name);
 
     // Mettre à jour le label dans Strapi pour définir `marker_icon`
     if ($labelId && $uploadedMedia) {
-        updateLabelMarkerIcon($labelId, $uploadedMedia, $nameEn);
+        updateLabelMarkerIcon($labelId, $uploadedMedia, $name);
     }
 }
 
@@ -75,12 +75,12 @@ function uploadImageToStrapi($filePath) {
     }
 }
 
-function findStrapiLabelIdByNameLocal($nameEn) {
+function findStrapiLabelIdByName($name) {
 
     global $strapiBaseUrl, $strapiToken;
 
     $curl = curl_init();
-    $curlopt_url = $strapiBaseUrl . '/api/labels?filters[name][name_en][$eq]=' . $nameEn . '&fields=id';
+    $curlopt_url = $strapiBaseUrl . '/api/labels?filters[name][name_en][$eq]=' . urlencode($name) . '&fields=id';
 
     curl_setopt_array($curl, [
         CURLOPT_URL => $curlopt_url,
@@ -98,15 +98,21 @@ function findStrapiLabelIdByNameLocal($nameEn) {
     curl_close($curl);
 
     if ($err) {
-        echo "findStrapiLabelIdByNameLocal cURL Error #:" . $err . "<br>";
+        echo "findStrapiLabelIdByName cURL Error #:" . $err . "<br>";
     } else {
         $decodedResponse = json_decode($response, true);
         // Supposons que le premier label correspondant est le bon
-        return $decodedResponse['data'][0]['id'] ?? null;
+        $id = $decodedResponse['data'][0]['id'];
+
+        if ($id == null) {
+            echo "Label $name not found.<br>";
+        }
+
+        return $id;
     }
 }
 
-function updateLabelMarkerIcon($labelId, $mediaId, $nameEn) {
+function updateLabelMarkerIcon($labelId, $mediaId, $name) {
 
     global $strapiBaseUrl, $strapiToken;
 
@@ -136,7 +142,7 @@ function updateLabelMarkerIcon($labelId, $mediaId, $nameEn) {
     if ($err) {
         echo "updateLabelMarkerIcon cURL Error #:" . $err . "<br>";
     } else {
-        echo "Label $nameEn updated successfully.<br>";
+        echo "Label $name updated successfully.<br>";
     }
 }
 
