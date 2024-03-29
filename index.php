@@ -941,7 +941,7 @@ if (isset($subdomain) && $subdomain != "www") {
                 </div>
                 <div class="talon-item" onclick='goToRegion("` + region["code_nuts"] + `")' onmouseover='legendRegionOver("` + region["code_nuts"] + `")' onmouseout='legendRegionOut("` + region["code_nuts"] + `")'>
                   <p>` + region["name"]["name_" + coLang1] + `</p>
-                  <p>` + region["name"]["name_" + coLang1] + `</p>
+                  <p>` + region["name"]["name_" + coLang2] + `</p>
                 </div>
               </li>`;
         }

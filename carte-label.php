@@ -218,32 +218,32 @@ $idLabel = $_REQUEST["id_label"];
     // var sizeBig = Math.trunc(psize * 1.5 / 2);
 
     listIconLabel["AOP"] = L.icon({
-      iconUrl: 'assets/img/icones-aterroir/logo-AOP.png',
+      iconUrl: 'medias/img/icones-aterroir/logo-AOP.png',
       iconSize: [psize, psize]
     });
 
     listIconBigLabel["AOP"] = L.icon({
-      iconUrl: 'assets/img/icones-aterroir/logo-AOP.png',
+      iconUrl: 'medias/img/icones-aterroir/logo-AOP.png',
       iconSize: [psize * 1.5, psize * 1.5]
     });
 
     listIconLabel["IGP"] = L.icon({
-      iconUrl: 'assets/img/icones-aterroir/logo-IGP.png',
+      iconUrl: 'medias/img/icones-aterroir/logo-IGP.png',
       iconSize: [psize, psize]
     });
 
     listIconBigLabel["IGP"] = L.icon({
-      iconUrl: 'assets/img/icones-aterroir/logo-IGP.png',
+      iconUrl: 'medias/img/icones-aterroir/logo-IGP.png',
       iconSize: [psize * 1.5, psize * 1.5]
     });
 
     listIconLabel["AOPIGP"] = L.icon({
-      iconUrl: 'assets/img/icones-aterroir/logo-AOPIGP.png',
+      iconUrl: 'medias/img/icones-aterroir/logo-AOPIGP.png',
       iconSize: [psize, psize]
     });
 
     listIconBigLabel["AOPIGP"] = L.icon({
-      iconUrl: 'assets/img/icones-aterroir/logo-AOPIGP.png',
+      iconUrl: 'medias/img/icones-aterroir/logo-AOPIGP.png',
       iconSize: [psize * 1.5, psize * 1.5]
     });
 
@@ -458,16 +458,16 @@ $idLabel = $_REQUEST["id_label"];
       <div id="F1" class="aterroir-window">
         <section class="left">
           <div class="menu-item" onmouseenter="openRight('F1-countries');">
-            <img src="assets/img/icones-aterroir/Bouton F Pays.png">
+            <img src="medias/img/icones-aterroir/Bouton F Pays.png">
           </div>
           <div class="menu-item" onmouseenter="openRight('F1-regions');">
-            <img src="assets/img/icones-aterroir/Bouton F Régions.png">
+            <img src="medias/img/icones-aterroir/Bouton F Regions.png">
           </div>
           <div class="menu-item" onmouseenter="openRight('F1-infos');">
-            <img src="assets/img/icones-aterroir/Bouton F InfoSite.png">
+            <img src="medias/img/icones-aterroir/Bouton F InfoSite.png">
           </div>
           <div class="menu-item" onmouseenter="openRight('F1-formulaire');">
-            <img src="assets/img/icones-aterroir/Bouton F Courrier.png">
+            <img src="medias/img/icones-aterroir/Bouton F Courrier.png">
           </div>
         </section>
         <section id="F1-countries" class="right" onmouseleave="closeRight();" style="display: none;">
@@ -491,7 +491,7 @@ $idLabel = $_REQUEST["id_label"];
       html += `
             </ul>
           </div>
-          <div class="footer"><img src="assets/img/icones-aterroir/aterroir-logo.png"></div>
+          <div class="footer"><img src="medias/img/icones-aterroir/aterroir-logo.png"></div>
         </section>
         <section id="F1-regions" class="right" onmouseleave="closeRight();" style="display: none;">
           <div class="header">
@@ -513,7 +513,7 @@ $idLabel = $_REQUEST["id_label"];
       html += `
             </ul>
           </div>
-          <div class="footer"><img src="assets/img/icones-aterroir/aterroir-logo.png"></div>
+          <div class="footer"><img src="medias/img/icones-aterroir/aterroir-logo.png"></div>
         </section>
         <section id="F1-infos" class="right" onmouseleave="closeRight();" style="display: none;">
           <div class="header">
@@ -521,7 +521,7 @@ $idLabel = $_REQUEST["id_label"];
           </div>
           <div class="content">
           </div>
-          <div class="footer"><img src="assets/img/icones-aterroir/aterroir-logo.png"></div>
+          <div class="footer"><img src="medias/img/icones-aterroir/aterroir-logo.png"></div>
         </section>
         <section id="F1-formulaire" class="right" onmouseleave="closeRight();" style="display: none;">
           <div class="header">
@@ -544,7 +544,7 @@ $idLabel = $_REQUEST["id_label"];
               <button class="btn btn-primary">Envoyer</button>
             <!-- </form> -->
           </div>
-          <div class="footer"><img src="assets/img/icones-aterroir/aterroir-logo.png"></div>
+          <div class="footer"><img src="medias/img/icones-aterroir/aterroir-logo.png"></div>
         </section>
       </div>
       `;

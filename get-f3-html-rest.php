@@ -39,10 +39,10 @@ $JSONPIs = [];
 <div id="F3" class="aterroir-window">
   <section class="left">
     <div class="menu-item" onmouseenter="openRight('F3-region-labels');">
-      <img src="assets/img/icones-aterroir/Bouton F Terroir.png">
+      <img src="medias/img/icones-aterroir/Bouton F Terroir.png">
     </div>
     <div class="menu-item" onmouseenter="openRight('F3-OTs');">
-      <img src="assets/img/icones-aterroir/Bouton F InfoOT.png">
+      <img src="medias/img/icones-aterroir/Bouton F InfoOT.png">
     </div>
     <div class="list-PI">
       <?php foreach ($rsPICategories as $row) {
@@ -55,10 +55,10 @@ $JSONPIs = [];
       <?php } ?>
     </div>
     <div class="menu-item" onmouseenter="openRight('F3-infos');">
-      <img src="assets/img/icones-aterroir/Bouton F InfoSite.png">
+      <img src="medias/img/icones-aterroir/Bouton F InfoSite.png">
     </div>
     <div class="menu-item" onmouseenter="openRight('F3-formulaire');">
-      <img src="assets/img/icones-aterroir/Bouton F Courrier.png">
+      <img src="medias/img/icones-aterroir/Bouton F Courrier.png">
     </div>
   </section>
   <section id="F3-region-labels" class="right" onmouseleave="closeRight();" style="display: none;">
@@ -80,7 +80,7 @@ $JSONPIs = [];
         <?php } ?>
       </ul>
     </div>
-    <div class="footer"><img src="assets/img/icones-aterroir/aterroir-logo.png"></div>
+    <div class="footer"><img src="medias/img/icones-aterroir/aterroir-logo.png"></div>
   </section>
   <section id="F3-OTs" class="right" onmouseleave="closeRight();" style="display: none;">
     <div class="header">
@@ -91,7 +91,7 @@ $JSONPIs = [];
         <?php foreach ($rsOTs as $row) { ?>
           <li class="legend-item">
             <div class="flag">
-              <img src="assets/img/icones-aterroir/icon-OT-local.png" alt="">
+              <img src="medias/img/icones-aterroir/icon-OT-local.png" alt="">
             </div>
             <div class="talon-item" onclick="legendMarkerPIClick(<?= $row['id_pi'] ?>);">
               <p><?= $row['name_CN'] ?></p>
@@ -101,7 +101,7 @@ $JSONPIs = [];
         <?php } ?>
       </ul>
     </div>
-    <div class="footer"><img src="assets/img/icones-aterroir/aterroir-logo.png"></div>
+    <div class="footer"><img src="medias/img/icones-aterroir/aterroir-logo.png"></div>
   </section>
   <?php foreach ($rsPICategories as $row) {
     if (count($JSONPIs[$row["id_picategory"]]) == 0) continue;
@@ -140,7 +140,7 @@ $JSONPIs = [];
           <?php } ?>
         </ul>
       </div>
-      <div class="footer"><img src="assets/img/icones-aterroir/aterroir-logo.png"></div>
+      <div class="footer"><img src="medias/img/icones-aterroir/aterroir-logo.png"></div>
     </section>
   <?php } ?>
   <section id="F3-infos" class="right" onmouseleave="closeRight();" style="display: none;">
@@ -149,7 +149,7 @@ $JSONPIs = [];
     </div>
     <div class="content">
     </div>
-    <div class="footer"><img src="assets/img/icones-aterroir/aterroir-logo.png"></div>
+    <div class="footer"><img src="medias/img/icones-aterroir/aterroir-logo.png"></div>
   </section>
   <section id="F3-formulaire" class="right" onmouseleave="closeRight();" style="display: none;">
     <div class="header">
@@ -172,6 +172,6 @@ $JSONPIs = [];
       <button class="btn btn-primary">Envoyer</button>
       <!-- </form> -->
     </div>
-    <div class="footer"><img src="assets/img/icones-aterroir/aterroir-logo.png"></div>
+    <div class="footer"><img src="medias/img/icones-aterroir/aterroir-logo.png"></div>
   </section>
 </div>
