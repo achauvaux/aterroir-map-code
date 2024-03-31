@@ -2,17 +2,44 @@
 
 include "util.php";
 
+// TODO: Move token to a separate file
+$jwtToken = '6afb7b639162f356dc5f5750c8b094b7d931636b87a9402097f0614f3ef9975a5b9f37a6a776cd5eb9942a84f73a336295938027956e17302e7b9ca7d8a799ae25b30460e13e2d2602b2bd6b1bbb863323d499b4f49dea26db6775167910a5712d9cc4b6923bbfb6a0b2d3795b0291ec54c087f53d5fd19b072c8a1c1fc3d307';
+
 $id_label = $_REQUEST["id_label"];
 
-$rsLabel = getDataArrayFromProcedure("getDetailLabel", $id_label);
+// get label from strapi
+$rsLabel = sendRequest('http://51.91.157.23:1338/api/labels/' . $id_label . '?populate=*', null)['data'];
 
-$id_region = $rsLabel[0]["id_region"];
+$id_region = $rsLabel["attributes"]["region"]["data"]["id"];
 
-$rsLabels = getDataArrayFromProcedure("getListLabels", null, null, $id_region);
-// $rsPIs = getDataArrayFromProcedure("getListPI", null, $id_region, null, null);
-$rsOTs = getDataArrayFromProcedure("getListPI", null, $id_region, null, 1);
-$rsPICategories = getDataArrayFromProcedure("getListPICategories");
+$rsLabels = sendRequest('http://51.91.157.23:1338/api/labels?populate=*&filters[region][id]=' . $id_region, null)['data'];
+$rsOTs = [];
+$rsPICategories =[];
 $rsPIs = [];
+
+// create a generic to make an API call to Strapi
+function sendRequest($url, $payload) {
+
+	global $jwtToken;
+
+	$ch = curl_init($url);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+	if ($payload) {
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+	}
+
+	curl_setopt($ch, CURLOPT_HTTPHEADER, [
+		'Content-Type: application/json',
+		'Authorization: Bearer ' . $jwtToken,
+	]);
+
+	$response = curl_exec($ch);
+	curl_close($ch);
+
+	return json_decode($response, true);
+}
 
 ?>
 
@@ -26,8 +53,8 @@ $rsPIs = [];
     </div>
     <div class="list-PI">
       <?php foreach ($rsPICategories as $row) {
-        $rsPIs[$row["id_picategory"]] = getDataArrayFromProcedure("getListPIs", null, null, $id_label, $row["id_picategory"]);
-        if(empty($rsPIs[$row["id_picategory"]])) continue;
+        $rsPIs[$row["id_picategory"]] = [];
+        if (empty($rsPIs[$row["id_picategory"]])) continue;
       ?>
         <div id="label-<?= $id_label ?>-F3-PI-type-<?= $row["id_picategory"] ?>" class="menu-item PI" onmouseenter="openRight('F3-PI-type-<?= $row['id_picategory'] ?>');" onclick="togglePIType(29,'<?= $row['id_picategory'] ?>');">
           <img src="assets/img/icones-categories-pi/<?= $row['img_icon_category'] ?>">
@@ -47,14 +74,19 @@ $rsPIs = [];
     </div>
     <div class="content">
       <ul class="list-items">
-        <?php foreach ($rsLabels as $row) { ?>
+        <?php 
+          foreach ($rsLabels as $rec) {
+            $id_label_tmp = $rec["id"];
+            $row = $rec["attributes"];
+            $label_image = "http://51.91.157.23:1338" . $row["marker_icon"]["data"]["attributes"]["url"];
+        ?>
           <li class="legend-item">
-            <div class="flag">
-              <img src="assets/img/images-labels/<?= $row["img_icon_filename"] ?>" alt="">
+            <div class="icon-label">
+              <img src="<?= $label_image ?>" alt="">
             </div>
-            <div class="talon-item" onclick="goToLabel(<?= $row['id_label'] ?>);">
-              <p><?= $row['name_CN'] ?></p>
-              <p><?= $row['name_FR'] ?></p>
+            <div class="talon-item" onclick="goToLabel(<?= $id_label_tmp ?>);">
+              <p><?= $row['name']['name_cn'] ?></p>
+              <p><?= $row['name']['name_fr'] ?></p>
             </div>
           </li>
         <?php } ?>
