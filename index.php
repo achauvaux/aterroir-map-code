@@ -722,9 +722,10 @@ if (isset($subdomain) && $subdomain != "www") {
       let bAOP = false;
       let bIGP = false;
 
-      for (let label of JSONMarkersLabelStrapi) {
+      for (let rec of JSONMarkersLabelStrapi) {
+        let label = rec.attributes;
         if (bAOP && bIGP) break;
-        if (label["code_country"] == pcode) {
+        if (label["region"]["data"]["attributes"]["country"]["data"]["attributes"]["code_nuts"] == pcode) {
           if (label["code_label"] == "AOP")
             bAOP = true;
           else if (label["code_label"] == "IGP")
@@ -747,9 +748,10 @@ if (isset($subdomain) && $subdomain != "www") {
       let bAOP = false;
       let bIGP = false;
 
-      for (let label of JSONMarkersLabelStrapi) {
+      for (let rec of JSONMarkersLabelStrapi) {
+        let label = rec.attributes;
         if (bAOP && bIGP) break;
-        if (label["code_region"] == pcode) {
+        if (label["region"]["data"]["attributes"]["code_nuts"] == pcode) {
           if (label["code_label"] == "AOP")
             bAOP = true;
           else if (label["code_label"] == "IGP")
