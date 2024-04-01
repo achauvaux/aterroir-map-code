@@ -615,7 +615,7 @@ if (isset($subdomain) && $subdomain != "www") {
         else
           dy = 50;
 
-        switch (label["direction_heel"]) {
+        switch (label["direction_heel"].toLowerCase()) {
           case "left":
             style = "transform: translate(-7px, -" + dy + "px)";
             break;
@@ -825,7 +825,7 @@ if (isset($subdomain) && $subdomain != "www") {
 
         iconMarker = listIconLabel[typeIconRegion];
 
-        classe = "talon-" + region["direction_heel"];
+        classe = "talon-" + region["direction_heel"].toLowerCase();
 
         let toolTipContent =
           "<div class='talon-pays " + classe + "'>" +
@@ -847,7 +847,7 @@ if (isset($subdomain) && $subdomain != "www") {
           ).bindTooltip(
             toolTipContent, {
               permanent: true,
-              direction: region["direction_heel"],
+              direction: region["direction_heel"].toLowerCase(),
               className: "aterroir-tooltip"
             }
           );
