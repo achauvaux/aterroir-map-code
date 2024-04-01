@@ -1178,21 +1178,8 @@ if (isset($subdomain) && $subdomain != "www") {
 
     function getJSONPolygonsLabel(pidLabel) {
 
-      let jsonMaps;
-
-      $.ajax({
-        url: "getJSONPolygonsLabel.php",
-        type: "POST",
-        async: false, // Mode synchrone indispensable
-        data: ({
-          id: pidLabel
-        }),
-        success: function(data) {
-          jsonMaps = JSON.parse(data); // !!! return ici ne marche pas malgré synchrone (!?)
-        }
-      });
-
-      return jsonMaps;
+      let jsonMaps = fetchStrapiData("http://51.91.157.23:1338/api/labels/" + pidLabel + "?populate=polygons");
+      return jsonMaps["attributes"]["polygons"]["data"];
     }
 
     let f2Html = [];
@@ -1301,23 +1288,19 @@ if (isset($subdomain) && $subdomain != "www") {
 
       let JSONPolygonsLabel = getJSONPolygonsLabel(pidLabel);
 
-      for (let pols of JSONPolygonsLabel) {
-        let files = JSON.parse(pols["filename"]);
-        for (let file of files) {
-          // let polMapJSON = loadJSON("medias/geojson/terroirs/" + getFileNameFromJSONMetaData(pol["filename"]));
-          let polMapJSON = loadJSON("medias/geojson/terroirs/" + file["name"].split("/").pop());
-          if (!polMapJSON) continue;
-          let tempLayer = L.geoJSON(polMapJSON, {
-            onEachFeature: function(feature, layer) {},
-            style: {
-              color: pols['color'] || "red",
-              fillOpacity: pols['opacity'] || 0.2,
-              weight: 0
-            }
-          });
+      for (let rec of JSONPolygonsLabel) {
+        let pol = rec.attributes;
+        let polMapJSON = loadJSON('http://51.91.157.23:1338' + pol.url);
+        let tempLayer = L.geoJSON(polMapJSON, {
+          onEachFeature: function(feature, layer) {},
+          style: {
+            color: pol['color'] || "red",
+            fillOpacity: pol['opacity'] || 0.2,
+            weight: 0
+          }
+        });
 
-          listImagesAndPolygonsLabel.push(tempLayer);
-        }
+        listImagesAndPolygonsLabel.push(tempLayer);
       }
 
       // listLayerPolygonsLabel[pidLabel] = L.layerGroup(layers);
