@@ -186,7 +186,7 @@ if (isset($subdomain) && $subdomain != "www") {
     let JSONRegionsCNStrapi = fetchStrapiData('http://51.91.157.23:1338/api/regions?populate=*&filters[country][code_zone][$eq]=CN');
 
     // let JSONMarkersLabelStrapi = fetchStrapiData('http://51.91.157.23:1338/api/labels?populate[region][populate][country]=*');
-    let JSONMarkersLabelStrapi = fetchStrapiData('http://51.91.157.23:1338/api/labels?populate[0]=name&populate[1]=region.country&populate[2]=marker_icon');
+    let JSONMarkersLabelStrapi = fetchStrapiData('http://51.91.157.23:1338/api/labels?populate[0]=name&populate[1]=region.country&populate[2]=marker_icon&populate[3]=medias.media_file&populate[4]=medias.media_icon');
 
     let coLang1 = "<?= $coLang1 ?>";
     let coLang2 = "<?= $coLang2 ?>";
@@ -436,7 +436,7 @@ if (isset($subdomain) && $subdomain != "www") {
 
     function getMarkerLabelPopupContent(pmarker) {
 
-      let JSONLabelMedias = getJSONMediasLabel(pmarker.label['id_label'], '<?= $coLang1 ?>');
+      let JSONLabelMedias = pmarker.label.medias;
 
       let i = 0;
       let href;
@@ -448,11 +448,11 @@ if (isset($subdomain) && $subdomain != "www") {
         href = '';
         html_code = '';
         anchor_attr = '';
-        if (row['type_media'] == 'file') {
-          href = "medias/label-medias/" + getFileNameFromJSONMetaData(row['media_filename']);
-        } else if (row['type_media'] == 'url') {
+        if (row['type'] == 'file') {
+          href = "http://51.91.157.23:1338" + row['media_file']['data']['attributes']['url'];
+        } else if (row['type'] == 'url') {
           href = row['url'];
-        } else if (row['type_media'] == 'embed') {
+        } else if (row['type'] == 'embed') {
           html_code = row['html_code'];
           console.log(html_code);
           anchor_attr = `data-toggle="modal" data-backdrop="false" data-target="#myModal" onclick="setVideoIframe('${ escape(html_code) }')"`;
@@ -463,14 +463,14 @@ if (isset($subdomain) && $subdomain != "www") {
         <input type="radio" name="radio-btn" id="img-${ i + 1 }" ${ i == 0 ? "checked" : "" } />
         <li class="slide-container">
           <div class="slide">
-            <p>${ pmarker.label["name_" + coLang1] }</p>
+            <p>${ pmarker.label.name["name_" + coLang1.toLowerCase()] }</p>
             <a href="${ href }" target="_blank" ${ anchor_attr }>
-              <img class="pdf-img" src="medias/label-medias/${ getFileNameFromJSONMetaData(row['icon_filename']) }">
+              <img class="pdf-img" src="${ "http://51.91.157.23:1338" + row['media_icon']['data']['attributes']['url'] }">
             </a>
             <!--
             <iframe src="https://www.youtube.com/embed/U0D_a_o9wcQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
             -->
-            <p>${ pmarker.label["name_" + coLang2] }</p>
+            <p>${ pmarker.label.name["name_" + coLang2.toLowerCase()] }</p>
             <div class="nav">
               <!--
               <label for="img-${ prev }" class="prev">&#x2039;</label>
@@ -912,10 +912,16 @@ if (isset($subdomain) && $subdomain != "www") {
             <ul class="list-items">`;
         for (let rec of JSONCountriesStrapi) {
           let country = rec.attributes;
+          let flag_image_path = country.flag_image.data?.attributes.url;
+          if (flag_image_path)
+            flag_image_url = "http://51.91.157.23:1338" + flag_image_path;
+          else
+            flag_image_url = "http://51.91.157.23:1338/uploads/flag-europe.png";
+
           html += `
               <li class="legend-item">
                 <div class="flag">
-                  <img src="medias/img/flags/` + (country["img_icon"] ?? "flag-europe.png") + `" alt="">
+                  <img src="` + flag_image_url + `" alt="">
                 </div>
                 <div class="talon-item" onclick='legendCountryClick("` + country["code_nuts"] + `")' onmouseover='legendCountryOver("` + country["code_nuts"] + `")' onmouseout='legendCountryOut("` + country["code_nuts"] + `")'>
                   <p>` + country["name"]["name_" + coLang1] + `</p>
@@ -936,10 +942,16 @@ if (isset($subdomain) && $subdomain != "www") {
             <ul class="list-items">`;
         for (let rec of JSONRegionsEUStrapi) {
           let region = rec.attributes;
+          let logo_image_path = region.logo_image.data?.attributes.url;
+          if (logo_image_path)
+            logo_image_url = "http://51.91.157.23:1338" + logo_image_path;
+          else
+            logo_image_url = "http://51.91.157.23:1338/uploads/flag_europe_76fbd4fe3d.png";
+
           html += `
               <li class="legend-item">
                 <div class="flag">
-                  <img src="medias/img/logos-regions/` + (region["img_logo"] ?? "flag-europe.png") + `" alt="">
+                  <img src="` + logo_image_url + `" alt="">
                 </div>
                 <div class="talon-item" onclick='goToRegion("` + region["code_nuts"] + `")' onmouseover='legendRegionOver("` + region["code_nuts"] + `")' onmouseout='legendRegionOut("` + region["code_nuts"] + `")'>
                   <p>` + region["name"]["name_" + coLang1] + `</p>
@@ -1158,22 +1170,8 @@ if (isset($subdomain) && $subdomain != "www") {
 
     function getJSONMediasLabel(pidLabel, pcoLang) {
 
-      let jsonMedias;
-
-      $.ajax({
-        url: "getJSONMediasLabel.php",
-        type: "POST",
-        async: false, // Mode synchrone indispensable
-        data: ({
-          id: pidLabel,
-          co_lang: pcoLang
-        }),
-        success: function(data) {
-          jsonMedias = JSON.parse(data); // !!! return ici ne marche pas malgré synchrone (!?)
-        }
-      });
-
-      return jsonMedias;
+      let jsonMedias = fetchStrapiData("http://51.91.157.23:1338/api/labels/" + pidLabel + "?populate=medias");
+      return jsonMedias["attributes"]["medias"]["data"];
     }
 
     function getJSONPolygonsLabel(pidLabel) {
@@ -1287,6 +1285,8 @@ if (isset($subdomain) && $subdomain != "www") {
       // listImagesAndPolygonsLabel = [];
 
       let JSONPolygonsLabel = getJSONPolygonsLabel(pidLabel);
+
+      if (!JSONPolygonsLabel) return;
 
       for (let rec of JSONPolygonsLabel) {
         let pol = rec.attributes;

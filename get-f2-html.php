@@ -72,10 +72,15 @@ function sendRequest($url, $payload) {
         <?php 
         foreach ($rsRegions as $rec) { 
           $row = $rec["attributes"];
+          $logo_image_path = $row["logo_image"]["data"]["attributes"]["url"];
+          if ($logo_image_path)
+            $logo_image_url = "http://51.91.157.23:1338" . $logo_image_path;
+          else
+            $logo_image_url = "http://51.91.157.23:1338/uploads/flag_europe_76fbd4fe3d.png";
         ?>
           <li class="legend-item">
             <div class="flag">
-              <img src="assets/img/logos-regions/<?= $row["logo_image"]["data"]["attributes"]["url"] ?>" alt="">
+              <img src="<?= $logo_image_url ?>" alt="">
             </div>
             <div class="talon-item" onclick="goToRegion('<?= $row['code_nuts'] ?>')" onmouseover="legendRegionOver('<?= $row['code_nuts'] ?>')" onmouseout="legendRegionOut('<?= $row['code_nuts'] ?>')">
               <p><?= $row['name']['name_cn'] ?></p>
