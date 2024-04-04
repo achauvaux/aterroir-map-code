@@ -1524,7 +1524,8 @@ function sendRequest($url, $payload) {
       layerPositron = new L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png");
       layerPositronNoLabel = new L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png");
 
-      if (JSONbasemap)
+      // if (JSONbasemap)
+      if (false)
         layerBasemap = new L.tileLayer(JSONbasemap[0]["url"]);
       else
         layerBasemap = layerPositron;
