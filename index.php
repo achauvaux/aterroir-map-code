@@ -46,17 +46,41 @@ if ((!isset($subdomain) || $subdomain == "www") && isset($_REQUEST["s"]))
 // if (isset($_REQUEST["s"])) {
 if (isset($subdomain) && $subdomain != "www") {
   // $subdomain = $_REQUEST["s"];
-  $rsMap = getDataArrayFromProcedure("getDetailMap", $subdomain);
+  $rsMap = sendRequest('http://51.91.157.23:1338/api/maps?populate=*&filters[subdomain]=' . $subdomain, null)["data"][0]["attributes"];
+  if ($rsMap["label"]["data"])
+    $idLabel = $rsMap["label"]["data"]["id"];
+  else if ($rsMap["region"]["data"])
+    $idRegion = $rsMap["region"]["data"]["id"];
+  else if ($rsMap["country"]["data"])
+    $idCountry = $rsMap["country"]["data"]["id"];
 
-  if (isset($rsMap[0]["id_label"]))
-    $idLabel = $rsMap[0]["id_label"];
-  else if (isset($rsMap[0]["id_region"]))
-    $idRegion = $rsMap[0]["id_region"];
-  else if (isset($rsMap[0]["id_country"]))
-    $idCountry = $rsMap[0]["id_country"];
+  // if (isset($rsMap[0]["id_basemap"]))
+  //   $rsBasemap = getDataArrayFromProcedure("getDetailBasemap", $rsMap[0]["id_basemap"]);
 
-  if (isset($rsMap[0]["id_basemap"]))
-    $rsBasemap = getDataArrayFromProcedure("getDetailBasemap", $rsMap[0]["id_basemap"]);
+  $rsBasemap = null;
+}
+
+function sendRequest($url, $payload) {
+
+	$jwtToken = '6afb7b639162f356dc5f5750c8b094b7d931636b87a9402097f0614f3ef9975a5b9f37a6a776cd5eb9942a84f73a336295938027956e17302e7b9ca7d8a799ae25b30460e13e2d2602b2bd6b1bbb863323d499b4f49dea26db6775167910a5712d9cc4b6923bbfb6a0b2d3795b0291ec54c087f53d5fd19b072c8a1c1fc3d307';
+
+	$ch = curl_init($url);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+	if ($payload) {
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+	}
+
+	curl_setopt($ch, CURLOPT_HTTPHEADER, [
+		'Content-Type: application/json',
+		'Authorization: Bearer ' . $jwtToken,
+	]);
+
+	$response = curl_exec($ch);
+	curl_close($ch);
+
+	return json_decode($response, true);
 }
 
 ?>
@@ -218,8 +242,7 @@ if (isset($subdomain) && $subdomain != "www") {
 
     <?php if ($idLabel) { ?>
       idLabelMap = <?= $idLabel ?>;
-      let JSONLabel = <?= getJSONArrayFromProcedure("getDetailLabel", $idLabel); ?>; // données JSON du label (carte terroir) 
-      JSONLabelMap = JSONLabel[0];
+      JSONLabelMap = fetchStrapiData(`http://51.91.157.23:1338/api/labels/${idLabelMap}?populate[0]=name&populate[1]=region.country&populate[2]=marker_icon&populate[3]=medias.media_file&populate[4]=medias.media_icon`)['attributes'];
       typeMap = 'label';
       // isWindows = true;
     <?php } else if ($idRegion) { ?>
@@ -277,10 +300,13 @@ if (isset($subdomain) && $subdomain != "www") {
 
       if (typeMap == 'label') {
         // let bounds = new L.LatLngBounds(new L.LatLng(JSONLabelMap["bounds_top_left_lat"], JSONLabelMap["bounds_top_left_lon"]), new L.LatLng(JSONLabelMap["bounds_bottom_right_lat"], JSONLabelMap["bounds_bottom_right_lon"]));
-        if (!JSONLabelMap["bounds_top_left_lat"] || !JSONLabelMap["bounds_top_left_lon"] || !JSONLabelMap["bounds_bottom_right_lat"] || !JSONLabelMap["bounds_bottom_right_lon"])
-          bounds = new L.LatLngBounds(new L.LatLng(Number(JSONLabelMap["lat"]) - 0.5, Number(JSONLabelMap["lon"]) - 0.5), new L.LatLng(Number(JSONLabelMap["lat"]) + 0.5, Number(JSONLabelMap["lon"]) + 0.5));
-        else
+        if (!JSONLabelMap["bounds_top_left_lat"] || !JSONLabelMap["bounds_top_left_lon"] || !JSONLabelMap["bounds_bottom_right_lat"] || !JSONLabelMap["bounds_bottom_right_lon"]) {
+          let lat = JSONLabelMap["marker"]["coordinates"]["lat"];
+          let lng = JSONLabelMap["marker"]["coordinates"]["lng"];
+          bounds = new L.LatLngBounds(new L.LatLng(Number(lat) - 0.5, Number(lng) - 0.5), new L.LatLng(Number(lat) + 0.5, Number(lng) + 0.5));
+        } else {
           bounds = new L.LatLngBounds(new L.LatLng(JSONLabelMap["bounds_top_left_lat"], JSONLabelMap["bounds_top_left_lon"]), new L.LatLng(JSONLabelMap["bounds_bottom_right_lat"], JSONLabelMap["bounds_bottom_right_lon"]));
+        }
       }
 
       let centerZone;
@@ -1046,7 +1072,7 @@ if (isset($subdomain) && $subdomain != "www") {
 
         let div = L.DomUtil.create('div', 'command');
 
-        if (JSONMap) {
+        if (false) {
 
           // L.DomEvent.addListener(div, 'click', L.DomEvent.stopPropagation).addListener(div, 'click', L.DomEvent.preventDefault); // TODO : autres événements (scroll...)
           // L.DomEvent.addListener(div, 'mousewheel', L.DomEvent.stopPropagation); // .addListener(div, 'mousewheel', L.DomEvent.preventDefault);
@@ -1498,9 +1524,10 @@ if (isset($subdomain) && $subdomain != "www") {
       layerPositron = new L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png");
       layerPositronNoLabel = new L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}.png");
 
-      if (JSONbasemap.length > 0)
+      if (JSONbasemap)
         layerBasemap = new L.tileLayer(JSONbasemap[0]["url"]);
-
+      else
+        layerBasemap = layerPositron;
     }
 
     function createMenuTilesLayer() {
