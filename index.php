@@ -46,7 +46,7 @@ if ((!isset($subdomain) || $subdomain == "www") && isset($_REQUEST["s"]))
 // if (isset($_REQUEST["s"])) {
 if (isset($subdomain) && $subdomain != "www") {
   // $subdomain = $_REQUEST["s"];
-  $rsMap = sendRequest('http://51.91.157.23:1337/api/maps?populate=*&filters[subdomain]=' . $subdomain, null)["data"][0]["attributes"];
+  $rsMap = sendRequest('http://localhost:1337/api/maps?populate=*&filters[subdomain]=' . $subdomain, null)["data"][0]["attributes"];
   if ($rsMap["label"]["data"])
     $idLabel = $rsMap["label"]["data"]["id"];
   else if ($rsMap["region"]["data"])
@@ -62,7 +62,7 @@ if (isset($subdomain) && $subdomain != "www") {
 
 function sendRequest($url, $payload) {
 
-	$jwtToken = '6afb7b639162f356dc5f5750c8b094b7d931636b87a9402097f0614f3ef9975a5b9f37a6a776cd5eb9942a84f73a336295938027956e17302e7b9ca7d8a799ae25b30460e13e2d2602b2bd6b1bbb863323d499b4f49dea26db6775167910a5712d9cc4b6923bbfb6a0b2d3795b0291ec54c087f53d5fd19b072c8a1c1fc3d307';
+	$jwtToken = 'c084886539484c66d3ea808e2716fef9ac33989b4769d1ce0f086049bab0dccce4939bcea56acb9bda3f4b232b8f433bd5d71eb10177ca3f4ba35e5d44cd033d3b2adc04b8635143204a9614089a7a5021eac178b98cc046758e40dbcb866c4acbc4bf34d0d4bdd924c5df9261855a1782362902910d8fcf928ba69995776acf';
 
 	$ch = curl_init($url);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -204,13 +204,14 @@ function sendRequest($url, $payload) {
 
     let villesTerroirBourgogneJSON;
 
-    let JSONCountriesStrapi = fetchStrapiData('http://51.91.157.23:1337/api/countries?populate=*');
+    let JSONCountriesStrapi = fetchStrapiData('http://localhost:1337/api/countries?populate=*');
 
-    let JSONRegionsEUStrapi = fetchStrapiData('http://51.91.157.23:1337/api/regions?populate=*&filters[country][code_zone][$eq]=EU');
-    let JSONRegionsCNStrapi = fetchStrapiData('http://51.91.157.23:1337/api/regions?populate=*&filters[country][code_zone][$eq]=CN');
+    let JSONRegionsEUStrapi = fetchStrapiData('http://localhost:1337/api/regions?populate=*&filters[country][code_zone][$eq]=EU');
+    let JSONRegionsCNStrapi = fetchStrapiData('http://localhost:1337/api/regions?populate=*&filters[country][code_zone][$eq]=CN');
 
-    // let JSONMarkersLabelStrapi = fetchStrapiData('http://51.91.157.23:1337/api/labels?populate[region][populate][country]=*');
-    let JSONMarkersLabelStrapi = fetchStrapiData('http://51.91.157.23:1337/api/labels?populate[0]=name&populate[1]=region.country&populate[2]=marker_icon&populate[3]=medias.media_file&populate[4]=medias.media_icon');
+    // let JSONMarkersLabelStrapi = fetchStrapiData('http://localhost:1337/api/labels?populate[region][populate][country]=*');
+    let JSONMarkersLabelStrapi = fetchStrapiData('http://localhost:1337/api/labels?populate[0]=name&populate[1]=region.country&populate[2]=marker_icon&populate[3]=medias.media_file&populate[4]=medias.media_icon&populate[5]=marker');
+    // let JSONMarkersLabelStrapi = fetchStrapiData('http://localhost:1337/api/labels?populate=*');
 
     let coLang1 = "<?= $coLang1 ?>";
     let coLang2 = "<?= $coLang2 ?>";
@@ -242,7 +243,7 @@ function sendRequest($url, $payload) {
 
     <?php if ($idLabel) { ?>
       idLabelMap = <?= $idLabel ?>;
-      JSONLabelMap = fetchStrapiData(`http://51.91.157.23:1337/api/labels/${idLabelMap}?populate[0]=name&populate[1]=region.country&populate[2]=marker_icon&populate[3]=medias.media_file&populate[4]=medias.media_icon`)['attributes'];
+      JSONLabelMap = fetchStrapiData(`http://localhost:1337/api/labels/${idLabelMap}?populate[0]=name&populate[1]=region.country&populate[2]=marker_icon&populate[3]=medias.media_file&populate[4]=medias.media_icon`)['attributes'];
       typeMap = 'label';
       // isWindows = true;
     <?php } else if ($idRegion) { ?>
@@ -301,8 +302,8 @@ function sendRequest($url, $payload) {
       if (typeMap == 'label') {
         // let bounds = new L.LatLngBounds(new L.LatLng(JSONLabelMap["bounds_top_left_lat"], JSONLabelMap["bounds_top_left_lon"]), new L.LatLng(JSONLabelMap["bounds_bottom_right_lat"], JSONLabelMap["bounds_bottom_right_lon"]));
         if (!JSONLabelMap["bounds_top_left_lat"] || !JSONLabelMap["bounds_top_left_lon"] || !JSONLabelMap["bounds_bottom_right_lat"] || !JSONLabelMap["bounds_bottom_right_lon"]) {
-          let lat = JSONLabelMap["marker"]["coordinates"]["lat"];
-          let lng = JSONLabelMap["marker"]["coordinates"]["lng"];
+          let lat = JSONLabelMap["marker"]["lat"];
+          let lng = JSONLabelMap["marker"]["lng"];
           bounds = new L.LatLngBounds(new L.LatLng(Number(lat) - 0.5, Number(lng) - 0.5), new L.LatLng(Number(lat) + 0.5, Number(lng) + 0.5));
         } else {
           bounds = new L.LatLngBounds(new L.LatLng(JSONLabelMap["bounds_top_left_lat"], JSONLabelMap["bounds_top_left_lon"]), new L.LatLng(JSONLabelMap["bounds_bottom_right_lat"], JSONLabelMap["bounds_bottom_right_lon"]));
@@ -475,7 +476,7 @@ function sendRequest($url, $payload) {
         html_code = '';
         anchor_attr = '';
         if (row['type'] == 'file') {
-          href = "http://51.91.157.23:1337" + row['media_file']['data']['attributes']['url'];
+          href = "http://localhost:1337" + row['media_file']['data']['attributes']['url'];
         } else if (row['type'] == 'url') {
           href = row['url'];
         } else if (row['type'] == 'embed') {
@@ -491,7 +492,7 @@ function sendRequest($url, $payload) {
           <div class="slide">
             <p>${ pmarker.label.name["name_" + coLang1.toLowerCase()] }</p>
             <a href="${ href }" target="_blank" ${ anchor_attr }>
-              <img class="pdf-img" src="${ "http://51.91.157.23:1337" + row['media_icon']['data']['attributes']['url'] }">
+              <img class="pdf-img" src="${ "http://localhost:1337" + row['media_icon']['data']['attributes']['url'] }">
             </a>
             <!--
             <iframe src="https://www.youtube.com/embed/U0D_a_o9wcQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
@@ -652,7 +653,7 @@ function sendRequest($url, $payload) {
             style = "";
         }
 
-        let labelImage = 'http://51.91.157.23:1337' + label.marker_icon.data?.attributes.url;
+        let labelImage = 'http://localhost:1337' + label.marker_icon.data?.attributes.url;
         let toolTipContent =
           "<div id='IG-" + label["id_label"] + "' class='IG " + label["direction_heel"].toLowerCase() + "' style='" + style + "'>" +
           "<img src='" + labelImage + "' style='height:" + label["marker_icon_height"] + "px'>" +
@@ -676,8 +677,8 @@ function sendRequest($url, $payload) {
         IGTooltip.setContent(toolTipContent);
 
         // ! coordonnées inversées dans geojson umap
-        let lat = label["marker"]["coordinates"]["lat"];
-        let lon = label["marker"]["coordinates"]["lng"];
+        let lat = label["marker"]["lat"];
+        let lon = label["marker"]["lng"];
 
         log(lat);
         log(lon);
@@ -826,7 +827,7 @@ function sendRequest($url, $payload) {
             "</div>";
 
           let m = L.marker(
-            [country["marker"]["coordinates"]["lat"], country["marker"]["coordinates"]["lng"]], {
+            [country["marker"]["lat"], country["marker"]["lng"]], {
               icon: iconMarker,
               interactive: false
             }
@@ -864,9 +865,9 @@ function sendRequest($url, $payload) {
           "</div>";
 
 
-        if (region["marker"]["coordinates"]["lat"] && region["marker"]["coordinates"]["lng"]) {
+        if (region["marker"]["lat"] && region["marker"]["lng"]) {
           let m = L.marker(
-            [region["marker"]["coordinates"]["lat"], region["marker"]["coordinates"]["lng"]], {
+            [region["marker"]["lat"], region["marker"]["lng"]], {
               icon: iconMarker,
               interactive: false
             }
@@ -940,9 +941,9 @@ function sendRequest($url, $payload) {
           let country = rec.attributes;
           let flag_image_path = country.flag_image.data?.attributes.url;
           if (flag_image_path)
-            flag_image_url = "http://51.91.157.23:1337" + flag_image_path;
+            flag_image_url = "http://localhost:1337" + flag_image_path;
           else
-            flag_image_url = "http://51.91.157.23:1337/uploads/flag-europe.png";
+            flag_image_url = "http://localhost:1337/uploads/flag-europe.png";
 
           html += `
               <li class="legend-item">
@@ -970,9 +971,9 @@ function sendRequest($url, $payload) {
           let region = rec.attributes;
           let logo_image_path = region.logo_image.data?.attributes.url;
           if (logo_image_path)
-            logo_image_url = "http://51.91.157.23:1337" + logo_image_path;
+            logo_image_url = "http://localhost:1337" + logo_image_path;
           else
-            logo_image_url = "http://51.91.157.23:1337/uploads/flag_europe_76fbd4fe3d.png";
+            logo_image_url = "http://localhost:1337/uploads/flag_europe_76fbd4fe3d.png";
 
           html += `
               <li class="legend-item">
@@ -1196,13 +1197,14 @@ function sendRequest($url, $payload) {
 
     function getJSONMediasLabel(pidLabel, pcoLang) {
 
-      let jsonMedias = fetchStrapiData("http://51.91.157.23:1337/api/labels/" + pidLabel + "?populate=medias");
+      let jsonMedias = fetchStrapiData("http://localhost:1337/api/labels/" + pidLabel + "?populate=medias");
       return jsonMedias["attributes"]["medias"]["data"];
     }
 
     function getJSONPolygonsLabel(pidLabel) {
 
-      let jsonMaps = fetchStrapiData("http://51.91.157.23:1337/api/labels/" + pidLabel + "?populate=polygons");
+      let jsonMaps = fetchStrapiData("http://localhost:1337/api/labels/" + pidLabel + "?populate=polygons");
+      jsonMaps["attributes"]["polygons"]["data"]["polygons_color"] = jsonMaps["attributes"]["polygons_color"];
       return jsonMaps["attributes"]["polygons"]["data"];
     }
 
@@ -1316,11 +1318,12 @@ function sendRequest($url, $payload) {
 
       for (let rec of JSONPolygonsLabel) {
         let pol = rec.attributes;
-        let polMapJSON = loadJSON('http://51.91.157.23:1337' + pol.url);
+        let pol_color = JSONPolygonsLabel.polygons_color;
+        let polMapJSON = loadJSON('http://localhost:1337' + pol.url);
         let tempLayer = L.geoJSON(polMapJSON, {
           onEachFeature: function(feature, layer) {},
           style: {
-            color: pol['color'] || "red",
+            color: pol_color,
             fillOpacity: pol['opacity'] || 0.2,
             weight: 0
           }
@@ -1894,7 +1897,7 @@ function sendRequest($url, $payload) {
         if (!labelDataExists[pid]) {
           // createLayerMarkersPILabel(pid);
           listImagesAndPolygonsLabel = [];
-          createLabelImages(pid);
+          // createLabelImages(pid);
           createLabelPolygons(pid);
           if (listImagesAndPolygonsLabel.length > 0)
             listLayerImagesAndPolygonsLabel[pid] = L.featureGroup(listImagesAndPolygonsLabel);
@@ -1990,7 +1993,7 @@ function sendRequest($url, $payload) {
     }
 
     // URL de l'API Strapi pour l'entité 'country'
-    // const url = 'http://51.91.157.23:1337/api/countries?populate=*';
+    // const url = 'http://localhost:1337/api/countries?populate=*';
 
     // Fonction asynchrone pour récupérer les enregistrements de 'country'
     function fetchStrapiData(url) {
@@ -2001,7 +2004,7 @@ function sendRequest($url, $payload) {
         type: "GET",
         headers: {
           // Ajoutez l'en-tête 'Authorization' si nécessaire
-          'Authorization': 'Bearer 6afb7b639162f356dc5f5750c8b094b7d931636b87a9402097f0614f3ef9975a5b9f37a6a776cd5eb9942a84f73a336295938027956e17302e7b9ca7d8a799ae25b30460e13e2d2602b2bd6b1bbb863323d499b4f49dea26db6775167910a5712d9cc4b6923bbfb6a0b2d3795b0291ec54c087f53d5fd19b072c8a1c1fc3d307',
+          'Authorization': 'Bearer c084886539484c66d3ea808e2716fef9ac33989b4769d1ce0f086049bab0dccce4939bcea56acb9bda3f4b232b8f433bd5d71eb10177ca3f4ba35e5d44cd033d3b2adc04b8635143204a9614089a7a5021eac178b98cc046758e40dbcb866c4acbc4bf34d0d4bdd924c5df9261855a1782362902910d8fcf928ba69995776acf',
           'Content-Type': 'application/json',
         },
         async: false, // Mode synchrone indispensable
