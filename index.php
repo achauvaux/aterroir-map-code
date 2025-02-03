@@ -922,7 +922,7 @@ function sendRequest($url, $payload) {
             <img src="medias/img/icones-aterroir/Bouton F Pays.png">
           </div>
           <div class="menu-item" onmouseenter="openRight('F1-regions');">
-            <img src="medias/img/icones-aterroir/Bouton F Regions.png">
+            <img src="medias/img/icones-aterroir/Bouton F Régions.png">
           </div>
           <div class="menu-item" onmouseenter="openRight('F1-infos');">
             <img src="medias/img/icones-aterroir/Bouton F InfoSite.png">

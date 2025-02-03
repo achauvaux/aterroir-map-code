@@ -48,7 +48,7 @@ function sendRequest($url, $payload) {
 <div id="F2" class="aterroir-window">
   <section class="left">
     <div class="menu-item" onmouseenter="openRight('F2-regions');">
-      <img src="medias/img/icones-aterroir/Bouton F Regions.png">
+      <img src="medias/img/icones-aterroir/Bouton F Régions.png">
     </div>
     <div class="menu-item" onmouseenter="openRight('F2-region-labels');">
       <img src="medias/img/icones-aterroir/Bouton F Terroir.png">
