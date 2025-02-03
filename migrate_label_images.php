@@ -106,6 +106,8 @@ function findStrapiLabelIdByName($name) {
 
         if ($id == null) {
             echo "Label $name not found.<br>";
+        } else {
+            echo "Label $name found with ID $id.<br>";
         }
 
         return $id;
