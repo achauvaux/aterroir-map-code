@@ -8,15 +8,15 @@ $jwtToken = '6afb7b639162f356dc5f5750c8b094b7d931636b87a9402097f0614f3ef9975a5b9
 $code_region = $_REQUEST["code_region"];
 // $id_region=$_REQUEST["id_region"];
 
-$rsRegion = sendRequest('http://51.91.157.23:1338/api/regions?populate=*&filters[code_nuts]=' . $code_region, null)['data'];
+$rsRegion = sendRequest('http://51.91.157.23:1337/api/regions?populate=*&filters[code_nuts]=' . $code_region, null)['data'];
 
 if (empty($rsRegion)) return;
 
 $id_region = $rsRegion[0]["id"];
 $id_country = $rsRegion[0]["attributes"]["country"]["data"]["id"];
 
-$rsRegions = sendRequest('http://51.91.157.23:1338/api/regions?populate=*&filters[country][id]=' . $id_country, null)['data'];
-$rsLabels = sendRequest('http://51.91.157.23:1338/api/labels?populate=*&filters[region][id]=' . $id_region, null)['data'];
+$rsRegions = sendRequest('http://51.91.157.23:1337/api/regions?populate=*&filters[country][id]=' . $id_country, null)['data'];
+$rsLabels = sendRequest('http://51.91.157.23:1337/api/labels?populate=*&filters[region][id]=' . $id_region, null)['data'];
 $rsOTs = [];
 
 // create a generic to make an API call to Strapi
@@ -74,9 +74,9 @@ function sendRequest($url, $payload) {
           $row = $rec["attributes"];
           $logo_image_path = $row["logo_image"]["data"]["attributes"]["url"];
           if ($logo_image_path)
-            $logo_image_url = "http://51.91.157.23:1338" . $logo_image_path;
+            $logo_image_url = "http://51.91.157.23:1337" . $logo_image_path;
           else
-            $logo_image_url = "http://51.91.157.23:1338/uploads/flag_europe_76fbd4fe3d.png";
+            $logo_image_url = "http://51.91.157.23:1337/uploads/flag_europe_76fbd4fe3d.png";
         ?>
           <li class="legend-item">
             <div class="flag">
@@ -101,7 +101,7 @@ function sendRequest($url, $payload) {
         <?php foreach ($rsLabels as $rec) {
           $id_label = $rec["id"];
           $row = $rec["attributes"];
-          $label_image = "http://51.91.157.23:1338" . $row["marker_icon"]["data"]["attributes"]["url"];
+          $label_image = "http://51.91.157.23:1337" . $row["marker_icon"]["data"]["attributes"]["url"];
         ?>
           <li class="legend-item">
             <div class="icon-label">

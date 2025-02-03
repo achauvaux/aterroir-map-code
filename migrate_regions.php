@@ -14,11 +14,11 @@ echo "Migrating regions to Strapi...<br>";
 $rsRegions = getDataArrayFromProcedure("getListRegions", null, null);
 
 // Votre token JWT pour l'authentification API Strapi
-$jwtToken = '6afb7b639162f356dc5f5750c8b094b7d931636b87a9402097f0614f3ef9975a5b9f37a6a776cd5eb9942a84f73a336295938027956e17302e7b9ca7d8a799ae25b30460e13e2d2602b2bd6b1bbb863323d499b4f49dea26db6775167910a5712d9cc4b6923bbfb6a0b2d3795b0291ec54c087f53d5fd19b072c8a1c1fc3d307';
+$jwtToken = 'c084886539484c66d3ea808e2716fef9ac33989b4769d1ce0f086049bab0dccce4939bcea56acb9bda3f4b232b8f433bd5d71eb10177ca3f4ba35e5d44cd033d3b2adc04b8635143204a9614089a7a5021eac178b98cc046758e40dbcb866c4acbc4bf34d0d4bdd924c5df9261855a1782362902910d8fcf928ba69995776acf';
 
 // $g = new Geohash();
 
-$jsonCountries = sendRequest('http://localhost:1338/api/countries', null);
+$jsonCountries = sendRequest('http://localhost:1337/api/countries', null);
 
 // create countries array from $jsonCountries indexec by code_nuts
 $countries = [];
@@ -46,7 +46,7 @@ foreach ($rsRegions as $region) {
 				'name_cn' => $region['name_CN'],
 				'name_local' => $region['name_local']
 			],
-      'capital' => [
+      		'capital' => [
 				'name_en' => $region['name_capital_region'],
 				'name_fr' => $region['name_capital_region'],
 				'name_cn' => $region['name_CN'],
@@ -54,10 +54,10 @@ foreach ($rsRegions as $region) {
 			],
 			'direction_heel' => ucfirst(strtolower($region['direction_heel'] == '' ? 'Bottom' : $region['direction_heel'])),
 			'marker' => [
-				'coordinates' => [
+				// 'coordinates' => [
 					'lat' => $region['lat_capital'],
 					'lng' => $region['lon_capital'],
-				],
+				// ],
 				// 'geohash' => $geohash
 			],
 			'country' => [ $countries[$region['code_country']] ]
@@ -67,7 +67,7 @@ foreach ($rsRegions as $region) {
 	// Envoi de la requête à Strapi
 	if (true) {
 		// Traitement de la réponse
-		$responseData = sendRequest('http://localhost:1338/api/regions', $payload);
+		$responseData = sendRequest('http://localhost:1337/api/regions', $payload);
 		if (isset($responseData['data'])) {
 			print "Région " . $region['name_FR'] . " ajouté à Strapi avec les détails du marker.<br>";
 		} else {

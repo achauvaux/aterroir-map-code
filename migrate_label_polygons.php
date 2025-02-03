@@ -13,8 +13,8 @@ echo "Migrating labels polygons to Strapi...<br>";
 
 $rsPolygons = getDataArrayFromProcedure("getListLabelPolygons", null, null, null);
 
-$strapiUrl = 'http://localhost:1338/api/labels';
-$strapiBaseUrl = 'http://localhost:1338';
+$strapiUrl = 'http://localhost:1337/api/labels';
+$strapiBaseUrl = 'http://localhost:1337';
 
 // Votre token JWT pour l'authentification API Strapi
 $jwtToken = '6afb7b639162f356dc5f5750c8b094b7d931636b87a9402097f0614f3ef9975a5b9f37a6a776cd5eb9942a84f73a336295938027956e17302e7b9ca7d8a799ae25b30460e13e2d2602b2bd6b1bbb863323d499b4f49dea26db6775167910a5712d9cc4b6923bbfb6a0b2d3795b0291ec54c087f53d5fd19b072c8a1c1fc3d307';

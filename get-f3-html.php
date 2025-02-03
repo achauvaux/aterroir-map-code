@@ -8,11 +8,11 @@ $jwtToken = '6afb7b639162f356dc5f5750c8b094b7d931636b87a9402097f0614f3ef9975a5b9
 $id_label = $_REQUEST["id_label"];
 
 // get label from strapi
-$rsLabel = sendRequest('http://51.91.157.23:1338/api/labels/' . $id_label . '?populate=*', null)['data'];
+$rsLabel = sendRequest('http://51.91.157.23:1337/api/labels/' . $id_label . '?populate=*', null)['data'];
 
 $id_region = $rsLabel["attributes"]["region"]["data"]["id"];
 
-$rsLabels = sendRequest('http://51.91.157.23:1338/api/labels?populate=*&filters[region][id]=' . $id_region, null)['data'];
+$rsLabels = sendRequest('http://51.91.157.23:1337/api/labels?populate=*&filters[region][id]=' . $id_region, null)['data'];
 $rsOTs = [];
 $rsPICategories =[];
 $rsPIs = [];
@@ -78,7 +78,7 @@ function sendRequest($url, $payload) {
           foreach ($rsLabels as $rec) {
             $id_label_tmp = $rec["id"];
             $row = $rec["attributes"];
-            $label_image = "http://51.91.157.23:1338" . $row["marker_icon"]["data"]["attributes"]["url"];
+            $label_image = "http://51.91.157.23:1337" . $row["marker_icon"]["data"]["attributes"]["url"];
         ?>
           <li class="legend-item">
             <div class="icon-label">
